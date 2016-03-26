@@ -6,7 +6,7 @@ This project serves two purposes:
   1. Get some hands-on with starting and maintaining a project.
   2. To create an awesome module
 
-so I'm not going to accept any pull request.
+so I'm not going to accept any pull requests.
 
 
 Ajax Servant
