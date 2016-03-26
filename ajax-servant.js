@@ -72,6 +72,9 @@ var AjaxServant = (function (win, doc) {
 			this.open();
 			this.setHeaders();
 			this.send();
+		},
+		die () {
+			// remove listeners
 		}
 	};
 
