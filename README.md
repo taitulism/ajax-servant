@@ -1,2 +1,3 @@
 # ajax-servant
+## A WORK IN PROGRESS...
 A javascript client-side class to create dedicated ajax services.
