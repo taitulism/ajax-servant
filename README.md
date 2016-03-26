@@ -1,4 +1,4 @@
-Ajax Servant
+Ajax Servant (A WORK IN PROGRESS...)
 ============
 A javascript client-side class to create dedicated ajax services.
 
