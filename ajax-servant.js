@@ -38,15 +38,18 @@ var AjaxServant = (function (win, doc) {
 	var proto = {
 		whois: 'AjaxServant',
 		constructor: AjaxServant,
-		config: function (verb = 'GET', url = '/', options = defaultOptions) {
+		config (verb = 'GET', url = '/', options = defaultOptions) {
 			this.verb  = verb;
 			this.url   = url;
 			this.async = (typeof options.async === 'undefined') ? true : options.async;
 		},
-		open: function () {
+		on (eventName, cbFn) {
+
+		},
+		open () {
 			this.xhr.open(this.verb, this.url, this.async);
 		},
-		setHeaders: function () {
+		setHeaders () {
 			if (!this.headers || typeof this.headers !== 'object') {return null;}
 
 			const xhr = this.xhr;
@@ -55,14 +58,14 @@ var AjaxServant = (function (win, doc) {
 				xhr.setRequestHeader(key, value);
 			});
 		},
-		setHeader: function (key, value) {
+		setHeader (key, value) {
 			xhr.setRequestHeader(key, value);
 		},
-		send: function (urlParams, data) {
+		send (urlParams, data) {
 			data = JSON.stringify(data);
 			this.xhr.send(data || null);
 		},
-		abort: function () {
+		abort () {
 			this.xhr.abort();
 		},
 		go () {
