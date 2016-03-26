@@ -1,7 +1,6 @@
 About this Project
 ------------------
-
-- A WORK IN PROGRESS...
+**A WORK IN PROGRESS...**
 
 This project serves two purposes:
   1. Get some hands-on with startin and maintaining a project.
@@ -10,7 +9,7 @@ This project serves two purposes:
 so I'm not going to accept any pull request.
 
 
-Ajax Servant (A WORK IN PROGRESS...)
+Ajax Servant
 ============
 A javascript client-side class to create dedicated ajax services.
 
