@@ -7,14 +7,13 @@
 	<body>
 		
 		
-	<script src="../src.js"></script>
+	<script src="ajax-servant.js"></script>
 	<script src="main.js"></script>
 	<script>
 	//-------------------------------
 		runTests();
 
-
-		var servant = new AjaxServant();
+		var servant = new AjaxServant('GET', '/api');
 
 		console.log(servant)
 

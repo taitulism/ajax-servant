@@ -1,0 +1,33 @@
+{
+  "name": "ajax-servant",
+  "version": "0.0.0",
+  "description": "A javascript client-side class to create dedicated ajax services",
+  "main": "src.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taitulism/ajax-servant.git"
+  },
+  "keywords": [
+    "ajax",
+    "xhr",
+    "XMLHttpRequest",
+    "xmlhttprequest",
+    "servant"
+  ],
+  "author": "Taitulism",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/taitulism/ajax-servant/issues"
+  },
+  "homepage": "https://github.com/taitulism/ajax-servant#readme",
+  "devDependencies": {
+    "a-server": "0.0.2",
+    "serve-static": "^1.10.2"
+  }
+}
