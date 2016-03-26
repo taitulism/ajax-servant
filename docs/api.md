@@ -46,11 +46,11 @@ servant.onStatus(404, notOKFn);
 
 send / abort
 ```js
-servat.send(['id', 3], {qry: 'str'});
+servant.send(['id', 3], {qry: 'str'});
 
 OR
 
-servat.send({
+servant.send({
 	params: ['id', 3],
 	qrStr: {qry: 'str'},
 	headers: {k: 'v'},
