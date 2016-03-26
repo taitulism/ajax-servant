@@ -1,3 +1,5 @@
+**THIS MODULE IS A WORK IN PROGRESS**
+
 import / require
 ```js
 import AjaxServant from 'ajax-servant';
