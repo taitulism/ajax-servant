@@ -36,15 +36,10 @@ servant.config(options);
 Bind events
 -----------
 ```js
-servant.beforeSend(pushState);
-servant.onResponse(validateResponse);
-servant.onComplete(updateSomething);
-
-servant.on('abort', abortFn);
-servant.on('timeout', timeoutFn);
-
 servant.onStatus(200, OKFn);
 servant.onStatus(404, notOKFn);
+servant.onSuccess(OKFn);
+servant.onFail(notOKFn);
 ```
 
 
@@ -57,7 +52,7 @@ servant.send(['id', 3], {qry: 'str'});
 OR
 
 servant.send({
-	params: ['id', 3],
+	urlParams: ['id', 3],
 	qrStr: {qry: 'str'},
 	headers: {k: 'v'},
 	body: 'bla bla bla'
