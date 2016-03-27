@@ -5,6 +5,7 @@ var serve = serveStatic(`${__dirname}/public`, {'index': 'index.html'});
 var log = console.log;
 
 log(__dirname)
+
 aServer.start(function (req, res) {
 	if (req.url === '/favicon.ico') {
 		res.end();

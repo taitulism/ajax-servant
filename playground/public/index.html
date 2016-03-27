@@ -17,12 +17,31 @@
 
 		console.log(servant)
 
-		servant.go();
+		servant
+			.on('start', {ctx:1}, function (response, servant, ajaxEvent) {
+				console.log('first ("before send")')
+			})
 
-		servant.dismiss();
-		servant.dismiss();
+			.on('load', function (response, servant, ajaxEvent) {
+				console.log('load - got a response')
+			})
 
-		console.log(servant)
+			.on('abort', function (response, servant, ajaxEvent) {
+				console.log('aborted')
+			})
+
+			.on('error', function (response, servant, ajaxEvent) {
+				console.log('error')
+			})
+
+			.on('end', function (response, servant, ajaxEvent) {
+				console.log('last')
+			})
+
+			.go();
+
+
+
 
 	//-------------------------------
 	</script>

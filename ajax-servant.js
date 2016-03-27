@@ -1,4 +1,45 @@
 var AjaxServant = (function (win, doc) {
+	'use strict';
+
+	const defaultOptions = {
+		async: true
+	};
+
+	const eventsDict = {
+		readystatechange : 'readystatechange',
+		rsc       : 'readystatechange',
+		err       : 'error',
+		end       : 'loadend',
+		load      : 'load',
+		prog      : 'progress',
+		error     : 'error',
+		start     : 'loadstart',
+		abort     : 'abort',
+		timeout   : 'timeout',
+		loadend   : 'loadend',
+		complete  : 'loadend',
+		progress  : 'progress',
+		response  : 'load',
+		loadstart : 'loadstart',
+		resolve          : function (eventName) {
+			eventName = eventName.toLowerCase();
+
+			if (this.hasOwnProperty(eventName) && eventName !== 'resolve') {
+				return this[eventName];
+			}
+
+			return null;
+		}
+	};
+
+	const eventsWrappers = {
+		readystatechange () {},
+		progress () {},
+		timeout () {}
+	};
+
+		// "loadend" event is triggered after: "load, "abort" and "error".
+		// i.e. Done, but result is unknown.
 	// private funcs
 	function forIn (obj, cbFn) {
 		var key;
@@ -23,9 +64,6 @@ var AjaxServant = (function (win, doc) {
 		return new XMLHttpRequest();
 	}
 
-	const defaultOptions = {
-		async: true
-	};
 
 	class AjaxServant {
 		constructor (verb = 'GET', url = '/', options = defaultOptions) {
@@ -43,8 +81,81 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
-		on (eventName, cbFn) {
+		createEventObj (nativeName) {
+			return {
+				queue: [],
+				wrapper: null
+			};
+		}
+
+		getEventQueue (nativeName) {
+			return this.events[nativeName].queue;
+		}
+
+		getResponse () {
+			const xhr = this.xhr;
+
+			return {
+				status: {
+					code: xhr.status,
+					text: xhr.statusText
+				},
+				headers: xhr.getAllResponseHeaders(),
+				body: xhr.responseText || xhr.responseXML
+			};
+		}
+
+		getDefaultWrapper (nativeName) {
+			const ajaxServant = this;
+			const queue = ajaxServant.getEventQueue(nativeName);
+
+			return function (ajaxEvent) {
+				const response = ajaxServant.getResponse();
+
+				queue.forEach(cbObj => {
+					const {ctx, fn} = cbObj;
+
+					fn.apply(ctx, [response, ajaxServant, ajaxEvent]);
+				});
+			};
+		}
+
+		getWrapper (nativeName) {
+			return (eventsWrappers[nativeName])
+				? eventsWrappers[nativeName].call(this, nativeName)
+				: this.getDefaultWrapper(nativeName);
+		}
+
+		on (eventName, ctx, cbFn) {
 			this.xhr = this.xhr || createXHR();
+
+			// shift args
+			if (!cbFn && typeof ctx === 'function') {
+				cbFn = ctx;
+				ctx = this.ctx || this;
+			}
+
+			// validate eventName
+			const nativeName = eventsDict.resolve(eventName);
+			if (!nativeName) {return this;}
+
+			// get or create eventObj
+			const eventObj = this.events[nativeName] || this.createEventObj(nativeName);
+
+			// add to queue
+			eventObj.queue.push({
+				ctx,
+				fn: cbFn
+			});
+
+			// if wrapper hasn't been set -> set it
+			if (!eventObj.wrapper) {
+				this.events[nativeName] = eventObj;
+
+				eventObj.wrapper = this.getWrapper(nativeName);
+
+				this.xhr.addEventListener(nativeName, eventObj.wrapper)
+			}
 
 			return this;
 		}
