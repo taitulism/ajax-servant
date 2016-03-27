@@ -27,36 +27,36 @@ var AjaxServant = (function (win, doc) {
 		async: true
 	};
 
-	// constructor
-	var AjaxServant = function (verb = 'GET', url = '/', options = defaultOptions) {
-		this.events = {};
-		this.xhr = createXHR();
-		this.config(verb, url, options);
-	}
+	class AjaxServant {
+		constructor (verb = 'GET', url = '/', options = defaultOptions) {
+			this.whois = 'AjaxServant';
+			this.events = {};
+			this.xhr = createXHR();
+			this.config(verb, url, options);
+		}
 
-	// constructor prototype
-	var proto = {
-		whois: 'AjaxServant',
-		constructor: AjaxServant,
 		config (verb = 'GET', url = '/', options = defaultOptions) {
 			this.verb  = verb;
 			this.url   = url;
 			this.async = (typeof options.async === 'undefined') ? true : options.async;
 
 			return this;
-		},
+		}
+
 		on (eventName, cbFn) {
 			this.xhr = this.xhr || createXHR();
 
 			return this;
-		},
+		}
+
 		open () {
 			this.xhr = this.xhr || createXHR();
 
 			this.xhr.open(this.verb, this.url, this.async);
 
 			return this;
-		},
+		}
+
 		setHeaders () {
 			if (!this.headers || typeof this.headers !== 'object') {return null;}
 
@@ -69,14 +69,16 @@ var AjaxServant = (function (win, doc) {
 			});
 
 			return this;
-		},
+		}
+
 		setHeader (key, value) {
 			this.xhr = this.xhr || createXHR();
 
 			xhr.setRequestHeader(key, value);
 
 			return this;
-		},
+		}
+
 		send (urlParams, data) {
 			this.xhr = this.xhr || createXHR();
 
@@ -84,12 +86,14 @@ var AjaxServant = (function (win, doc) {
 			this.xhr.send(data || null);
 
 			return this;
-		},
+		}
+
 		abort () {
 			this.xhr && this.xhr.abort();
 
 			return this;
-		},
+		}
+
 		go () {
 			this.xhr = this.xhr || createXHR();
 
@@ -98,7 +102,8 @@ var AjaxServant = (function (win, doc) {
 			this.send();
 
 			return this;
-		},
+		}
+
 		dismiss () {
 			var xhr = this.xhr;
 
@@ -113,9 +118,7 @@ var AjaxServant = (function (win, doc) {
 
 			return this;
 		}
-	};
-
-	AjaxServant.prototype = proto;
+	}
 
 	return AjaxServant;
 
