@@ -4,7 +4,7 @@ About this Project
 
 This project serves two purposes:
   1. Get some hands-on with starting and maintaining a project.
-  2. To create an awesome module
+  2. Create an awesome module
 
 so I won't be taking any pull requests. For now.
 
@@ -26,3 +26,5 @@ With today's js programming concepts, an ajax request will be triggered by a spe
 A component will usually have just a couple of requests it uses to the same API, with the same methods (GET, POST...) and the only thing that changes is the payload (dynamic data).
 
 An **Ajax Servant** instance is a pre-configured ajax request object that you configure once (i.e. in myConroller.init()) and use multiple times (i.e. in myController.addItem()), using the same XHR instance.
+
+[See API](https://github.com/taitulism/ajax-servant/blob/master/docs/api.md)
