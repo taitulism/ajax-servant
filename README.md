@@ -4,7 +4,7 @@ About this Project
 
 This project serves two purposes:
   1. Get some hands-on with starting and maintaining a project.
-  2. To create an awesome module
+  2. Create an awesome module
 
 so I won't be taking any pull requests. For now.
 
