@@ -19,7 +19,8 @@ Init
 ----
 ```js
 const options = {
-	async: true
+	async: true,
+	ctx: {a:1}
 };
 
 const servant = new AjaxServant('GET', '/api/user', options);
