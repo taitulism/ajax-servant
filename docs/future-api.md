@@ -1,6 +1,7 @@
 **THIS MODULE IS A WORK IN PROGRESS**
 
-import / require
+Usage
+-----
 ```js
 import AjaxServant from 'ajax-servant';
 // OR
@@ -9,7 +10,8 @@ const AjaxServant = require('ajax-servant');
 
 
 
-init
+Init
+----
 ```js
 const options = {
 	async: true,
@@ -31,7 +33,8 @@ servant.config(options);
 
 
 
-config
+Bind events
+-----------
 ```js
 servant.beforeSend(pushState);
 servant.onResponse(validateResponse);
@@ -46,7 +49,8 @@ servant.onStatus(404, notOKFn);
 
 
 
-send / abort
+Send / Abort
+------------
 ```js
 servant.send(['id', 3], {qry: 'str'});
 
