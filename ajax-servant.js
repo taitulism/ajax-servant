@@ -116,8 +116,9 @@ var AjaxServant = (function (win, doc) {
 		config (verb = 'GET', baseUrl = '/', options = defaultOptions) {
 			this.verb       = verb;
 			this.baseUrl    = baseUrl;
-			this.ctx        = options.ctx || this;
-			this.baseQryStr = options.qryStr || {};
+			this.ctx        = options.ctx      || this;
+			this.baseQryStr = options.qryStr   || {};
+			this.baseHeaders = options.headers || {};
 			this.async      = (typeof options.async === 'undefined') ? true : options.async;
 
 			if (options.breakCache) {
@@ -154,13 +155,15 @@ var AjaxServant = (function (win, doc) {
 		setHeaders (headers) {
 			const fullHeaders = this.getFullHeaders(headers);
 
-			if (!this.headers || typeof this.headers !== 'object') {return null;}
+			if (!fullHeaders) {
+				return null;
+			}
 
 			this.xhr = this.xhr || createXHR();
 
 			const xhr = this.xhr;
 
-			forIn(this.headers, function (key, value) {
+			forIn(fullHeaders, function (key, value) {
 				xhr.setRequestHeader(key, value);
 			});
 
