@@ -12,8 +12,11 @@
 	<script>
 	//-------------------------------
 		// runTests();
-
-		var servant = new AjaxServant('GET', '/xxxxxxxx', {ctx:{b:2}});
+		const opts = {
+			ctx:{b:2},
+			qryStr: {def: 'DEF'}
+		}
+		var servant = new AjaxServant('GET', '/api', opts);
 
 
 		servant
@@ -26,7 +29,6 @@
 				params: ['a','b','c'],
 				qryStr: {a:1, b:2}
 			})
-			.send()
 
 
 

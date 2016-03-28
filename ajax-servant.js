@@ -108,11 +108,11 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		config (verb = 'GET', baseUrl = '/', options = defaultOptions) {
-			this.verb        = verb;
-			this.baseUrl     = baseUrl;
-			this.baseQryStrObj = {};
-			this.ctx         = options.ctx;
-			this.async       = (typeof options.async === 'undefined') ? true : options.async;
+			this.verb       = verb;
+			this.baseUrl    = baseUrl;
+			this.ctx        = options.ctx || this;
+			this.baseQryStr = options.qryStr || {};
+			this.async      = (typeof options.async === 'undefined') ? true : options.async;
 
 			return this;
 		}
@@ -192,7 +192,7 @@ var AjaxServant = (function (win, doc) {
 			// shift args
 			if (!cbFn && typeof ctx === 'function') {
 				cbFn = ctx;
-				ctx = this.ctx || this;
+				ctx = this.ctx;
 			}
 
 			// validate eventName
@@ -239,7 +239,7 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		getFullQueryString (qryStrObj) {
-			const queryString = stringifyAll(this.baseQryStrObj, qryStrObj);
+			const queryString = stringifyAll(this.baseQryStr, qryStrObj);
 			log('qs', queryString)
 			return queryString ? '?' + queryString : '';
 		}
