@@ -181,20 +181,28 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
-		getUrl () {
-			const baseUrl = normalizeBaseUrl(this.baseUrl);
-			const urlParams = this.urlParams.join('/');
-			const queryString = this.getQueryString();
+		getUrlParams () {
+			if (!this.urlParams.length) {
+				return '';
+			}
 
-			return `${baseUrl}/${urlParams}`;
-			// ?${queryString}`;
+			return '/' + this.urlParams.join('/');
 		}
 
 		getQueryString () {
-			if (this.qryStrObj.active) {
-				return JSON.stringify(this.qryStrObj);
+			if (!Object.keys(this.qryStrObj).length) {
+				return '';
 			}
-			return '';
+			return '?' + JSON.stringify(this.qryStrObj);
+		}
+
+		getUrl () {
+			const baseUrl = normalizeBaseUrl(this.baseUrl);
+			const urlParams = this.getUrlParams();
+			const queryString = this.getQueryString();
+
+			return baseUrl + urlParams + queryString;
+			// ?${queryString}`;
 		}
 
 		open () {

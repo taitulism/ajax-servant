@@ -13,7 +13,7 @@
 	//-------------------------------
 		// runTests();
 
-		var servant = new AjaxServant('GET', '/api', {ctx:{b:2}});
+		var servant = new AjaxServant('GET', '/api/', {ctx:{b:2}});
 
 
 		servant
@@ -22,7 +22,7 @@
 				console.log('Response:', response.body)
 			})
 
-			.send(['a','b','c']);
+			.send(['/a','b']);
 
 
 
