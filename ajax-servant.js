@@ -101,15 +101,14 @@ var AjaxServant = (function (win, doc) {
 
 // Class
 	class AjaxServant {
-		constructor (verb = 'GET', baseUrl = '/', options = defaultOptions) {
+		constructor (baseUrl = '/', options = defaultOptions) {
 			this.whois = 'AjaxServant';
 			this.events = {};
 			this.xhr = createXHR();
-			this.config(verb, baseUrl, options);
+			this.config(baseUrl, options);
 		}
 
-		config (verb = 'GET', baseUrl = '/', options = defaultOptions) {
-			this.verb        = verb;
+		config (baseUrl = '/', options = defaultOptions) {
 			this.baseUrl     = baseUrl;
 			this.urlParams   = [];
 			this.qryStrObj   = {};
@@ -228,12 +227,12 @@ var AjaxServant = (function (win, doc) {
 			return baseUrl + urlParams + queryString;
 		}
 
-		open () {
+		open (verb = 'GET') {
 			this.xhr = this.xhr || createXHR();
 
 			log('URL:', this.getUrl())
 
-			this.xhr.open(this.verb, this.getUrl(), this.async);
+			this.xhr.open(verb, this.getUrl(), this.async);
 
 			return this;
 		}
@@ -267,7 +266,7 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		// TODO: move data handling to .open .setHeaders
-		send (urlParams, qryStrObj, data) {
+		send (verb, urlParams, qryStrObj, data) {
 			this.xhr = this.xhr || createXHR();
 
 			if (Array.isArray(urlParams)) {
@@ -278,13 +277,26 @@ var AjaxServant = (function (win, doc) {
 				this.qryStrObj = qryStrObj;
 			}
 
-			this.open();
+			this.open(verb);
 			this.setHeaders();
 
 			data = JSON.stringify(data);
 			this.xhr.send(data || null);
 
 			return this;
+		}
+
+		GET (...args) {
+			this.send('GET', ...args);
+		}
+		POST (...args) {
+			this.send('POST', ...args);
+		}
+		PUT (...args) {
+			this.send('PUT', ...args);
+		}
+		DELETE (...args) {
+			this.send('DELETE', ...args);
 		}
 
 		dismiss () {

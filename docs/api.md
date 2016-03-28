@@ -44,12 +44,28 @@ servant.on(eventName, context, callback);
 Send / Abort
 ------------
 ```js
-servant.send(['id', 3], {qry: 'str'});
+servant.GET(requestObj);
+servant.POST(requestObj);
+servant.PUT(requestObj);
+servant.DELETE(requestObj);
 
+servant.send(verb, requestObj);
 
 servant.abort();
 ```
 
+
+
+Request Object
+--------------
+```js
+{
+	urlParams : ['id', 3],
+	qrStr     : {qry: 'str'},
+	headers   : {k: 'v'},
+	body      : 'bla bla bla'
+}
+```
 
 
 
