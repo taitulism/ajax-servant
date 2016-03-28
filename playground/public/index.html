@@ -11,37 +11,50 @@
 	<script src="main.js"></script>
 	<script>
 	//-------------------------------
-		runTests();
+		// runTests();
 
 		var servant = new AjaxServant('GET', '/api', {ctx:{b:2}});
 
-		console.log(servant)
 
 		servant
-			.on('start', {ctx:1}, function (response, servant, ajaxEvent) {
-				console.log(1, this)
-				console.log('first ("before send")')
-			})
-
 			.on('load', function (response, servant, ajaxEvent) {
-				console.log(2, this)
-				console.log('load - got a response')
+				// console.log('load - got a response')
+				console.log('Response:', response.body)
 			})
 
-			.on('abort', function (response, servant, ajaxEvent) {
-				console.log('aborted')
-			})
+			.send(['a','b','c']);
 
-			.on('error', function (response, servant, ajaxEvent) {
-				console.log('error')
-			})
 
-			.on('end', function (response, servant, ajaxEvent) {
-				console.log(3, this)
-				console.log('last')
-			})
 
-			.send();
+
+
+
+
+
+
+
+
+
+		// console.log(servant)
+
+			// .on('start', {ctx:1}, function (response, servant, ajaxEvent) {
+			// 	console.log('first ("before send")')
+			// })
+
+
+			// .on('abort', function (response, servant, ajaxEvent) {
+			// 	console.log('aborted')
+			// })
+
+			// .on('error', function (response, servant, ajaxEvent) {
+			// 	console.log('error')
+			// })
+
+			// .on('end', function (response, servant, ajaxEvent) {
+			// 	console.log(3, this)
+			// 	console.log('last')
+			// })
+
 
 
 

@@ -1,6 +1,7 @@
 var AjaxServant = (function (win, doc) {
 	'use strict';
 
+// private vars
 	const defaultOptions = {
 		async: true,
 		ctx: null
@@ -41,7 +42,8 @@ var AjaxServant = (function (win, doc) {
 
 		// "loadend" event is triggered after: "load, "abort" and "error".
 		// i.e. Done, but result is unknown.
-	// private funcs
+
+// Private functions
 	function forIn (obj, cbFn) {
 		var key;
 		var hasOwn = Object.hasOwnProperty;
@@ -65,20 +67,37 @@ var AjaxServant = (function (win, doc) {
 		return new XMLHttpRequest();
 	}
 
+	function normalizeBaseUrl (baseUrl) {
+		if (baseUrl === '/') {
+			return '';
+		}
 
+		const len = baseUrl.length;
+
+		if (baseUrl[len-1] === '/') {
+			return baseUrl.substr(0, len-1);
+		}
+
+		return baseUrl;
+	}
+
+// Class
 	class AjaxServant {
-		constructor (verb = 'GET', url = '/', options = defaultOptions) {
+		constructor (verb = 'GET', baseUrl = '/', options = defaultOptions) {
 			this.whois = 'AjaxServant';
 			this.events = {};
 			this.xhr = createXHR();
-			this.config(verb, url, options);
+			this.config(verb, baseUrl, options);
 		}
 
-		config (verb = 'GET', url = '/', options = defaultOptions) {
-			this.verb = verb;
-			this.url  = url;
-			this.ctx  = options.ctx;
-			this.async = (typeof options.async === 'undefined') ? true : options.async;
+		config (verb = 'GET', baseUrl = '/', options = defaultOptions) {
+			this.verb        = verb;
+			this.baseUrl     = baseUrl;
+			this.urlParams   = [];
+			this.qryStrObj   = {};
+			this.queryString = '';
+			this.ctx         = options.ctx;
+			this.async       = (typeof options.async === 'undefined') ? true : options.async;
 
 			return this;
 		}
@@ -162,10 +181,28 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
+		getUrl () {
+			const baseUrl = normalizeBaseUrl(this.baseUrl);
+			const urlParams = this.urlParams.join('/');
+			const queryString = this.getQueryString();
+
+			return `${baseUrl}/${urlParams}`;
+			// ?${queryString}`;
+		}
+
+		getQueryString () {
+			if (this.qryStrObj.active) {
+				return JSON.stringify(this.qryStrObj);
+			}
+			return '';
+		}
+
 		open () {
 			this.xhr = this.xhr || createXHR();
 
-			this.xhr.open(this.verb, this.url, this.async);
+			log('URL:', this.getUrl())
+
+			this.xhr.open(this.verb, this.getUrl(), this.async);
 
 			return this;
 		}
@@ -200,6 +237,10 @@ var AjaxServant = (function (win, doc) {
 
 		send (urlParams, data) {
 			this.xhr = this.xhr || createXHR();
+
+			if (Array.isArray(urlParams)) {
+				this.urlParams = urlParams;
+			}
 
 			this.open();
 			this.setHeaders();

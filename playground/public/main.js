@@ -23,7 +23,7 @@ function testApi () {
 	const servant = createSimple();
 
 	log('has prop .verb', servant.verb === 'GET');
-	log('has prop .url', servant.url === '/');
+	log('has prop .baseUrl', servant.baseUrl === '/');
 	log('has prop .async', servant.async === true);
 	log('has prop .xhr',            typeof servant.xhr        === 'object' && servant.xhr instanceof XMLHttpRequest)
 	log('has method .config()',     typeof servant.config     === 'function');
