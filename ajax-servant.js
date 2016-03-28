@@ -152,7 +152,7 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
-		getResponse () {
+		formatResponse () {
 			const xhr = this.xhr;
 
 			return {
@@ -170,7 +170,7 @@ var AjaxServant = (function (win, doc) {
 			const queue = ajaxServant.getEventQueue(nativeName);
 
 			return function (ajaxEvent) {
-				const response = ajaxServant.getResponse();
+				const response = ajaxServant.formatResponse();
 
 				queue.forEach(cbObj => {
 					const {ctx, fn} = cbObj;
