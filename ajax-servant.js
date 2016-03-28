@@ -2,7 +2,8 @@ var AjaxServant = (function (win, doc) {
 	'use strict';
 
 	const defaultOptions = {
-		async: true
+		async: true,
+		ctx: null
 	};
 
 	const eventsDict = {
@@ -74,8 +75,9 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		config (verb = 'GET', url = '/', options = defaultOptions) {
-			this.verb  = verb;
-			this.url   = url;
+			this.verb = verb;
+			this.url  = url;
+			this.ctx  = options.ctx;
 			this.async = (typeof options.async === 'undefined') ? true : options.async;
 
 			return this;

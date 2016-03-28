@@ -13,16 +13,18 @@
 	//-------------------------------
 		runTests();
 
-		var servant = new AjaxServant('GET', '/api');
+		var servant = new AjaxServant('GET', '/api', {ctx:{b:2}});
 
 		console.log(servant)
 
 		servant
 			.on('start', {ctx:1}, function (response, servant, ajaxEvent) {
+				console.log(1, this)
 				console.log('first ("before send")')
 			})
 
 			.on('load', function (response, servant, ajaxEvent) {
+				console.log(2, this)
 				console.log('load - got a response')
 			})
 
@@ -35,6 +37,7 @@
 			})
 
 			.on('end', function (response, servant, ajaxEvent) {
+				console.log(3, this)
 				console.log('last')
 			})
 
