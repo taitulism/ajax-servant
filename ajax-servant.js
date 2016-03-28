@@ -81,6 +81,24 @@ var AjaxServant = (function (win, doc) {
 		return baseUrl;
 	}
 
+	function stringify (obj) {
+
+		if (!obj) {
+			return '';
+		}
+
+		const ary = [];
+
+		forIn(obj, function (key, value) {
+			const esc_key = encodeURIComponent(key);
+			const esc_val = encodeURIComponent(value);
+
+			ary.push(esc_key + '=' + esc_val);
+		});
+
+		return ary.join('&');
+	}
+
 // Class
 	class AjaxServant {
 		constructor (verb = 'GET', baseUrl = '/', options = defaultOptions) {
@@ -186,14 +204,20 @@ var AjaxServant = (function (win, doc) {
 				return '';
 			}
 
-			return '/' + this.urlParams.join('/');
+			const params = this.urlParams.filter(param => param && typeof param === 'string');
+
+			if (!params.length) {
+				return '';
+			}
+
+			return '/' + params.join('/');
 		}
 
 		getQueryString () {
 			if (!Object.keys(this.qryStrObj).length) {
 				return '';
 			}
-			return '?' + JSON.stringify(this.qryStrObj);
+			return '?' + stringify(this.qryStrObj);
 		}
 
 		getUrl () {
@@ -202,7 +226,6 @@ var AjaxServant = (function (win, doc) {
 			const queryString = this.getQueryString();
 
 			return baseUrl + urlParams + queryString;
-			// ?${queryString}`;
 		}
 
 		open () {
@@ -243,11 +266,16 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
-		send (urlParams, data) {
+		// TODO: move data handling to .open .setHeaders
+		send (urlParams, qryStrObj, data) {
 			this.xhr = this.xhr || createXHR();
 
 			if (Array.isArray(urlParams)) {
 				this.urlParams = urlParams;
+			}
+
+			if (qryStrObj) {
+				this.qryStrObj = qryStrObj;
 			}
 
 			this.open();
