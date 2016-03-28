@@ -2,9 +2,14 @@ var AjaxServant = (function (win, doc) {
 	'use strict';
 
 /* Private vars */
+
+	const DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
+
 	const defaultOptions = {
 		async: true,
-		ctx: null
+		ctx: null,
+		qryStr: {},
+		breakCache: false,
 	};
 
 	const eventsDict = {
@@ -44,6 +49,7 @@ var AjaxServant = (function (win, doc) {
 		// i.e. Done, but result is unknown.
 
 /* Private functions */
+
 	function forIn (obj, cbFn) {
 		var key;
 		var hasOwn = Object.hasOwnProperty;
@@ -114,7 +120,24 @@ var AjaxServant = (function (win, doc) {
 			this.baseQryStr = options.qryStr || {};
 			this.async      = (typeof options.async === 'undefined') ? true : options.async;
 
+			if (options.breakCache) {
+				this.setCacheBreaker(options.breakCache);
+			}
+
 			return this;
+		}
+
+		setCacheBreaker (breaker) {
+			const type = typeof breaker;
+			if (type === 'boolean') {
+				this.cacheBreaker = DEFAULT_CACHE_BREAKER_KEY;
+			}
+			else if (type === 'string') {
+				this.cacheBreaker = breaker;
+			}
+			else { // TODO: maybe this is useless
+				this.cacheBreaker = DEFAULT_CACHE_BREAKER_KEY;
+			}
 		}
 
 		createEventObj (nativeName) {
@@ -239,8 +262,12 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		getFullQueryString (qryStrObj) {
-			const queryString = stringifyAll(this.baseQryStr, qryStrObj);
-			log('qs', queryString)
+			let queryString = stringifyAll(this.baseQryStr, qryStrObj);
+
+			if (this.cacheBreaker) {
+				queryString += `&${this.cacheBreaker}=${Date.now()}`;
+			}
+
 			return queryString ? '?' + queryString : '';
 		}
 
