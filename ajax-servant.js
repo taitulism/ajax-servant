@@ -221,8 +221,8 @@ var AjaxServant = (function (win, doc) {
 			this.abort();
 
 			// remove listeners
-			forIn(this.events, function (eventName, handler) {
-				xhr.removeListener(eventName, handler);
+			forIn(this.events, function (eventName, eventObj) {
+				xhr.removeListener(eventName, eventObj.wrapper);
 			});
 
 			this.xhr = null;
