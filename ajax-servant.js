@@ -192,27 +192,20 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
-		send (urlParams, data) {
-			this.xhr = this.xhr || createXHR();
-
-			data = JSON.stringify(data);
-			this.xhr.send(data || null);
-
-			return this;
-		}
-
 		abort () {
 			this.xhr && this.xhr.abort();
 
 			return this;
 		}
 
-		go () {
+		send (urlParams, data) {
 			this.xhr = this.xhr || createXHR();
 
 			this.open();
 			this.setHeaders();
-			this.send();
+
+			data = JSON.stringify(data);
+			this.xhr.send(data || null);
 
 			return this;
 		}

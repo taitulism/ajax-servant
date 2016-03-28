@@ -32,7 +32,7 @@ function testApi () {
 	log('has method .setHeader()',  typeof servant.setHeader  === 'function');
 	log('has method .send()',       typeof servant.send       === 'function');
 	log('has method .abort()',      typeof servant.abort      === 'function');
-	log('has method .go()',         typeof servant.go         === 'function');
+	log('has method .send()',       typeof servant.send       === 'function');
 	log('has method .dismiss()',    typeof servant.dismiss    === 'function');
 }
 

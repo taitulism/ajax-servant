@@ -44,7 +44,7 @@ servant.on(eventName, context, callback);
 Send / Abort
 ------------
 ```js
-servant.go(['id', 3], {qry: 'str'});
+servant.send(['id', 3], {qry: 'str'});
 
 
 servant.abort();
