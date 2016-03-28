@@ -263,7 +263,7 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
-		send ({params, qryStr, headers, body}) {
+		send ({params, qryStr, headers, body} = {}) {
 			this.xhr = this.xhr || createXHR();
 
 			this.open(params, qryStr);

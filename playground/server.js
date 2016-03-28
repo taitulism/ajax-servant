@@ -1,5 +1,6 @@
 var aServer = require('a-server')();
 var serveStatic = require('serve-static');
+var $url = require('url');
 var serve = serveStatic(`${__dirname}/public`, {'index': 'index.html'});
 
 var log = console.log;
@@ -15,7 +16,13 @@ aServer.start(function (req, res) {
 	
 	// log(req.url)
 	serve(req, res, function () {
-		log(req.method, req.url)
+		const qry =  $url.parse(req.url, true).query;
+		log(req.method)
+
+		if (Object.keys(qry).length) {
+			res.end('qry');
+			return;
+		}
 		res.end('sababa');
 		
 	});

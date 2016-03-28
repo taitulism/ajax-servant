@@ -13,7 +13,7 @@
 	//-------------------------------
 		// runTests();
 
-		var servant = new AjaxServant('GET', '/api', {ctx:{b:2}});
+		var servant = new AjaxServant('GET', '/xxxxxxxx', {ctx:{b:2}});
 
 
 		servant
@@ -25,7 +25,8 @@
 			.send({
 				params: ['a','b','c'],
 				qryStr: {a:1, b:2}
-			});
+			})
+			.send()
 
 
 
