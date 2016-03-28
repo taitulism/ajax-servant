@@ -104,6 +104,19 @@ var AjaxServant = (function (win, doc) {
 		return ary.join('&');
 	}
 
+	function objectifyHeaders (headersStr) {
+		const headersObj = {};
+		const headersAry = headersStr.split(/\n/).filter(header => !!header);
+
+		headersAry.forEach(header => {
+			const pair = header.split(/:\s?/);
+
+			headersObj[pair[0]] = pair[1];
+		});
+
+		return headersObj;
+	}
+
 /* Class */
 	class AjaxServant {
 		constructor (verb = 'GET', baseUrl = '/', options = defaultOptions) {
@@ -180,13 +193,15 @@ var AjaxServant = (function (win, doc) {
 
 		formatResponse () {
 			const xhr = this.xhr;
+			const headersStr = xhr.getAllResponseHeaders();
+			const headersObj = objectifyHeaders(headersStr);
 
 			return {
 				status: {
 					code: xhr.status,
 					text: xhr.statusText
 				},
-				headers: xhr.getAllResponseHeaders(),
+				headers: headersObj,
 				body: xhr.responseText || xhr.responseXML
 			};
 		}

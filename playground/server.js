@@ -17,7 +17,7 @@ aServer.start(function (req, res) {
 	// log(req.url)
 	serve(req, res, function () {
 		const qry =  $url.parse(req.url, true).query;
-		log(req.method)
+		log(req.method, req.url)
 
 		if (Object.keys(qry).length) {
 			res.end('qry');
