@@ -47,12 +47,7 @@ servant.onFail(notOKFn);
 Send / Abort
 ------------
 ```js
-servant.GET(requestObj);
-servant.POST(requestObj);
-servant.PUT(requestObj);
-servant.DELETE(requestObj);
-
-servant.send(verb, requestObj);
+servant.send(requestObj);
 
 servant.abort();
 ```

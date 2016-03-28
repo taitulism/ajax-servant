@@ -1,7 +1,7 @@
 var AjaxServant = (function (win, doc) {
 	'use strict';
 
-// private vars
+/* Private vars */
 	const defaultOptions = {
 		async: true,
 		ctx: null
@@ -43,7 +43,7 @@ var AjaxServant = (function (win, doc) {
 		// "loadend" event is triggered after: "load, "abort" and "error".
 		// i.e. Done, but result is unknown.
 
-// Private functions
+/* Private functions */
 	function forIn (obj, cbFn) {
 		var key;
 		var hasOwn = Object.hasOwnProperty;
@@ -81,38 +81,36 @@ var AjaxServant = (function (win, doc) {
 		return baseUrl;
 	}
 
-	function stringify (obj) {
-
-		if (!obj) {
-			return '';
-		}
-
+	function stringifyAll (...objects) {
 		const ary = [];
 
-		forIn(obj, function (key, value) {
-			const esc_key = encodeURIComponent(key);
-			const esc_val = encodeURIComponent(value);
+		objects.forEach(obj => {
+			if (typeof obj !== 'object') {return;}
 
-			ary.push(esc_key + '=' + esc_val);
+			forIn(obj, function (key, value) {
+				const esc_key = encodeURIComponent(key);
+				const esc_val = encodeURIComponent(value);
+
+				ary.push(esc_key + '=' + esc_val);
+			});
 		});
 
 		return ary.join('&');
 	}
 
-// Class
+/* Class */
 	class AjaxServant {
-		constructor (baseUrl = '/', options = defaultOptions) {
+		constructor (verb = 'GET', baseUrl = '/', options = defaultOptions) {
 			this.whois = 'AjaxServant';
 			this.events = {};
 			this.xhr = createXHR();
-			this.config(baseUrl, options);
+			this.config(verb, baseUrl, options);
 		}
 
-		config (baseUrl = '/', options = defaultOptions) {
+		config (verb = 'GET', baseUrl = '/', options = defaultOptions) {
+			this.verb        = verb;
 			this.baseUrl     = baseUrl;
-			this.urlParams   = [];
-			this.qryStrObj   = {};
-			this.queryString = '';
+			this.baseQryStrObj = {};
 			this.ctx         = options.ctx;
 			this.async       = (typeof options.async === 'undefined') ? true : options.async;
 
@@ -128,6 +126,30 @@ var AjaxServant = (function (win, doc) {
 
 		getEventQueue (nativeName) {
 			return this.events[nativeName].queue;
+		}
+
+		setHeaders (headers) {
+			const fullHeaders = this.getFullHeaders(headers);
+
+			if (!this.headers || typeof this.headers !== 'object') {return null;}
+
+			this.xhr = this.xhr || createXHR();
+
+			const xhr = this.xhr;
+
+			forIn(this.headers, function (key, value) {
+				xhr.setRequestHeader(key, value);
+			});
+
+			return this;
+		}
+
+		setHeader (key, value) {
+			this.xhr = this.xhr || createXHR();
+
+			xhr.setRequestHeader(key, value);
+
+			return this;
 		}
 
 		getResponse () {
@@ -198,12 +220,16 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
-		getUrlParams () {
-			if (!this.urlParams.length) {
+		getFullHeaders (headers) {
+			return mixin({}, this.baseHeaders, headers);
+		}
+
+		getUrlParams (urlParams) {
+			if (!urlParams || !urlParams.length) {
 				return '';
 			}
 
-			const params = this.urlParams.filter(param => param && typeof param === 'string');
+			const params = urlParams.filter(param => param && typeof param === 'string');
 
 			if (!params.length) {
 				return '';
@@ -212,49 +238,40 @@ var AjaxServant = (function (win, doc) {
 			return '/' + params.join('/');
 		}
 
-		getQueryString () {
-			if (!Object.keys(this.qryStrObj).length) {
-				return '';
-			}
-			return '?' + stringify(this.qryStrObj);
+		getFullQueryString (qryStrObj) {
+			const queryString = stringifyAll(this.baseQryStrObj, qryStrObj);
+			log('qs', queryString)
+			return queryString ? '?' + queryString : '';
 		}
 
-		getUrl () {
-			const baseUrl = normalizeBaseUrl(this.baseUrl);
-			const urlParams = this.getUrlParams();
-			const queryString = this.getQueryString();
+		getFullUrl (baseUrl, urlParams, qryStrObj) {
+			const url = normalizeBaseUrl(baseUrl) + this.getUrlParams(urlParams);
+			const queryString = this.getFullQueryString(qryStrObj);
 
-			return baseUrl + urlParams + queryString;
+			return url + queryString;
 		}
 
-		open (verb = 'GET') {
+		open (params, qryStr) {
 			this.xhr = this.xhr || createXHR();
 
-			log('URL:', this.getUrl())
+			const fullUrl = this.getFullUrl(this.baseUrl, params, qryStr);
 
-			this.xhr.open(verb, this.getUrl(), this.async);
+			log('URL:', fullUrl)
+
+			this.xhr.open(this.verb, fullUrl, this.async);
 
 			return this;
 		}
 
-		setHeaders () {
-			if (!this.headers || typeof this.headers !== 'object') {return null;}
-
+		send ({params, qryStr, headers, body}) {
 			this.xhr = this.xhr || createXHR();
 
-			const xhr = this.xhr;
+			this.open(params, qryStr);
+			this.setHeaders(headers, body);
 
-			forIn(this.headers, function (key, value) {
-				xhr.setRequestHeader(key, value);
-			});
+			const data = JSON.stringify(body);
 
-			return this;
-		}
-
-		setHeader (key, value) {
-			this.xhr = this.xhr || createXHR();
-
-			xhr.setRequestHeader(key, value);
+			this.xhr.send(data || null);
 
 			return this;
 		}
@@ -263,40 +280,6 @@ var AjaxServant = (function (win, doc) {
 			this.xhr && this.xhr.abort();
 
 			return this;
-		}
-
-		// TODO: move data handling to .open .setHeaders
-		send (verb, urlParams, qryStrObj, data) {
-			this.xhr = this.xhr || createXHR();
-
-			if (Array.isArray(urlParams)) {
-				this.urlParams = urlParams;
-			}
-
-			if (qryStrObj) {
-				this.qryStrObj = qryStrObj;
-			}
-
-			this.open(verb);
-			this.setHeaders();
-
-			data = JSON.stringify(data);
-			this.xhr.send(data || null);
-
-			return this;
-		}
-
-		GET (...args) {
-			this.send('GET', ...args);
-		}
-		POST (...args) {
-			this.send('POST', ...args);
-		}
-		PUT (...args) {
-			this.send('PUT', ...args);
-		}
-		DELETE (...args) {
-			this.send('DELETE', ...args);
 		}
 
 		dismiss () {
