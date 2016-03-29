@@ -24,9 +24,10 @@
 
 
 		servant
-			.on('load', function (response, servant, ajaxEvent) {
+			.on('load', {a:1},function (response, servant, ajaxEvent) {
 				// console.log('load - got a response')
 				console.log('Response:', response.headers)
+				console.log('this:', this)
 			})
 
 			.send({

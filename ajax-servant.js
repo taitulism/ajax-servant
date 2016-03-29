@@ -119,19 +119,24 @@ var AjaxServant = (function (win, doc) {
 
 /* Class */
 	class AjaxServant {
-		constructor (verb = 'GET', baseUrl = '/', options = defaultOptions) {
+		constructor (verb = 'GET', baseUrl = '/', options) {
 			this.whois = 'AjaxServant';
 			this.events = {};
 			this.xhr = createXHR();
 			this.config(verb, baseUrl, options);
 		}
 
-		config (verb = 'GET', baseUrl = '/', options = defaultOptions) {
+		config (verb = 'GET', baseUrl = '/', options) {
+			if (!options) {
+
+			}
+
+			options = (!options) ? defaultOptions : mixin({}, defaultOptions, options);
 			this.verb       = verb;
 			this.baseUrl    = baseUrl;
-			this.ctx        = options.ctx      || this;
-			this.baseQryStr = options.qryStr   || {};
-			this.baseHeaders = options.headers || {};
+			this.ctx        = options.ctx || this;
+			this.baseQryStr = options.qryStr;
+			this.baseHeaders = options.headers;
 			this.async      = (typeof options.async === 'undefined') ? true : options.async;
 
 			if (options.breakCache) {
