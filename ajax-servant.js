@@ -49,6 +49,16 @@ var AjaxServant = (function (win, doc) {
 		// i.e. Done, but result is unknown.
 
 /* Private functions */
+	function getType (x) {
+		let type = typeof x;
+
+		if (type === 'object') {
+			type = Object.prototype.toString.call(x);
+			type = type.substring(8, type.length -1);
+		}
+
+		return type.toLowerCase();
+	}
 
 	function forIn (obj, cbFn) {
 		var key;
@@ -127,12 +137,9 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		config (verb = 'GET', baseUrl = '/', options) {
-			if (!options) {
-
-			}
-
 			options = (!options) ? defaultOptions : mixin({}, defaultOptions, options);
-			this.verb       = verb;
+
+			this.verb       = verb.toUpperCase();
 			this.baseUrl    = baseUrl;
 			this.ctx        = options.ctx || this;
 			this.baseQryStr = options.qryStr;
@@ -306,22 +313,53 @@ var AjaxServant = (function (win, doc) {
 
 			const fullUrl = this.getFullUrl(this.baseUrl, params, qryStr);
 
-			log('URL:', fullUrl)
-
 			this.xhr.open(this.verb, fullUrl, this.async);
 
 			return this;
 		}
 
+		formatBody (data) {
+			const type = getType(data);
+			const verb = this.verb;
+
+			if (verb === 'GET' || verb === 'HEAD') {
+				return null;
+			}
+
+			if (type === 'string') {
+				return data;
+			}
+
+			if (type === 'number') {
+				return data + '';
+			}
+
+			if (type === 'object' || type === 'array') {
+				try {
+					return JSON.stringify(data);
+				}
+				catch (err) {
+					return null;
+				}
+			}
+
+			return data.toString() || null;
+		}
+
 		send ({params, qryStr, headers, body} = {}) {
 			this.xhr = this.xhr || createXHR();
+			const data = this.formatBody(body);
 
 			this.open(params, qryStr);
-			this.setHeaders(headers, body);
+			this.setHeaders(headers, data);
 
-			const data = JSON.stringify(body);
+			this.xhr.send(data);
 
-			this.xhr.send(data || null);
+			log('request',{
+				verb: this.verb,
+
+				body: data
+			});
 
 			return this;
 		}

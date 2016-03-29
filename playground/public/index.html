@@ -5,7 +5,13 @@
 		<title>Ajax Servant - Dev</title>
 	</head>
 	<body>
+
+
+
 		
+	<script>
+		log = console.log;
+	</script>
 		
 	<script src="ajax-servant.js"></script>
 	<script src="main.js"></script>
@@ -13,27 +19,31 @@
 	//-------------------------------
 		// runTests();
 		const opts = {
-			ctx:{b:2},
-			qryStr: {def: 'DEF'},
-			breakCache: 'qwe',
-			headers: {qwe:1234}
+			// ctx:{b:2},
+			// qryStr: {def: 'DEF'},
+			// breakCache: 'qwe',
+			headers: {
+				// 'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+				'Content-type': 'application/json;charset=UTF-8',
+				// qwe:1234
+			}
 
 
 		}
-		var servant = new AjaxServant('GET', '/api', opts);
+		var servant = new AjaxServant('POST', '/api', opts);
 
 
 		servant
-			.on('load', {a:1},function (response, servant, ajaxEvent) {
-				// console.log('load - got a response')
-				console.log('Response:', response.headers)
-				console.log('this:', this)
+			.on('load', {a:1}, function (response, servant, ajaxEvent) {
+				// log('load - got a response')
+				log('Response:', response.body)
 			})
 
 			.send({
-				params: ['a','b','c'],
-				qryStr: {a:1, b:2},
-				headers: {asd:4567}
+				// params: ['a','b','c'],
+				// qryStr: {a:1, b:2},
+				// headers: {asd:4567},
+				body: {a:1,b:'2'}
 			})
 
 
