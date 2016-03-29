@@ -322,7 +322,7 @@ var AjaxServant = (function (win, doc) {
 			const type = getType(data);
 			const verb = this.verb;
 
-			if (verb === 'GET' || verb === 'HEAD') {
+			if (!data || verb === 'GET' || verb === 'HEAD') {
 				return null;
 			}
 
@@ -352,7 +352,6 @@ var AjaxServant = (function (win, doc) {
 
 			this.open(params, qryStr);
 			this.setHeaders(headers, data);
-
 			this.xhr.send(data);
 
 			log('request',{
