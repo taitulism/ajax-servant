@@ -18,11 +18,6 @@ AjaxServant // global for now
 Init
 ----
 ```js
-const options = {
-	async: true,
-	ctx: {a:1}
-};
-
 const servant = new AjaxServant('GET', '/api/user', options);
 
 // OR
@@ -33,10 +28,24 @@ servant.config(options);
 
 
 
+Options
+-------
+```js
+const options = {
+	async: true,
+	breakCache: false,
+	ctx: {},
+	headers: {},
+	qryStr: {}
+};
+```
+
+
+
 Bind events
 -----------
 ```js
-servant.on(eventName, context, callback);
+servant.on(XHREventName, optionalContext, callback);
 ```
 
 
@@ -55,10 +64,10 @@ Request Object
 --------------
 ```js
 {
-	params  : ['id', 3],
-	qrStr   : {qry: 'str'},
-	headers : {k: 'v'},
-	body    : 'bla bla bla'
+	params  : ['param1', 'param2'], // URL/param1/param2
+	qryStr   : {query: string},
+	headers : {key: value},
+	body    : '*'
 }
 ```
 
