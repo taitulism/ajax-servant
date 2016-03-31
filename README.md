@@ -1,12 +1,5 @@
-About this Project
-------------------
 **A WORK IN PROGRESS...**
-
-This project serves two purposes:
-  1. Get some hands-on with starting and maintaining a project.
-  2. Create an awesome module
-
-so I won't be taking any pull requests. For now.
+I won't be taking any pull requests. For now.
 
 
 Ajax Servant
@@ -22,8 +15,8 @@ A fully costumed ajax request could be really messy to write natively. This proc
   * set headers (which should be prepared somewhere)
   * send the data
 
-With today's js programming concepts, an ajax request will be triggered by a specific component or an app and not by the page itself (i.e some arbitrary code in the global scope). An ajax request has a master entity (e.g. a controller, an initiator, a parent or a boss) to trigger, abort, config and handle its responses.
-A component will usually have just a couple of requests it uses to the same API, with the same methods (GET, POST...) and the only thing that changes is the payload (dynamic data).
+With today's js programming concepts, an ajax request will be triggered by a specific component or an app and not by the page itself (i.e some arbitrary code in the global scope). An ajax request has now a master entity (e.g. a controller, an initiator) to trigger, abort, config and handle its responses.
+A component will usually have just a couple of requests it uses to the same API, with the same HTTP methods (GET, POST...) and the only thing that changes is the payload (dynamic data).
 
 An **Ajax Servant** instance is a pre-configured ajax request object that you configure once (i.e. in myConroller.init()) and use multiple times (i.e. in myController.addItem()), using the same XHR instance.
 
