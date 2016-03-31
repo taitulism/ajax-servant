@@ -21,7 +21,7 @@ function parsePOSTBody(req, res, next) {
 
     req.on('end', function () {
         // var post = qs.parse(body);
-        log('post data:', body)
+        log('post data:', decodeURIComponent(body))
         next(body);
     });
 }
@@ -38,7 +38,6 @@ aServer.start(function (req, res) {
 		'use strict';
 
 		const qry =  $url.parse(req.url, true).query;
-
 		log(req.method, req.url);
 		log(req.headers['content-type']);
 
@@ -49,9 +48,8 @@ aServer.start(function (req, res) {
 			return;
 		}
 
-
 		if (Object.keys(qry).length) {
-			res.end(qry);
+			res.end('qry');
 			return;
 		}
 

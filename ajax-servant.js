@@ -274,6 +274,7 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		getFullHeaders (headers) {
+			log(this.baseHeaders)
 			return mixin({}, this.baseHeaders, headers);
 		}
 

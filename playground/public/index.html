@@ -3,14 +3,64 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Ajax Servant - Dev</title>
+		<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 	</head>
 	<body>
 
-
-
-		
+		<!-- <form id="qwe" method="POST" action="/api" enctype="text/plain"> -->
+		<!-- <form id="qwe" method="POST" action="/api" enctype="multipart/form-data"> -->
+		<form id="qwe" method="POST" action="/api" enctype="application/x-www-form-urlencoded;charset=UTF-8">
+			<input id="d1" type="text" name="name" />
+			<textarea id="d2" type="text" name="txt" /></textarea>
+			<input id="d3" type="hidden" name="qwe" value="qqq" />
+			<button id="go" value="click" />GO</button>
+		</form>
 	<script>
 		log = console.log;
+
+		function id(id) {
+			return document.getElementById(id);
+		}
+		const d1 = id('d1');
+		const d2 = id('d2');
+		const d3 = id('d3');
+		let bound = false;
+
+		function jqrSend() {
+			if (bound) {return}
+			$("#qwe").submit(function(e) {
+				bound = true;
+
+			    var url = "/form";
+			    var data = $("#qwe").serialize();
+
+			    log(data)
+
+			    $.ajax({
+			           type: "POST",
+			           url: url,
+			           data,
+			           success: function(data) {
+			               alert(data);
+			           }
+			         });
+
+			    e.preventDefault();
+			});
+		}
+
+		function mySend () {
+			const dat = `${d1.name}=${d1.value}${d2.name}=${d2.value}${d3.name}=${d3.value}`;
+
+			servant.send({
+						// params: ['a','b','c'],
+						// qryStr: {a:1, b:2},
+						// headers: {asd:4567},
+						body: escape(dat)
+						// body: 'foo=bar&baz=The+first+line.%0D%0AThe+second+line.%0D%0A'
+					});
+		}
+
 	</script>
 		
 	<script src="ajax-servant.js"></script>
@@ -23,8 +73,9 @@
 			// qryStr: {def: 'DEF'},
 			// breakCache: 'qwe',
 			headers: {
-				// 'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+				'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
 				// 'Content-type': 'application/json;charset=UTF-8',
+				// 'Content-type': 'text/plain',
 				// qwe:1234
 			}
 
@@ -33,19 +84,20 @@
 		var servant = new AjaxServant('POST', '/api', opts);
 
 
-		servant
-			.on('load', {a:1}, function (response, servant, ajaxEvent) {
-				// log('load - got a response')
-				log('Response:', response.body)
-			})
+		servant.on('load', {a:1}, function (response, servant, ajaxEvent) {
+			// log('load - got a response')
+			log('Response:', response.body)
+		});
 
-			.send({
-				// params: ['a','b','c'],
-				// qryStr: {a:1, b:2},
-				// headers: {asd:4567},
-				body: ''
-			})
 
+
+			
+$('#go').on('click', e => {
+	// e.preventDefault();
+	// debugger
+	jqrSend();
+	// mySend();
+});
 
 
 
