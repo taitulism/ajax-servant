@@ -22,7 +22,7 @@ One of the servant lifecycle event:
 
 ####optionalContext
 **type:** any  
-The context of the `this` keyword to run the following callback with.
+The context of the `this` keyword to call the following callback with.
 You can set the same context for all of the servant's callbacks ([see config docs](./init.md#ctx)). Use `optionalContext` to run the following callback with a specific context.
 
 ####callback
