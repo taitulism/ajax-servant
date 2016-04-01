@@ -30,6 +30,6 @@ Keep the `servant` instance on your component. This is your component's go-to gu
 
 You can bind the response event handlers now or later in the code (`servant.on()`).
 
-When time comes you can send the servant on its way (`servant.send()`) with some dynamic data, additional URL segments, querystring parameters and headers. Next time you'll send the `servant` away, it will use the same base configuration, the same XHR instance and the same handlers.
+When time comes you can send the servant on its way with some dynamic data (`servant.send()`), additional URL segments, querystring parameters and headers. Next time you'll send the `servant` away, it will use the same base configuration, the same XHR instance and the same handlers.
 
 [Read The Fabulous Manual](https://github.com/taitulism/ajax-servant/blob/master/docs/README.md)
