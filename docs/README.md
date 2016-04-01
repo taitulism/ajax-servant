@@ -5,7 +5,7 @@ Table Of Contents
 * Main API (this page)
 * [Configuration](./options.md)
 * [Servant Events](./events.md)
-* [Dynamic Data](./dynamic-data)
+* [Dynamic Data](./dynamic-data.md)
 
 
 
