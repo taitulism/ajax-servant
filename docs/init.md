@@ -44,19 +44,27 @@ Config
 }
 ```
 
-####(boolean) async
+####async
+type: boolean  
+default: `true`  
 When set to `false` the AJAX request will be synchronous (but why would you do that?).
 
 
-####(any) ctx
+####ctx
+type: any  
+default: `null`  
 The context of the `this` keyword to run your callback with. See [events](./events.md).
 
 
-#### (boolean | string) breakCache
+####breakCache
+type: boolean | string  
+default: `'timestamp'`  
 Adds a timestamp to the querystring (`key=value`) to get a fresh response. Pass `true` to use the default key (`timestamp=123456`). Pass a string to set your own cache breaker (e.g. `myCacheBreaker=123456`).
 
 
-#### (object) qryStr
+####qryStr
+type: object  
+default: `null`  
 An object that will be stringified and added to the request URL as the querystring (for all requests). Its keys and values will be encoded with the native `encodeURIComponent()`
 
 ```js
@@ -69,7 +77,9 @@ qryStr: {
 ```
 
 
-#### (object) headers
+####headers
+type: object  
+default: `null`  
 An object of HTTP headers to be sent for all requests.
 ```js
 headers: {
