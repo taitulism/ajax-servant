@@ -11,7 +11,7 @@ Justification
 -------------
 A customized AJAX request can get really messy to configure, send and bind the response handlers to, and we usually do it all in one place (e.g. `jQuery.ajax({...})`).
 
-`Promise`s are ok, i guess, but often doesn't **feel** like the "right" way to go with. This concept was very hard for me to understand back then. A promise is an abstarct idea. I mean, I can imagine a Car object, I can "see" an Events object and its queue array, I can almost feel an HTML element, but WTH is a promise? 
+`Promise`s are ok, i guess, but often doesn't **feel** like the "right" way to go with. This concept was very hard for me to understand back then. A promise is an abstarct idea. I mean, I can imagine a car object, I can "see" an events object and its queue array, I can almost feel an HTML element, but WTH is a promise? 
 
 And why should I "re-wire" the promise to the "send" function call (`.send().then()`) when I usually want the same callback to run when the same request is sent?
 
