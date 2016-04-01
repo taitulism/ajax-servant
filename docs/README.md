@@ -68,7 +68,7 @@ servant.send({body: 2});
 
 Dismissing a Servant
 --------------------
-Dismissing a servant unbind all of its event handlers and delete its XHR object.
+Dismissing a servant unbinds all of its event handlers and deletes its XHR object.
 ```js
 console.log(servant.xhr); // {XMLHttpRequest instance}
 console.log(servant.events); // {loadEnd: {queue: [fn, fn, fn]}}
