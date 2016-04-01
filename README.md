@@ -17,7 +17,7 @@ And why should I "re-wire" the promise to the "send" function call (`.send().the
 
 That's because the XHR object is used only for one single request and then it dies. All of its XHR event handlers are gone with it so we need to bind some new handlers for every new request, even if it's exactly the same request as the one before.
 
-With today's js programming concepts, an ajax request will likely to be triggered by a specific component or an app rather than by the page itself (i.e some arbitrary code in the global scope). An ajax request has now a master entity (e.g. a controller, an initiator) to config, send, abort and handle its responses.
+With today's javascript programming concepts, an ajax request will likely to be triggered by a specific component or an app rather than by the page itself (i.e some arbitrary code in the global scope). An ajax request has now a master entity (e.g. a controller, an initiator) to config, send, abort and handle its responses.
 A component will usually have just a couple of requests it uses to the same API, with the same HTTP methods (GET, POST...) and the only thing that changes per request is the payload (dynamic data).
 
 An **Ajax Servant** instance is a pre-configured ajax request object that you configure once (i.e. in your `component.init()`) and use multiple times (i.e. in your `component.getItem()`), using the same XHR instance.
