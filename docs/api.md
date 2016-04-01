@@ -7,8 +7,9 @@
 3. send request
 
 
-Usage
------
+Import
+------
+Currently it's just a global.
 ```js
 AjaxServant // global for now
 ```
@@ -39,6 +40,7 @@ const options = {
 	qryStr: {}
 };
 ```
+[Options](./options.md)
 
 
 
@@ -47,21 +49,22 @@ Bind events
 ```js
 servant.on(XHREventName, optionalContext, callback);
 ```
+[Events](./events.md)
 
 
 
 Send / Abort
 ------------
 ```js
-servant.send(requestObj);
+servant.send(dynamicDataObj);
 
 servant.abort();
 ```
 
 
 
-Request Object
---------------
+Dynamic Data Object
+-------------------
 ```js
 {
 	params  : ['param1', 'param2'], // URL/param1/param2
@@ -70,6 +73,6 @@ Request Object
 	body    : '*'
 }
 ```
-
+[Dynamic data object](./dynamic-data.md)
 
 
