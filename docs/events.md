@@ -9,7 +9,7 @@ servant.on(eventName, optionalContext, callback)
 ```
 
 
-#####eventName
+####eventName
 **type:** string
 One of the servant lifecycle event:
 * **loadStart** - runs before each request
@@ -20,14 +20,36 @@ One of the servant lifecycle event:
 
 **Some of the listed events have aliases. [See below](#events-aliases)**
 
-#####optionalContext
+####optionalContext
 **type:** any
 The context of the `this` keyword to run the following callback with.
 You can set the same context for all of the servant's callbacks ([see config docs](./init.md#ctx)). Use `optionalContext` to run the following callback with a specific context.
 
-#####callback
+####callback
 **type:** function
-The function to run when the event occurs. The `this` keyword context can be set individually or globaly. [See optionalContext above](#optionalcontext)
+The function to run when the event occurs. The `this` keyword context can be set individually or globaly. [See optionalContext above](#optionalcontext).  
+Events are triggerd with the following arguments:  
+```js
+callback(response, currentServant, ajaxEvent)
+```
+
+`response` is a formatted object containing three props:
+
+1. response.status ( = {code: 200, text: 'ok'} )
+2. response.headers
+3. response.body
+
+`currentServant` is very self explanatory.  
+`ajaxEvent` is a native XHR event that is passed to the event handler.
+
+examlpe:  
+```js
+servant.on('load', function(response, currentServant, ajaxEvent){
+  if (response.status.code === 200) {
+    console.log(response.body);
+  }
+});
+```
 
 
 Events Aliases
