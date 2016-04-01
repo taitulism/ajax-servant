@@ -22,7 +22,7 @@ Steps
 
 Import
 ------
-Currently it's just a global.
+Currently it's just a global. Will become an "import/export" eventually.
 ```js
 AjaxServant // global for now
 ```
