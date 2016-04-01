@@ -32,12 +32,12 @@ The function to run when the event occurs. The `this` keyword context can be set
 
 Events Aliases
 --------------
-| Event Name    | aliases  |           |      |         |
-|---------------|----------|-----------|------|---------|
-| **loadStart** | start    | loadstart |      |         |
-| **load**      | response |           |      |         |
-| **loadEnd**   | end      | complete  | done | loadend |
-| **error**     | err      |           |      |         |
+| Event Name | aliases  |           |      |         |
+|------------|----------|-----------|------|---------|
+| loadStart  | start    | loadstart |      |         |
+| load       | response |           |      |         |
+| loadEnd    | end      | complete  | done | loadend |
+| error      | err      |           |      |         |
 
 
 example:  
