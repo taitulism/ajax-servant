@@ -50,16 +50,16 @@ Config
 When set to `false` the AJAX request will be synchronous (but why would you do that?).
 
 
-####ctx
-**type:** any  
-**default:** `null`  
-The context of the `this` keyword to run your callback with. See [events](./events.md).
-
-
 ####breakCache
 **type:** boolean | string  
 **default:** `'timestamp'`  
 Adds a timestamp to the querystring (`key=value`) to get a fresh response. Pass `true` to use the default key (`timestamp=123456`). Pass a string to set your own cache breaker (e.g. `myCacheBreaker=123456`).
+
+
+####ctx
+**type:** any  
+**default:** `null`  
+The context of the `this` keyword to run your callback with. See [events](./events.md).
 
 
 ####qryStr
