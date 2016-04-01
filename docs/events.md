@@ -12,11 +12,11 @@ servant.on(eventName, optionalContext, callback)
 #####eventName
 **type:** string
 One of the servant lifecycle event:
-* loadStart - runs before each request
-* load - runs when a response has recieved
-* loadEnd - runs after a "load", "abort" and "error" events
-* abort - get called when when the request is being aborted
-* error - get called when an error occured something is wrong with the request
+* **loadStart** - runs before each request
+* **load** - runs when a response has recieved
+* **loadEnd** - runs after a "load", "abort" and "error" events
+* **abort** - get called when when the request is being aborted
+* **error** - get called when an error occured something is wrong with the request
 
 **Some of the listed events have aliases. [See below](#events-aliases)**
 
