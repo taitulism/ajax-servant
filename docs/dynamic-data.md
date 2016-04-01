@@ -11,6 +11,7 @@ This data object includes the following props (all are optional):
 examples:  
 ```js
 servant.send({body: 'some text to send to the server'});
+// OR
 servant.send({
   params: ['path', 'to', 'somewhere'],
   qryStr: {myKey: 'myValue'},
@@ -36,9 +37,7 @@ servant.send({
   }
 }); // -> request URL = /api/user/john/?action=same&color=blue
 
-// ...
-// ...
-// ...
+// somewhere down the road...
 
 // send 2
 servant.send({
