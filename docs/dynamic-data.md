@@ -1,4 +1,6 @@
-When sending a `servant` on its way you can load it with some dynamic data (per request).
+Dynamic Data Object
+===================
+When sending a `servant` on its way you can send it with some dynamic data (per request).
 
 This data object includes the following props (all are optional):  
 * **params** - array of URL parameters (e.g. `['api', 'user']`)
