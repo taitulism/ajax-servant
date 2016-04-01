@@ -34,5 +34,12 @@ Events Aliases
 --------------
 * **loadStart:** [start, loadstart]
 * **load:** [response]
-* **loadEnd:** [end, complete, loadend]
+* **loadEnd:** [end, complete, done, loadend]
 * **error:** [err]
+
+example:  
+```js
+servant.on('complete', fn(){...});
+// is same as
+servant.on('loadEnd', fn(){...});
+```
