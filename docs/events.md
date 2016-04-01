@@ -32,7 +32,7 @@ The function to run when the event occurs. The `this` keyword context can be set
 
 Events Aliases
 --------------
-**loadStart:** [start, loadstart]
-**load:** [response]
-**loadEnd:** [end, complete, loadend]
-**error:** [err]
+* **loadStart:** [start, loadstart]
+* **load:** [response]
+* **loadEnd:** [end, complete, loadend]
+* **error:** [err]
