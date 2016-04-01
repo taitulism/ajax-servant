@@ -10,16 +10,6 @@ Table Of Contents
 
 
 
-How to Use
-----------
-1. import
-2. create & config
-3. Bind events
-4. send/abort request
-
-
-
-
 Import
 ------
 Currently it's just a global class. Will become an "import/export" eventually.
