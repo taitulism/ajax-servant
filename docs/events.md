@@ -1,6 +1,6 @@
 Events
 ======
-After [initializing](./init.md) a servant instance you can bind it with callbacks to handle its different events.
+After [initializing](./init.md#create) a servant instance you can bind it with callbacks to handle its different events.
 
 ```js
 var servant = new AjaxServant();
