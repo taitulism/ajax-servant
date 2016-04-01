@@ -1,15 +1,5 @@
 **THIS MODULE IS A WORK IN PROGRESS**
 
-Table Of Contents
------------------
-* Main API (this page)
-* [Configuration](./init.md)
-* [Servant Events](./events.md)
-* [Dyncamic Data](./dynamic-data.md)
-
-
-
-
 Import
 ------
 Currently it's just a global class. Will become an "import/export" eventually.
