@@ -29,8 +29,8 @@ servant.config(options);
 
 
 
-Options
--------
+Configuration
+-------------
 ```js
 const options = {
 	async: true,
@@ -40,16 +40,16 @@ const options = {
 	qryStr: {}
 };
 ```
-[Options](./configurations.md)
+[Read more about "configuration"](./configuration.md)
 
 
 
-Bind events
+Bind Events
 -----------
 ```js
 servant.on(XHREventName, optionalContext, callback);
 ```
-[Events](./events.md)
+[Read more about "Events"](./events.md)
 
 
 
@@ -73,6 +73,6 @@ Dynamic Data Object
 	body    : '*'
 }
 ```
-[Dynamic data object](./dynamic-data.md)
+[Read more about "Dynamic data object"](./dynamic-data.md)
 
 
