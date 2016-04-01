@@ -10,7 +10,7 @@ servant.on(eventName, optionalContext, callback)
 
 
 ####eventName
-**type:** string
+**type:** string  
 One of the servant lifecycle event:
 * **loadStart** - runs before each request
 * **load** - runs when a response has recieved
@@ -21,12 +21,12 @@ One of the servant lifecycle event:
 **Some of the listed events have aliases. [See below](#events-aliases)**
 
 ####optionalContext
-**type:** any
+**type:** any  
 The context of the `this` keyword to run the following callback with.
 You can set the same context for all of the servant's callbacks ([see config docs](./init.md#ctx)). Use `optionalContext` to run the following callback with a specific context.
 
 ####callback
-**type:** function
+**type:** function  
 The function to run when the event occurs. The `this` keyword context can be set individually or globaly. [See optionalContext above](#optionalcontext).  
 Events are triggerd with the following arguments:  
 ```js
