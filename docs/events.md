@@ -27,7 +27,7 @@ You can set the same context for all of the servant's callbacks ([see config doc
 
 #####callback
 **type:** function
-The function to run when the event occurs. The `this` keyword context can be set individually or globaly. See [above](#optionlcontext)
+The function to run when the event occurs. The `this` keyword context can be set individually or globaly. See [above](#optionalcontext)
 
 
 Events Aliases
