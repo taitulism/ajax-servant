@@ -3,15 +3,17 @@ Dynamic Data Object
 When sending a `servant` on its way you can send it with some dynamic data (per request).
 
 This data object includes the following props (all are optional):  
-* **params** - array of URL parameters (e.g. `['api', 'user']`)
-* **qryStr** - querystring parameters (e.g. /api/?key=value)
-* **headers** - request headers
-* **body** - request body
+* **params** - (array | string) URL segments
+* **qryStr** - (object) querystring parameters object (e.g. `{key:value}`)
+* **headers** - (object) request headers
+* **body** - (any) request body
 
 examples:  
 ```js
 servant.send({body: 'some text to send to the server'});
 servant.send({
+  params: ['path', 'to', 'somewhere'],
+  qryStr: {myKey: 'myValue'},
   header: {'Content-type': 'application/json'},
   body: {name: 'john', age: 30}
 });
