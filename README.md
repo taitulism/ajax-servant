@@ -26,7 +26,7 @@ You configure it once with a base URL, a querystring if you'd like and maybe som
 ```js
 var servant = new AjaxServant('GET', '/api/items', configObj);
 ```
-Keep the `servant` instance on your component. This is your component's go-to guy for everything you'll ever need from the back-end. You can bind the response event handlers now or later in the code (`servant.on()`).   
-When time comes you can send the servent on its way (`servant.send()`) with some dynamic data, additional URL segments, querystring parameters and headers. Next time you'll send the `servant` away, it will use the same base configuration, the same XHR instance and the same handlers.
+Keep the `servant` instance on your component. This is your component's go-to guy for everything you'll ever need from the back-end. You can bind the response event handlers now or later in the code (`servant.on()`).  
+When time comes you can send the servant on its way (`servant.send()`) with some dynamic data, additional URL segments, querystring parameters and headers. Next time you'll send the `servant` away, it will use the same base configuration, the same XHR instance and the same handlers.
 
 [See API](https://github.com/taitulism/ajax-servant/blob/master/docs/api.md)
