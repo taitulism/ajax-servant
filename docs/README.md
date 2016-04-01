@@ -2,7 +2,7 @@
 
 Table Of Contents
 -----------------
-* [API](./api.md)
+* Main API (this page)
 * [Configuration](./options.md)
 * [Servant Events](./events.md)
 * [Dyncamic Data](./dynamic-data.md)
