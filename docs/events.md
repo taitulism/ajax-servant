@@ -39,7 +39,7 @@ Events Aliases
 
 example:  
 ```js
-servant.on('complete', fn(){...});
-// is same as
 servant.on('loadEnd', fn(){...});
+// is same as
+servant.on('complete', fn(){...});
 ```
