@@ -1,5 +1,5 @@
 **A WORK IN PROGRESS...**  
-I won't be taking any pull requests. For now.
+Won't be taking any pull requests. For now.
 
 
 Ajax Servant
