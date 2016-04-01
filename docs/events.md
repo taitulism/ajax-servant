@@ -23,11 +23,11 @@ One of the servant lifecycle event:
 #####optionalContext
 **type:** any
 The context of the `this` keyword to run the following callback with.
-You can set the same context for all of the servant's callbacks ([see config docs](./init.md)). Use `optionalContext` to run the following callback with a specific context.
+You can set the same context for all of the servant's callbacks ([see config docs](./init.md#ctx)). Use `optionalContext` to run the following callback with a specific context.
 
 #####callback
 **type:** function
-The function to run when the event occurs. The `this` keyword context can be set individually or globaly. See [above](#optionalcontext)
+The function to run when the event occurs. The `this` keyword context can be set individually or globaly. [See optionalContext above](#optionalcontext)
 
 
 Events Aliases
