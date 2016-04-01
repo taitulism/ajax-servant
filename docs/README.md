@@ -10,19 +10,19 @@ Table Of Contents
 
 
 
-Steps
------
-0. import
-1. instanciate & config
-2. bind events
-3. send request
+How to Use
+----------
+1. import
+2. create & config
+3. Bind events
+4. send/abort request
 
 
 
 
 Import
 ------
-Currently it's just a global. Will become an "import/export" eventually.
+Currently it's just a global class. Will become an "import/export" eventually.
 ```js
 AjaxServant // global for now
 ```
@@ -30,8 +30,8 @@ AjaxServant // global for now
 
 
 
-Init
-----
+Create & Config
+---------------
 ```js
 const servant = new AjaxServant('GET', '/api/user', options);
 
@@ -41,21 +41,7 @@ const servant = new AjaxServant('GET', '/api/user');
 servant.config(options);
 ```
 
-
-
-
-Configuration
--------------
-```js
-const options = {
-	async: true,
-	breakCache: false,
-	ctx: {},
-	headers: {},
-	qryStr: {}
-};
-```
-[Read more about "configuration"](./configuration.md)
+[Read more about initialization](./init.md)
 
 
 
@@ -81,14 +67,14 @@ servant.abort();
 
 
 
-Dynamic Data Object
--------------------
+Dynamic Data
+------------
 ```js
 {
 	params  : ['param1', 'param2'], // URL/param1/param2
-	qryStr   : {query: string},
-	headers : {key: value},
+	qryStr   : {query: 'string'},
+	headers : {key: 'value'},
 	body    : '*'
 }
 ```
-[Read more about "Dynamic data object"](./dynamic-data.md)
+[Read more about "Dynamic data"](./dynamic-data.md)
