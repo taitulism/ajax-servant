@@ -40,7 +40,7 @@ const options = {
 	qryStr: {}
 };
 ```
-[Options](./options.md)
+[Options](./configurations.md)
 
 
 
