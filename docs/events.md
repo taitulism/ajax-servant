@@ -18,7 +18,7 @@ One of the servant lifecycle event:
 * abort - get called when when the request is being aborted
 * error - get called when an error occured something is wrong with the request
 
-**Some of the listed events have aliases.**
+**Some of the listed events have aliases. [See below](#events-aliases)**
 
 #####optionalContext
 **type:** any
@@ -28,3 +28,11 @@ You can set the same context for all of the servant's callbacks ([see config doc
 #####callback
 **type:** function
 The function to run when the event occurs. The `this` keyword context can be set individually or globaly. See [above](#optionlcontext)
+
+
+Events Aliases
+--------------
+**loadStart:** [start, loadstart]
+**load:** [response]
+**loadEnd:** [end, complete, loadend]
+**error:** [err]
