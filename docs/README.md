@@ -49,22 +49,15 @@ servant.on(XHREventName, optionalContext, callback);
 Send / Abort
 ------------
 ```js
-servant.send(dynamicDataObj);
-
-servant.abort();
-```
-
-
-
-
-Dynamic Data
-------------
-```js
-{
+var dynamicDataObj = {
 	params  : ['param1', 'param2'], // URL/param1/param2
 	qryStr   : {query: 'string'},
 	headers : {key: 'value'},
 	body    : '*'
 }
+
+servant.send(dynamicDataObj);
+
+servant.abort();
 ```
 [Read more about "Dynamic data"](./dynamic-data.md)
