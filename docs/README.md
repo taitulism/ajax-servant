@@ -10,8 +10,8 @@ AjaxServant // global for now
 
 
 
-Create & Config
----------------
+Create
+------
 ```js
 const servant = new AjaxServant('GET', '/api/user', options);
 ```
