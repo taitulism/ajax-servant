@@ -1,38 +1,32 @@
-Create and Config
-=================
+Initialization
+==============
 
 Create
 ------
 `AjaxServant` is a class you create a servant instance from:
 ```js
-var servant = new AjaxServant();
+var servant = new AjaxServant(verb, url, options);
 ```
 
-The constructor's signature is very flexible. It accepts up to three arguments:
-* string: `VERB` - (default: `'GET'`) an HTTP verb: GET, POST, PUT, DELETE... Should be CAPITALIZED. 
-* string: `/baseURL` - (default: `'/'`) the URL to assign the servant to. Should start with a slash e.g. `'/api'`.
-* object: `{config}` - (default: `{}`) a configuration object (covered later).  
+The constructor requires an HTTP verb and a RELATIVE URL. 
 
-**Currently, there is no check against a valid HTTP verb.**
+>**NOTE:** there's no support for cross domain requests. yet!
+
+Options are optional.
+* `verb` (string, required*) - one of: `'GET'`, `'POST'`, `'PUT'`, `'DELETE'`.
+* `url` (string, required*) - the URL to assign the servant to. Should start with a slash e.g. `'/api'`.
+* `options` (object, optional) - a configuration object (covered later).  
+
+>**NOTE:** Currently, only the 4 HTTP verbs listed above are supported formally but you can set `servant.verb` to whatever, after instanciation.
 
 A string could be either the HTTP `VERB` or the `/baseURL`:  
 If it starts with a slash `'/'` it's the base URL. Else, it's the VERB. An error is thrown if two strings were passed and none or both starts with a `'/'`.
 
-```js
-var cfg = {...};
-
-new AjaxServant('GET', cfg, '/api'); // ok
-new AjaxServant(cfg, '/api', 'GET'); // ok
-new AjaxServant('GET', 'api'); // error (no slash)
-new AjaxServant('/GET', '/api', cfg); // error (two slashes)
-
-```
 
 
 
-
-Config
-------
+Options
+-------
 **Defaults:**
 ```js
 {
@@ -59,7 +53,14 @@ Adds a timestamp to the querystring (`key=value`) to get a fresh response. Pass 
 ####ctx
 **type:** any  
 **default:** `null`  
-The context of the `this` keyword to run your callback with. See [events](./events.md).
+The context of the `this` keyword to run your callbacks with.
+```js
+var servant = new AjaxServant('GET', '/api', {ctx: {a:1}});
+
+servant.on('load', function () {
+  console.log(this); // -> {a:1}
+});
+```
 
 
 ####qryStr

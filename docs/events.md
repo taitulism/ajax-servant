@@ -3,7 +3,7 @@ Events
 After [initializing](./init.md#create) a servant instance you can bind it with callbacks to handle its different events.
 
 ```js
-var servant = new AjaxServant();
+var servant = new AjaxServant('GET', '/api');
 
 servant.on(eventName, optionalContext, callback)
 ```
@@ -18,12 +18,34 @@ One of the servant lifecycle event:
 * **abort** - gets called when when the request is being aborted
 * **error** - gets called when an error occured something is wrong with the request
 
-**Some of the listed events have aliases. [See below](#events-aliases)**
+Some of them have aliases:
+
+| Event Name | aliases  |           |      |         |
+|------------|----------|-----------|------|---------|
+| loadStart  | start    | loadstart |      |         |
+| load       | response |           |      |         |
+| loadEnd    | end      | complete  | done | loadend |
+| error      | err      |           |      |         |
+
+example:  
+```js
+servant.on('loadEnd', callback);
+// is same as
+servant.on('complete', callback);
+```
+
 
 ####optionalContext
 **type:** any  
-The context of the `this` keyword to call the following callback with.
-You can set the same context for all of the servant's callbacks ([see config docs](./init.md#ctx)). Use `optionalContext` to run the following callback with a specific context.
+When you want the following callback to run with a certain context. You can set a default context for all of the servant's callbacks ([see `options.ctx`](./init.md#ctx)).
+```js
+var servant = new AjaxServant('GET', '/api');
+
+servant.on('load', {b:2}, function () {
+  console.log(this); // -> {b:2}
+});
+```
+
 
 ####callback
 **type:** function  
@@ -49,22 +71,3 @@ servant.on('load', function(response, currentServant, ajaxEvent){
     console.log(response.body);
   }
 });
-```
-
-
-Events Aliases
---------------
-| Event Name | aliases  |           |      |         |
-|------------|----------|-----------|------|---------|
-| loadStart  | start    | loadstart |      |         |
-| load       | response |           |      |         |
-| loadEnd    | end      | complete  | done | loadend |
-| error      | err      |           |      |         |
-
-
-example:  
-```js
-servant.on('loadEnd', fn(){...});
-// is same as
-servant.on('complete', fn(){...});
-```
