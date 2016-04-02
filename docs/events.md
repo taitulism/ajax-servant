@@ -18,7 +18,21 @@ One of the servant lifecycle event:
 * **abort** - gets called when when the request is being aborted
 * **error** - gets called when an error occured something is wrong with the request
 
-**Some of the listed events have aliases. [See below](#events-aliases)**
+Some of them have aliases:
+
+| Event Name | aliases  |           |      |         |
+|------------|----------|-----------|------|---------|
+| loadStart  | start    | loadstart |      |         |
+| load       | response |           |      |         |
+| loadEnd    | end      | complete  | done | loadend |
+| error      | err      |           |      |         |
+
+example:  
+```js
+servant.on('loadEnd', callback);
+// is same as
+servant.on('complete', callback);
+```
 
 
 ####optionalContext
@@ -57,22 +71,3 @@ servant.on('load', function(response, currentServant, ajaxEvent){
     console.log(response.body);
   }
 });
-```
-
-
-Events Aliases
---------------
-| Event Name | aliases  |           |      |         |
-|------------|----------|-----------|------|---------|
-| loadStart  | start    | loadstart |      |         |
-| load       | response |           |      |         |
-| loadEnd    | end      | complete  | done | loadend |
-| error      | err      |           |      |         |
-
-
-example:  
-```js
-servant.on('loadEnd', callback);
-// is same as
-servant.on('complete', callback);
-```
