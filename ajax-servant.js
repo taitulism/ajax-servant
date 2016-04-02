@@ -134,7 +134,6 @@ var AjaxServant = (function (win, doc) {
 /* Class */
 	class AjaxServant {
 		constructor (verb = 'GET', baseUrl = '/', options) {
-			this.whois = 'AjaxServant';
 			this.events = {};
 			this.config(verb, baseUrl, options);
 		}
@@ -282,7 +281,7 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		getFullHeaders (headers = null) {
-			log(this.baseHeaders)
+			console.log(this.baseHeaders)
 			return mixin({}, this.baseHeaders, headers);
 		}
 
@@ -363,7 +362,7 @@ var AjaxServant = (function (win, doc) {
 			this.setHeaders(headers, data);
 			this.xhr.send(data);
 
-			log('request',{
+			console.log('request',{
 				verb: this.verb,
 				body: data
 			});

@@ -16,8 +16,6 @@
 			<button id="go" value="click" />GO</button>
 		</form>
 	<script>
-		log = console.log;
-
 		function id(id) {
 			return document.getElementById(id);
 		}
@@ -34,7 +32,7 @@
 			    var url = "/form";
 			    var data = $("#qwe").serialize();
 
-			    log(data)
+			    console.log(data)
 
 			    $.ajax({
 			           type: "POST",
@@ -65,10 +63,8 @@
 	</script>
 		
 	<script src="ajax-servant.js"></script>
-	<script src="main.js"></script>
 	<script>
 	//-------------------------------
-		// runTests();
 		const opts = {
 			ctx:{b:2},
 			// qryStr: {def: 'DEF'},
@@ -87,14 +83,14 @@
 
 		servant
 			.on('done', {a:1}, function (response, servant, ajaxEvent) {
-				// log('load - got a response')
-				log('Response:', response.body)
+				// console.log('load - got a response')
+				console.log('Response:', response.body)
 			})
 			.on('abort', (resonse, servant, ajaxEvent) => {
-				log('aborted')
+				console.log('aborted')
 			})
 			.on('err', (resonse, servant, ajaxEvent) => {
-				log('error')
+				console.log('error')
 			})
 		;
 
