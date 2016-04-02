@@ -23,7 +23,7 @@ servant.send({
 The dynamic data will be added to any corresponding data that was set during the servant initialization.
 ```js
 // init
-var servant = new AjaxServant('/api/user', {
+var servant = new AjaxServant('GET', '/api/user', {
   qryStr: {
     action: 'same'
   }
