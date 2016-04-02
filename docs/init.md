@@ -53,7 +53,7 @@ Adds a timestamp to the querystring (`key=value`) to get a fresh response. Pass 
 ####ctx
 **type:** any  
 **default:** `null`  
-The context of the `this` keyword to run your callback with. See [events](./events.md).
+The context of the `this` keyword to run your callbacks with. See [events](./events.md).
 
 
 ####qryStr
