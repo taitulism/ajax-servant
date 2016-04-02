@@ -61,17 +61,18 @@ var AjaxServant = (function (win, doc) {
 	}
 
 	function forIn (obj, cbFn) {
-		var key;
-		var hasOwn = Object.hasOwnProperty;
+		if (!obj) {return};
 
-		for (key in obj) { if (hasOwn.call(obj, key)) {
+		const hasOwn = Object.hasOwnProperty;
+
+		for (const key in obj) { if (hasOwn.call(obj, key)) {
 			cbFn.call(obj, key, obj[key]);
 		}}
 	}
 
 	function mixin(target, ...sources) {
 		sources.forEach(srcObj => {
-			forIn(srcObj, (key, value) => {
+			srcObj && forIn(srcObj, (key, value) => {
 				target[key] = value;
 			});
 		});
