@@ -3,7 +3,7 @@ Events
 After [initializing](./init.md#create) a servant instance you can bind it with callbacks to handle its different events.
 
 ```js
-var servant = new AjaxServant('GET', '/api);
+var servant = new AjaxServant('GET', '/api');
 
 servant.on(eventName, optionalContext, callback)
 ```
