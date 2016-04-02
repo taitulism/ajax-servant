@@ -3,7 +3,7 @@ Events
 After [initializing](./init.md#create) a servant instance you can bind it with callbacks to handle its different events.
 
 ```js
-var servant = new AjaxServant();
+var servant = new AjaxServant('GET', '/api);
 
 servant.on(eventName, optionalContext, callback)
 ```
@@ -64,7 +64,7 @@ Events Aliases
 
 example:  
 ```js
-servant.on('loadEnd', fn(){...});
+servant.on('loadEnd', callback);
 // is same as
-servant.on('complete', fn(){...});
+servant.on('complete', callback);
 ```
