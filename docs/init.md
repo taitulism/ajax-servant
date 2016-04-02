@@ -13,9 +13,9 @@ The constructor requires an HTTP verb and a RELATIVE URL.
 >**NOTE:** there's no support for cross domain requests. yet!
 
 Options are optional.
-* `verb` (string, required) - one of: `'GET'`, `'POST'`, `'PUT'`, `'DELETE'`.
-* `url` (string, required) - the URL to assign the servant to. Should start with a slash e.g. `'/api'`.
-* `options` (Object, optional) - a configuration object (covered later).  
+* `verb` (string, required*) - one of: `'GET'`, `'POST'`, `'PUT'`, `'DELETE'`.
+* `url` (string, required*) - the URL to assign the servant to. Should start with a slash e.g. `'/api'`.
+* `options` (object, optional) - a configuration object (covered later).  
 
 >**NOTE:** Currently, only the 4 HTTP verbs listed above are supported formally but you can set `servant.verb` to whatever, after instanciation.
 
