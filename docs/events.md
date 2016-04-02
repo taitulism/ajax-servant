@@ -20,10 +20,18 @@ One of the servant lifecycle event:
 
 **Some of the listed events have aliases. [See below](#events-aliases)**
 
+
 ####optionalContext
 **type:** any  
-The context of the `this` keyword to call the following callback with.
-You can set the same context for all of the servant's callbacks ([see config docs](./init.md#ctx)). Use `optionalContext` to run the following callback with a specific context.
+When you want the following callback to run with a certain context. You can set a default context for all of the servant's callbacks ([see `options.ctx`](./init.md#ctx)).
+```js
+var servant = new AjaxServant('GET', '/api');
+
+servant.on('load', {b:2}, function () {
+  console.log(this); // -> {b:2}
+});
+```
+
 
 ####callback
 **type:** function  
