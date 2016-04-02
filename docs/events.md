@@ -18,14 +18,13 @@ One of the servant lifecycle event:
 * **abort** - gets called when when the request is being aborted
 * **error** - gets called when an error occured something is wrong with the request
 
-Some of them have aliases:
+Some of them have an alias:
 
 | Event Name |  alias   |
 |------------|----------|
 | loadStart  | start    |
 | load       | response |
 | loadEnd    | end      |
-| error      | err      |
 
 example:  
 ```js
