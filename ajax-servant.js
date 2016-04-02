@@ -133,6 +133,23 @@ var AjaxServant = (function (win, doc) {
 		return headersObj;
 	}
 
+	function formatResponse (xhr, headersObj) {
+		return {
+			status: {
+				code: xhr.status,
+				text: xhr.statusText
+			},
+			headers: headersObj,
+			body: xhr.responseText || xhr.responseXML
+		};
+	}
+
+	function getResponseHeader (xhr) {
+		const headersStr = xhr.getAllResponseHeaders();
+
+		return objectifyHeaders(headersStr);
+	}
+
 	function isUrl(url) {
 		// not supporting cross domain requests. yet!
 		return (typeof url === 'string' && url[0] === '/');
@@ -155,18 +172,15 @@ var AjaxServant = (function (win, doc) {
 
 			options = mixin({}, defaultOptions, options);
 
-			this.xhr         = null;
-			this.events      = {};
-			this.baseUrl     = baseUrl;
-			this.verb        = verb.toUpperCase();
-			this.ctx         = options.ctx;
-			this.baseQryStr  = options.qryStr;
-			this.baseHeaders = options.headers;
-			this.async       = isNotUndefined(options.async) ? options.async : true;
-
-			if (options.breakCache) {
-				this.cacheBreaker = this.getCacheBreaker(options.breakCache);
-			}
+			this.xhr          = null;
+			this.events       = {};
+			this.baseUrl      = baseUrl;
+			this.verb         = verb.toUpperCase();
+			this.ctx          = options.ctx;
+			this.baseQryStr   = options.qryStr;
+			this.baseHeaders  = options.headers;
+			this.async        = isNotUndefined(options.async) ? options.async : true;
+			this.cacheBreaker = this.getCacheBreaker(options.breakCache);
 		}
 
 		getXhr () {
@@ -174,6 +188,10 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		getCacheBreaker (breaker) {
+			if (!breaker) {
+				return false;
+			}
+
 			const type = typeof breaker;
 
 			return (type === 'string') ? breaker : DEFAULT_CACHE_BREAKER_KEY;
@@ -216,19 +234,11 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
-		formatResponse () {
+		getReaponse () {
 			const xhr = this.xhr;
-			const headersStr = xhr.getAllResponseHeaders();
-			const headersObj = objectifyHeaders(headersStr);
+			const headers = getResponseHeader(xhr);
 
-			return {
-				status: {
-					code: xhr.status,
-					text: xhr.statusText
-				},
-				headers: headersObj,
-				body: xhr.responseText || xhr.responseXML
-			};
+			return formatResponse(xhr, headers);
 		}
 
 		getDefaultWrapper (nativeName) {
@@ -236,7 +246,7 @@ var AjaxServant = (function (win, doc) {
 			const queue = this.getEventQueue(nativeName);
 
 			return function (ajaxEvent) {
-				const response = self.formatResponse();
+				const response = self.getReaponse();
 
 				queue.forEach(cbObj => {
 					const {ctx, fn} = cbObj;

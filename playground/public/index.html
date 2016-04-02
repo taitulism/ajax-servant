@@ -85,7 +85,7 @@
 			.on('done', function (response, servant, ajaxEvent) {
 				// console.log('load - got a response')
 				console.log('this:', this)
-				console.log('Response:', response.body)
+				console.log('Response:', response.headers)
 			})
 			.on('abort', (resonse, servant, ajaxEvent) => {
 				console.log('aborted')
