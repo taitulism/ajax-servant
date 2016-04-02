@@ -4,13 +4,15 @@ var AjaxServant = (function (win, doc) {
 /* Private vars */
 
 	const DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
+	const SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE'];
+	const INSUFFICIENT_DATA_ERR = "AjaxServant requires an HTTP verb and a base-URL as first parmeters:\n\tnew AjaxServant('GET', '/')";
 
 	const defaultOptions = {
-		async: true,
-		ctx: null,
-		qryStr: null,
-		headers: null,
+		async     : true,
 		breakCache: false,
+		ctx       : null,
+		qryStr    : null,
+		headers   : null,
 	};
 
 	const eventsDict = {
@@ -131,46 +133,50 @@ var AjaxServant = (function (win, doc) {
 		return headersObj;
 	}
 
+	function isUrl(url) {
+		// not supporting cross domain requests. yet!
+		return (typeof url === 'string' && url[0] === '/');
+		// TODO: add condition: || url.substr(0,4) === 'http'
+	}
+
+	function isSupported (verb) {
+		return ~SUPPORTED_VERBS.indexOf(verb.toUpperCase())
+	}
+
+	function isVerb (verb) {
+		return (typeof verb === 'string' && isSupported(verb));
+	}
 /* Class */
 	class AjaxServant {
-		constructor (verb = 'GET', baseUrl = '/', options) {
-			this.events = {};
-			this.config(verb, baseUrl, options);
-		}
+		constructor (verb, baseUrl, options = {}) {
+			if (!isVerb(verb) || !isUrl(baseUrl)) {
+				throw new Error(INSUFFICIENT_DATA_ERR);
+			}
 
-		config (verb = 'GET', baseUrl = '/', options) {
-			options = (!options) ? defaultOptions : mixin({}, defaultOptions, options);
+			options = mixin({}, defaultOptions, options);
 
 			this.xhr         = null;
-			this.verb        = verb.toUpperCase();
+			this.events      = {};
 			this.baseUrl     = baseUrl;
+			this.verb        = verb.toUpperCase();
 			this.ctx         = options.ctx;
 			this.baseQryStr  = options.qryStr;
 			this.baseHeaders = options.headers;
 			this.async       = isNotUndefined(options.async) ? options.async : true;
 
 			if (options.breakCache) {
-				this.setCacheBreaker(options.breakCache);
+				this.cacheBreaker = this.getCacheBreaker(options.breakCache);
 			}
-
-			return this;
 		}
 
 		getXhr () {
 			return this.xhr || createXHR();
 		}
 
-		setCacheBreaker (breaker) {
+		getCacheBreaker (breaker) {
 			const type = typeof breaker;
-			if (type === 'boolean') {
-				this.cacheBreaker = DEFAULT_CACHE_BREAKER_KEY;
-			}
-			else if (type === 'string') {
-				this.cacheBreaker = breaker;
-			}
-			else { // TODO: maybe this is useless
-				this.cacheBreaker = DEFAULT_CACHE_BREAKER_KEY;
-			}
+
+			return (type === 'string') ? breaker : DEFAULT_CACHE_BREAKER_KEY;
 		}
 
 		createEventObj (nativeName) {
@@ -281,7 +287,6 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		getFullHeaders (headers = null) {
-			console.log(this.baseHeaders)
 			return mixin({}, this.baseHeaders, headers);
 		}
 
