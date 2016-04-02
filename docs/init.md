@@ -1,5 +1,5 @@
-Create and Config
-=================
+Initialization
+==============
 
 Create
 ------
