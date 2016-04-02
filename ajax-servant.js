@@ -26,6 +26,7 @@ var AjaxServant = (function (win, doc) {
 		timeout   : 'timeout',
 		loadend   : 'loadend',
 		complete  : 'loadend',
+		done      : 'loadend',
 		progress  : 'progress',
 		response  : 'load',
 		loadstart : 'loadstart',
