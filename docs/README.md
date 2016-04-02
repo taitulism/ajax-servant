@@ -14,11 +14,6 @@ Create & Config
 ---------------
 ```js
 const servant = new AjaxServant('GET', '/api/user', options);
-
-// OR
-
-const servant = new AjaxServant('GET', '/api/user');
-servant.config(options);
 ```
 
 [Read more about initialization](./init.md)
