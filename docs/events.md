@@ -20,12 +20,12 @@ One of the servant lifecycle event:
 
 Some of them have aliases:
 
-| Event Name | aliases  |           |      |         |
-|------------|----------|-----------|------|---------|
-| loadStart  | start    | loadstart |      |         |
-| load       | response |           |      |         |
-| loadEnd    | end      | complete  | done | loadend |
-| error      | err      |           |      |         |
+| Event Name |  alias   |
+|------------|----------|
+| loadStart  | start    |
+| load       | response |
+| loadEnd    | end      |
+| error      | err      |
 
 example:  
 ```js
