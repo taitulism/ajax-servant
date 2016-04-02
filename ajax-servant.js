@@ -14,23 +14,23 @@ var AjaxServant = (function (win, doc) {
 	};
 
 	const eventsDict = {
-		readystatechange : 'readystatechange',
-		rsc       : 'readystatechange',
-		err       : 'error',
-		end       : 'loadend',
-		load      : 'load',
-		prog      : 'progress',
-		error     : 'error',
-		start     : 'loadstart',
 		abort     : 'abort',
 		timeout   : 'timeout',
+		prog      : 'progress',
+		progress  : 'progress',
+		err       : 'error',
+		error     : 'error',
+		start     : 'loadstart',
+		loadstart : 'loadstart',
+		load      : 'load',
+		response  : 'load',
+		end       : 'loadend',
 		loadend   : 'loadend',
 		complete  : 'loadend',
 		done      : 'loadend',
-		progress  : 'progress',
-		response  : 'load',
-		loadstart : 'loadstart',
-		resolve          : function (eventName) {
+		rsc             : 'readystatechange',
+		readystatechange: 'readystatechange',
+		resolve: function (eventName) {
 			eventName = eventName.toLowerCase();
 
 			if (this.hasOwnProperty(eventName) && eventName !== 'resolve') {
@@ -227,16 +227,16 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		getDefaultWrapper (nativeName) {
-			const ajaxServant = this;
-			const queue = ajaxServant.getEventQueue(nativeName);
+			const self = this;
+			const queue = this.getEventQueue(nativeName);
 
 			return function (ajaxEvent) {
-				const response = ajaxServant.formatResponse();
+				const response = self.formatResponse();
 
 				queue.forEach(cbObj => {
 					const {ctx, fn} = cbObj;
 
-					fn.apply(ctx, [response, ajaxServant, ajaxEvent]);
+					fn.apply(ctx, [response, self, ajaxEvent]);
 				});
 			};
 		}
@@ -255,8 +255,6 @@ var AjaxServant = (function (win, doc) {
 				cbFn = ctx;
 				ctx = this.ctx;
 			}
-
-			console.log('ctx', ctx)
 
 			// validate eventName
 			const nativeName = eventsDict.resolve(eventName);
@@ -367,7 +365,6 @@ var AjaxServant = (function (win, doc) {
 
 			log('request',{
 				verb: this.verb,
-
 				body: data
 			});
 

@@ -58,7 +58,8 @@
 						// headers: {asd:4567},
 						body: escape(dat)
 						// body: 'foo=bar&baz=The+first+line.%0D%0AThe+second+line.%0D%0A'
-					});
+					})
+			.abort()
 		}
 
 	</script>
@@ -84,10 +85,18 @@
 		var servant = new AjaxServant('POST', '/api', opts);
 
 
-		servant.on('done', {a:1}, function (response, servant, ajaxEvent) {
-			// log('load - got a response')
-			log('Response:', response.body)
-		});
+		servant
+			.on('done', {a:1}, function (response, servant, ajaxEvent) {
+				// log('load - got a response')
+				log('Response:', response.body)
+			})
+			.on('abort', (resonse, servant, ajaxEvent) => {
+				log('aborted')
+			})
+			.on('err', (resonse, servant, ajaxEvent) => {
+				log('error')
+			})
+		;
 
 
 
