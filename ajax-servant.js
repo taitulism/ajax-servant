@@ -8,7 +8,8 @@ var AjaxServant = (function (win, doc) {
 	const defaultOptions = {
 		async: true,
 		ctx: null,
-		qryStr: {},
+		qryStr: null,
+		headers: null,
 		breakCache: false,
 	};
 
@@ -57,6 +58,10 @@ var AjaxServant = (function (win, doc) {
 		return type.toLowerCase();
 	}
 
+	function isNotUndefined(x) {
+		return (typeof x !== 'undefined');
+	}
+
 	function forIn (obj, cbFn) {
 		if (!obj) {return};
 
@@ -99,7 +104,7 @@ var AjaxServant = (function (win, doc) {
 		const ary = [];
 
 		objects.forEach(obj => {
-			if (typeof obj !== 'object') {return;}
+			if (!obj || typeof obj !== 'object') {return;}
 
 			forIn(obj, function (key, value) {
 				const esc_key = encodeURIComponent(key);
@@ -131,18 +136,19 @@ var AjaxServant = (function (win, doc) {
 			this.whois = 'AjaxServant';
 			this.events = {};
 			this.xhr = createXHR();
+
 			this.config(verb, baseUrl, options);
 		}
 
 		config (verb = 'GET', baseUrl = '/', options) {
 			options = (!options) ? defaultOptions : mixin({}, defaultOptions, options);
 
-			this.verb       = verb.toUpperCase();
-			this.baseUrl    = baseUrl;
-			this.ctx        = options.ctx || this;
-			this.baseQryStr = options.qryStr;
+			this.verb        = verb.toUpperCase();
+			this.baseUrl     = baseUrl;
+			this.ctx         = options.ctx;
+			this.baseQryStr  = options.qryStr;
 			this.baseHeaders = options.headers;
-			this.async      = (typeof options.async === 'undefined') ? true : options.async;
+			this.async       = isNotUndefined(options.async) ? options.async : true;
 
 			if (options.breakCache) {
 				this.setCacheBreaker(options.breakCache);
@@ -175,7 +181,7 @@ var AjaxServant = (function (win, doc) {
 			return this.events[nativeName].queue;
 		}
 
-		setHeaders (headers) {
+		setHeaders (headers = null) {
 			const fullHeaders = this.getFullHeaders(headers);
 
 			if (!fullHeaders) {
@@ -240,11 +246,13 @@ var AjaxServant = (function (win, doc) {
 		on (eventName, ctx, cbFn) {
 			this.xhr = this.xhr || createXHR();
 
-			// shift args
+			// shift args: no ctx
 			if (!cbFn && typeof ctx === 'function') {
 				cbFn = ctx;
 				ctx = this.ctx;
 			}
+
+			console.log('ctx', ctx)
 
 			// validate eventName
 			const nativeName = eventsDict.resolve(eventName);
@@ -271,7 +279,7 @@ var AjaxServant = (function (win, doc) {
 			return this;
 		}
 
-		getFullHeaders (headers) {
+		getFullHeaders (headers = null) {
 			log(this.baseHeaders)
 			return mixin({}, this.baseHeaders, headers);
 		}
@@ -290,7 +298,7 @@ var AjaxServant = (function (win, doc) {
 			return '/' + params.join('/');
 		}
 
-		getFullQueryString (qryStrObj) {
+		getFullQueryString (qryStrObj = null) {
 			let queryString = stringifyAll(this.baseQryStr, qryStrObj);
 
 			if (this.cacheBreaker) {
