@@ -53,7 +53,14 @@ Adds a timestamp to the querystring (`key=value`) to get a fresh response. Pass 
 ####ctx
 **type:** any  
 **default:** `null`  
-The context of the `this` keyword to run your callbacks with. See [events](./events.md).
+The context of the `this` keyword to run your callbacks with.
+```js
+var servant = new AjaxServant('GET', '/api', {ctx: {a:1}});
+
+servant.on('load', function () {
+  console.log(this); // -> {a:1}
+});
+```
 
 
 ####qryStr
