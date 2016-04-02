@@ -136,14 +136,13 @@ var AjaxServant = (function (win, doc) {
 		constructor (verb = 'GET', baseUrl = '/', options) {
 			this.whois = 'AjaxServant';
 			this.events = {};
-			this.xhr = createXHR();
-
 			this.config(verb, baseUrl, options);
 		}
 
 		config (verb = 'GET', baseUrl = '/', options) {
 			options = (!options) ? defaultOptions : mixin({}, defaultOptions, options);
 
+			this.xhr         = null;
 			this.verb        = verb.toUpperCase();
 			this.baseUrl     = baseUrl;
 			this.ctx         = options.ctx;
@@ -156,6 +155,10 @@ var AjaxServant = (function (win, doc) {
 			}
 
 			return this;
+		}
+
+		getXhr () {
+			return this.xhr || createXHR();
 		}
 
 		setCacheBreaker (breaker) {
@@ -189,7 +192,7 @@ var AjaxServant = (function (win, doc) {
 				return null;
 			}
 
-			this.xhr = this.xhr || createXHR();
+			this.xhr = this.getXhr();
 
 			const xhr = this.xhr;
 
@@ -201,7 +204,7 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		setHeader (key, value) {
-			this.xhr = this.xhr || createXHR();
+			this.xhr = this.getXhr();
 
 			xhr.setRequestHeader(key, value);
 
@@ -245,7 +248,7 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		on (eventName, ctx, cbFn) {
-			this.xhr = this.xhr || createXHR();
+			this.xhr = this.getXhr();
 
 			// shift args: no ctx
 			if (!cbFn && typeof ctx === 'function') {
@@ -317,7 +320,7 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		open (params, qryStr) {
-			this.xhr = this.xhr || createXHR();
+			this.xhr = this.getXhr();
 
 			const fullUrl = this.getFullUrl(this.baseUrl, params, qryStr);
 
@@ -355,7 +358,7 @@ var AjaxServant = (function (win, doc) {
 		}
 
 		send ({params, qryStr, headers, body} = {}) {
-			this.xhr = this.xhr || createXHR();
+			this.xhr = this.getXhr();
 			const data = this.formatBody(body);
 
 			this.open(params, qryStr);
