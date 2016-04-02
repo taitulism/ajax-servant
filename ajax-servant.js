@@ -45,9 +45,6 @@ var AjaxServant = (function (win, doc) {
 		timeout () {}
 	};
 
-		// "loadend" event is triggered after: "load, "abort" and "error".
-		// i.e. Done, but result is unknown.
-
 /* Private functions */
 	function getType (x) {
 		let type = typeof x;
