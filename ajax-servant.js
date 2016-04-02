@@ -16,22 +16,20 @@ var AjaxServant = (function (win, doc) {
 	};
 
 	const eventsDict = {
-		abort     : 'abort',
-		timeout   : 'timeout',
-		prog      : 'progress',
-		progress  : 'progress',
-		err       : 'error',
-		error     : 'error',
-		start     : 'loadstart',
-		loadstart : 'loadstart',
-		load      : 'load',
-		response  : 'load',
-		end       : 'loadend',
-		loadend   : 'loadend',
-		complete  : 'loadend',
-		done      : 'loadend',
+		abort           : 'abort',
+		timeout         : 'timeout',
+		prog            : 'progress',
+		progress        : 'progress',
+		error           : 'error',
+		start           : 'loadstart',
+		loadstart       : 'loadstart',
+		load            : 'load',
+		response        : 'load',
+		end             : 'loadend',
+		loadend         : 'loadend',
 		rsc             : 'readystatechange',
 		readystatechange: 'readystatechange',
+		
 		resolve: function (eventName) {
 			eventName = eventName.toLowerCase();
 
