@@ -6,6 +6,16 @@ var AjaxServant = (function (win, doc) {
 	const DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
 	const SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE'];
 	const INSUFFICIENT_DATA_ERR = "AjaxServant requires an HTTP verb and a base-URL as first parmeters:\n\tnew AjaxServant('GET', '/')";
+	const EVENT_NAME = {
+		ABORT           : 'abort',
+		TIMEOUT         : 'timeout',
+		PROGRESS        : 'progress',
+		ERROR           : 'error',
+		LOADSTART       : 'loadstart',
+		LOAD            : 'load',
+		LOADEND         : 'loadend',
+		READYSTATECHANGE: 'readystatechange',
+	};
 
 	const defaultOptions = {
 		async     : true,
@@ -16,19 +26,17 @@ var AjaxServant = (function (win, doc) {
 	};
 
 	const eventsDict = {
-		abort           : 'abort',
-		timeout         : 'timeout',
-		prog            : 'progress',
-		progress        : 'progress',
-		error           : 'error',
-		start           : 'loadstart',
-		loadstart       : 'loadstart',
-		load            : 'load',
-		response        : 'load',
-		end             : 'loadend',
-		loadend         : 'loadend',
-		rsc             : 'readystatechange',
-		readystatechange: 'readystatechange',
+		abort            : EVENT_NAME.ABORT,
+		error            : EVENT_NAME.ERROR,
+		timeout          : EVENT_NAME.TIMEOUT,
+		progress         : EVENT_NAME.PROGRESS,
+		start            : EVENT_NAME.LOADSTART,
+		loadstart        : EVENT_NAME.LOADSTART,
+		load             : EVENT_NAME.LOAD,
+		response         : EVENT_NAME.LOAD,
+		end              : EVENT_NAME.LOADEND,
+		loadend          : EVENT_NAME.LOADEND,
+		readystatechange : EVENT_NAME.READYSTATECHANGE,
 		
 		resolve: function (eventName) {
 			eventName = eventName.toLowerCase();

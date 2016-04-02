@@ -66,7 +66,7 @@
 	<script>
 	//-------------------------------
 		const opts = {
-			ctx:{b:2},
+			ctx:{a:1},
 			// qryStr: {def: 'DEF'},
 			breakCache: 'zzz',
 			headers: {
@@ -82,15 +82,13 @@
 
 
 		servant
-			.on('done', function (response, servant, ajaxEvent) {
-				// console.log('load - got a response')
-				console.log('this:', this)
+			.on('end', function (response, servant, ajaxEvent) {
 				console.log('Response:', response.headers)
 			})
 			.on('abort', (resonse, servant, ajaxEvent) => {
 				console.log('aborted')
 			})
-			.on('err', (resonse, servant, ajaxEvent) => {
+			.on('error', (resonse, servant, ajaxEvent) => {
 				console.log('error')
 			})
 		;
