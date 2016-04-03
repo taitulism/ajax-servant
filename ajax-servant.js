@@ -6,6 +6,7 @@ var AjaxServant = (function (win, doc) {
 	const DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
 	const SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE'];
 	const INSUFFICIENT_DATA_ERR = "AjaxServant requires an HTTP verb and a base-URL as first parmeters:\n\tnew AjaxServant('GET', '/')";
+	const UNKNOWN_EVENT_ERR = "An unknown event name";
 	const EVENT_NAME = {
 		ABORT           : 'abort',
 		TIMEOUT         : 'timeout',
@@ -39,13 +40,17 @@ var AjaxServant = (function (win, doc) {
 		readystatechange : EVENT_NAME.READYSTATECHANGE,
 		
 		resolve: function (eventName) {
+			if (!eventName || typeof eventName !== 'string') {
+				return false;
+			}
+
 			eventName = eventName.toLowerCase();
 
 			if (this.hasOwnProperty(eventName) && eventName !== 'resolve') {
 				return this[eventName];
 			}
 
-			return null;
+			return false;
 		}
 	};
 
@@ -344,7 +349,9 @@ var AjaxServant = (function (win, doc) {
 
 			// validate eventName
 			const nativeName = eventsDict.resolve(eventName);
-			if (!nativeName) {return this;}
+			if (!nativeName) {
+				throw new Error(UNKNOWN_EVENT_ERR);
+			}
 
 			// get or create eventObj
 			const eventObj = this.events[nativeName] || createEventObj(nativeName);
@@ -370,11 +377,12 @@ var AjaxServant = (function (win, doc) {
 		send ({params, qryStr, headers, body} = {}) {
 			this.xhr = getXhr(this);
 
-			const data = formatBody(body, this.verb);
+			const verb = this.verb;
+			const data = formatBody(body, verb);
 			const url  = getFullUrl(this, params, qryStr);
 
 			// open
-			this.xhr.open(this.verb, url, this.async);
+			this.xhr.open(verb, url, this.async);
 
 			// set headers
 			setHeaders(this, headers, data);
@@ -382,11 +390,7 @@ var AjaxServant = (function (win, doc) {
 			// send
 			this.xhr.send(data);
 
-			console.log('request',[
-				this.verb,
-				url,
-				data
-			]);
+			console.log('Request:',[verb, url, data]);
 
 			return this;
 		}
