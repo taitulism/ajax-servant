@@ -18,7 +18,7 @@ One of the servant lifecycle event:
 * **abort** - gets called when when the request is being aborted
 * **error** - gets called when an error occured something is wrong with the request
 
-Some of them have an alias:
+Some of them have an alias (and all are case-insensitive):
 
 | Event Name |  alias   |
 |------------|----------|
