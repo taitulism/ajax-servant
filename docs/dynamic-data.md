@@ -3,7 +3,7 @@ Dynamic Data Object
 When sending a `servant` on its way you can send it with some dynamic data (per request).
 
 This data object includes the following props (all are optional):  
-* **params** - (array | string) URL segments
+* **params** - (array | string) addition URL segments (e.g. `['a','b']` or `'/a/b'`)
 * **qryStr** - (object) querystring parameters object (e.g. `{key:value}`)
 * **headers** - (object) request headers
 * **body** - (any) request body
