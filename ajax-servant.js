@@ -170,7 +170,6 @@ var AjaxServant = (function (win, doc) {
 		return (typeof verb === 'string' && isSupported(verb));
 	}
 
-
 	function getFullQueryString (baseQryStr, dynaQryStr, cacheBreaker) {
 		let cacheBreakerObj;
 
@@ -187,9 +186,21 @@ var AjaxServant = (function (win, doc) {
 		return queryString ? ('?' + queryString) : '';
 	}
 
+	function removePreSlash (urlParamsStr) {
+		if (urlParamsStr[0] === '/') {
+			return urlParamsStr.substr(1);
+		}
+		return urlParamsStr;
+	}
+
 	function getUrlParams (urlParams) {
 		if (!urlParams || !urlParams.length) {
 			return '';
+		}
+
+		if (typeof urlParams === 'string') {
+			urlParams = removePreSlash(urlParams);
+			return `/${urlParams}`;
 		}
 
 		const params = urlParams.filter(param => (param && typeof param === 'string'));
