@@ -47,19 +47,6 @@
 			});
 		}
 
-		function mySend () {
-			const dat = `${d1.name}=${d1.value}${d2.name}=${d2.value}${d3.name}=${d3.value}`;
-
-			servant.send({
-						// params: ['a','b','c'],
-						// qryStr: {a:1, b:2},
-						// headers: {asd:4567},
-						body: escape(dat)
-						// body: 'foo=bar&baz=The+first+line.%0D%0AThe+second+line.%0D%0A'
-					})
-			// .abort()
-		}
-
 	</script>
 		
 	<script src="ajax-servant.js"></script>
@@ -68,7 +55,7 @@
 		const opts = {
 			ctx:{a:1},
 			// qryStr: {def: 'DEF'},
-			breakCache: 'zzz',
+			breakCache: '_',
 			headers: {
 				'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
 				// 'Content-type': 'application/json;charset=UTF-8',
@@ -83,7 +70,8 @@
 
 		servant
 			.on('end', function (response, servant, ajaxEvent) {
-				console.log('Response:', response.headers)
+				console.log('Response Headers:', response.headers)
+				console.log('Response body:', response.body)
 			})
 			.on('abort', (resonse, servant, ajaxEvent) => {
 				console.log('aborted')
@@ -100,7 +88,18 @@ $('#go').on('click', e => {
 	e.preventDefault();
 	// debugger
 	// jqrSend();
-	mySend();
+
+	const dat = `${d1.name}=${d1.value}${d2.name}=${d2.value}${d3.name}=${d3.value}`;
+
+	servant.send({
+		params: ['a','b','c'],
+		qryStr: {filter: 'qwe'},
+		// headers: {asd:4567},
+		body: 'sababa'
+		// body: escape(dat)
+		// body: 'foo=bar&baz=The+first+line.%0D%0AThe+second+line.%0D%0A'
+	})
+	// .abort()
 });
 
 

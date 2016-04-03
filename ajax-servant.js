@@ -169,6 +169,139 @@ var AjaxServant = (function (win, doc) {
 	function isVerb (verb) {
 		return (typeof verb === 'string' && isSupported(verb));
 	}
+
+
+	function getFullQueryString (baseQryStr, dynaQryStr, cacheBreaker) {
+		let cacheBreakerObj;
+
+		if (cacheBreaker) {
+			cacheBreakerObj = {};
+			cacheBreakerObj[cacheBreaker] = Date.now();
+		}
+		else {
+			cacheBreakerObj = null;
+		}
+
+		const queryString = stringifyAll(baseQryStr, dynaQryStr, cacheBreakerObj);
+
+		return queryString ? ('?' + queryString) : '';
+	}
+
+	function getUrlParams (urlParams) {
+		if (!urlParams || !urlParams.length) {
+			return '';
+		}
+
+		const params = urlParams.filter(param => (param && typeof param === 'string'));
+
+		if (!params.length) {
+			return '';
+		}
+
+		return `/${params.join('/')}`;
+	}
+
+	function getFullUrl (servant, params, qryStr) {
+		const baseUrl = normalizeBaseUrl(servant.baseUrl);
+
+		params = getUrlParams(params);
+		qryStr = getFullQueryString(servant.baseQryStr, qryStr, servant.cacheBreaker);
+
+		return baseUrl + params + qryStr;
+	}
+
+	function setHeaders (servant, headers = null) {
+		const fullHeaders = mixin({}, servant.baseHeaders, headers);
+
+		if (!fullHeaders) {
+			return null;
+		}
+
+		const xhr = getXhr(servant);
+
+		forIn(fullHeaders, function (key, value) {
+			xhr.setRequestHeader(key, value);
+		});
+	}
+
+	function formatBody (data, verb) {
+		const type = getType(data);
+
+		if (!data || verb === 'GET' || verb === 'HEAD') {
+			return null;
+		}
+
+		if (type === 'string') {
+			return data;
+		}
+
+		if (type === 'number') {
+			return data + '';
+		}
+
+		if (type === 'object' || type === 'array') {
+			try {
+				return JSON.stringify(data);
+			}
+			catch (err) {
+				return null;
+			}
+		}
+
+		return data.toString() || null;
+	}
+
+	function getCacheBreaker (breaker) {
+		if (!breaker) {
+			return false;
+		}
+
+		const type = typeof breaker;
+
+		return (type === 'string') ? breaker : DEFAULT_CACHE_BREAKER_KEY;
+	}
+
+	function getEventQueue (servant, nativeName) {
+		return servant.events[nativeName].queue;
+	}
+
+	function getResponse (xhr) {
+		const headers = getResponseHeader(xhr);
+
+		return formatResponse(xhr, headers);
+	}
+
+	function getDefaultWrapper (servant, nativeName) {
+		const queue = getEventQueue(servant, nativeName);
+
+		return function (ajaxEvent) {
+			const response = getResponse(servant.xhr);
+
+			queue.forEach(cbObj => {
+				const {ctx, fn} = cbObj;
+
+				fn.apply(ctx, [response, servant, ajaxEvent]);
+			});
+		};
+	}
+
+	function getWrapper (servant, nativeName) {
+		return (eventsWrappers[nativeName])
+			? eventsWrappers[nativeName].call(servant, nativeName)
+			: getDefaultWrapper(servant, nativeName);
+	}
+
+	function createEventObj (nativeName) {
+		return {
+			queue: [],
+			wrapper: null
+		};
+	}
+
+	function getXhr (servant) {
+		return servant.xhr || createXHR();
+	}
+
 /* Class */
 	class AjaxServant {
 		constructor (verb, baseUrl, options = {}) {
@@ -186,90 +319,11 @@ var AjaxServant = (function (win, doc) {
 			this.baseQryStr   = options.qryStr;
 			this.baseHeaders  = options.headers;
 			this.async        = isNotUndefined(options.async) ? options.async : true;
-			this.cacheBreaker = this.getCacheBreaker(options.breakCache);
-		}
-
-		getXhr () {
-			return this.xhr || createXHR();
-		}
-
-		getCacheBreaker (breaker) {
-			if (!breaker) {
-				return false;
-			}
-
-			const type = typeof breaker;
-
-			return (type === 'string') ? breaker : DEFAULT_CACHE_BREAKER_KEY;
-		}
-
-		createEventObj (nativeName) {
-			return {
-				queue: [],
-				wrapper: null
-			};
-		}
-
-		getEventQueue (nativeName) {
-			return this.events[nativeName].queue;
-		}
-
-		setHeaders (headers = null) {
-			const fullHeaders = this.getFullHeaders(headers);
-
-			if (!fullHeaders) {
-				return null;
-			}
-
-			this.xhr = this.getXhr();
-
-			const xhr = this.xhr;
-
-			forIn(fullHeaders, function (key, value) {
-				xhr.setRequestHeader(key, value);
-			});
-
-			return this;
-		}
-
-		setHeader (key, value) {
-			this.xhr = this.getXhr();
-
-			xhr.setRequestHeader(key, value);
-
-			return this;
-		}
-
-		getReaponse () {
-			const xhr = this.xhr;
-			const headers = getResponseHeader(xhr);
-
-			return formatResponse(xhr, headers);
-		}
-
-		getDefaultWrapper (nativeName) {
-			const self = this;
-			const queue = this.getEventQueue(nativeName);
-
-			return function (ajaxEvent) {
-				const response = self.getReaponse();
-
-				queue.forEach(cbObj => {
-					const {ctx, fn} = cbObj;
-
-					fn.apply(ctx, [response, self, ajaxEvent]);
-				});
-			};
-		}
-
-		getWrapper (nativeName) {
-			return (eventsWrappers[nativeName])
-				? eventsWrappers[nativeName].call(this, nativeName)
-				: this.getDefaultWrapper(nativeName);
+			this.cacheBreaker = getCacheBreaker(options.breakCache);
 		}
 
 		on (eventName, ctx, cbFn) {
-			this.xhr = this.getXhr();
+			this.xhr = getXhr(this);
 
 			// shift args: no ctx
 			if (!cbFn && typeof ctx === 'function') {
@@ -282,7 +336,7 @@ var AjaxServant = (function (win, doc) {
 			if (!nativeName) {return this;}
 
 			// get or create eventObj
-			const eventObj = this.events[nativeName] || this.createEventObj(nativeName);
+			const eventObj = this.events[nativeName] || createEventObj(nativeName);
 
 			// add to queue
 			eventObj.queue.push({
@@ -294,99 +348,34 @@ var AjaxServant = (function (win, doc) {
 			if (!eventObj.wrapper) {
 				this.events[nativeName] = eventObj;
 
-				eventObj.wrapper = this.getWrapper(nativeName);
+				eventObj.wrapper = getWrapper(this, nativeName);
 
-				this.xhr.addEventListener(nativeName, eventObj.wrapper)
+				this.xhr.addEventListener(nativeName, eventObj.wrapper);
 			}
 
 			return this;
-		}
-
-		getFullHeaders (headers = null) {
-			return mixin({}, this.baseHeaders, headers);
-		}
-
-		getUrlParams (urlParams) {
-			if (!urlParams || !urlParams.length) {
-				return '';
-			}
-
-			const params = urlParams.filter(param => param && typeof param === 'string');
-
-			if (!params.length) {
-				return '';
-			}
-
-			return '/' + params.join('/');
-		}
-
-		getFullQueryString (qryStrObj = null) {
-			let queryString = stringifyAll(this.baseQryStr, qryStrObj);
-
-			if (this.cacheBreaker) {
-				queryString += `&${this.cacheBreaker}=${Date.now()}`;
-			}
-
-			return queryString ? '?' + queryString : '';
-		}
-
-		getFullUrl (baseUrl, urlParams, qryStrObj) {
-			const url = normalizeBaseUrl(baseUrl) + this.getUrlParams(urlParams);
-			const queryString = this.getFullQueryString(qryStrObj);
-
-			return url + queryString;
-		}
-
-		open (params, qryStr) {
-			this.xhr = this.getXhr();
-
-			const fullUrl = this.getFullUrl(this.baseUrl, params, qryStr);
-
-			this.xhr.open(this.verb, fullUrl, this.async);
-
-			return this;
-		}
-
-		formatBody (data) {
-			const type = getType(data);
-			const verb = this.verb;
-
-			if (!data || verb === 'GET' || verb === 'HEAD') {
-				return null;
-			}
-
-			if (type === 'string') {
-				return data;
-			}
-
-			if (type === 'number') {
-				return data + '';
-			}
-
-			if (type === 'object' || type === 'array') {
-				try {
-					return JSON.stringify(data);
-				}
-				catch (err) {
-					return null;
-				}
-			}
-
-			return data.toString() || null;
 		}
 
 		send ({params, qryStr, headers, body} = {}) {
-			this.xhr = this.getXhr();
-			const data = this.formatBody(body);
+			this.xhr = getXhr(this);
 
-			this.open(params, qryStr);
-			this.setHeaders(headers, data);
+			const data = formatBody(body, this.verb);
+			const url  = getFullUrl(this, params, qryStr);
+
+			// open
+			this.xhr.open(this.verb, url, this.async);
+
+			// set headers
+			setHeaders(this, headers, data);
+			
+			// send
 			this.xhr.send(data);
 
-			console.log('request',{
-				verb: this.verb,
-				body: data
-			});
+			console.log('request',[
+				this.verb,
+				url,
+				data
+			]);
 
 			return this;
 		}
