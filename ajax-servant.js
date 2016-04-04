@@ -5,8 +5,11 @@ var AjaxServant = (function (win, doc) {
 
 	const DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
 	const SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE'];
-	const INSUFFICIENT_DATA_ERR = "AjaxServant requires an HTTP verb and a base-URL as first parmeters:\n\tnew AjaxServant('GET', '/')";
-	const UNKNOWN_EVENT_ERR = "An unknown event name";
+	const CONSTRUCTOR_SIGNATURE = "new AjaxServant(verb, url, options)";
+	const DOT_ON_SIGNATURE = 'AjaxServant.on(eventName, optionalContext, eventHandler)';
+	const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;
+	const UNKNOWN_EVENT_ERR = 'An unknown XMLHttpRequest eventName: ' + DOT_ON_SIGNATURE;
+	const CALLBACK_NOT_FUNCTION_ERR = 'eventHandler should be a function: ' + DOT_ON_SIGNATURE;
 	const EVENT_NAME = {
 		ABORT           : 'abort',
 		TIMEOUT         : 'timeout',
@@ -322,7 +325,7 @@ var AjaxServant = (function (win, doc) {
 	class AjaxServant {
 		constructor (verb, baseUrl, options = {}) {
 			if (!isVerb(verb) || !isUrl(baseUrl)) {
-				throw new Error(INSUFFICIENT_DATA_ERR);
+				throw new TypeError(CONSTRUCTOR_INVALID_ARGS_ERR);
 			}
 
 			options = mixin({}, defaultOptions, options);
@@ -349,8 +352,11 @@ var AjaxServant = (function (win, doc) {
 
 			// validate eventName
 			const nativeName = eventsDict.resolve(eventName);
-			if (!nativeName) {
-				throw new Error(UNKNOWN_EVENT_ERR);
+			if (!nativeName || typeof cbFn !== 'function') {
+				if (!nativeName) {
+					throw new TypeError(UNKNOWN_EVENT_ERR);
+				}
+				throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
 			}
 
 			// get or create eventObj
