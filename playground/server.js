@@ -38,6 +38,7 @@ aServer.start(function (req, res) {
 		'use strict';
 
 		const qry =  $url.parse(req.url, true).query;
+		log('');
 		log(req.method, req.url);
 		log(req.headers['content-type']);
 
