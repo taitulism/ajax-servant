@@ -10,7 +10,7 @@ describe('AjaxServant', function() {
 		it('should be a function', function() {
 			expect(AjaxServant).to.be.a('function');
 		});
-		
+
 		it('should have a .on() API method', function() {
 			expect(AjaxServant.prototype.on).to.be.an('function');
 		});
@@ -21,10 +21,6 @@ describe('AjaxServant', function() {
 
 		it('should have a .abort() API method', function() {
 			expect(AjaxServant.prototype.abort).to.be.an('function');
-		});
-
-		it('should have a .dismiss() API method', function() {
-			expect(AjaxServant.prototype.dismiss).to.be.an('function');
 		});
 
 		it('should have a .dismiss() API method', function() {
