@@ -2,11 +2,10 @@ require("babel-register");
 
 const expect = require('chai').expect;
 
-// const AjaxServant = require('../ajax-servant').default;
 import AjaxServant from '../ajax-servant';
 
 describe('AjaxServant', function() {
-	describe('AjaxServant Class', function() {
+	describe('class', function() {
 		it('should be a function', function() {
 			expect(AjaxServant).to.be.a('function');
 		});
@@ -27,4 +26,58 @@ describe('AjaxServant', function() {
 			expect(AjaxServant.prototype.dismiss).to.be.an('function');
 		});
 	});
+
+	describe('instance', function () {
+		const CONSTRUCTOR_ERROR = 'AjaxServant requires two strings';
+
+		it('should have a .on() API method', function () {
+			const servant = new AjaxServant('GET', '/');
+			expect(servant).to.have.property('on');
+		});
+
+		it('should have a .send() API method', function () {
+			const servant = new AjaxServant('GET', '/');
+			expect(servant).to.have.property('send');
+		});
+
+		it('should have a .abort() API method', function () {
+			const servant = new AjaxServant('GET', '/');
+			expect(servant).to.have.property('abort');
+		});
+
+		it('should have a .dismiss() API method', function () {
+			const servant = new AjaxServant('GET', '/');
+			expect(servant).to.have.property('dismiss');
+		});
+
+		it('should throw an error when constructed with no arguments', function () {
+			try {
+				new AjaxServant();
+			}
+			catch (err) {
+				expect(err.name).to.equal('TypeError');
+				expect(err.message).to.contain(CONSTRUCTOR_ERROR);
+			}
+		});
+
+		it('should throw an error when constructed with one argument', function () {
+			try {
+				new AjaxServant('GET');
+			}
+			catch (err) {
+				expect(err.name).to.equal('TypeError');
+				expect(err.message).to.contain(CONSTRUCTOR_ERROR);
+			}
+		});
+
+		it('should throw an error when constructed with invalid arguments', function () {
+			try {
+				new AjaxServant('aaa', 'bbb');
+			}
+			catch (err) {
+				expect(err.name).to.equal('TypeError');
+				expect(err.message).to.contain(CONSTRUCTOR_ERROR);
+			}
+		});
+	})
 });
