@@ -4,7 +4,7 @@
 
 const DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
 const SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE'];
-const CONSTRUCTOR_SIGNATURE = "new AjaxServant(verb, url, options)";
+const CONSTRUCTOR_SIGNATURE = 'new AjaxServant(verb, url, options)';
 const DOT_ON_SIGNATURE = 'AjaxServant.on(eventName, optionalContext, eventHandler)';
 const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;
 const UNKNOWN_EVENT_ERR = 'An unknown XMLHttpRequest eventName: ' + DOT_ON_SIGNATURE;
@@ -17,7 +17,7 @@ const EVENT_NAME = {
 	LOADSTART       : 'loadstart',
 	LOAD            : 'load',
 	LOADEND         : 'loadend',
-	READYSTATECHANGE: 'readystatechange',
+	READYSTATECHANGE: 'readystatechange'
 };
 
 const defaultOptions = {
@@ -25,7 +25,7 @@ const defaultOptions = {
 	breakCache: false,
 	ctx       : null,
 	qryStr    : null,
-	headers   : null,
+	headers   : null
 };
 
 const eventsDict = {
@@ -79,7 +79,7 @@ function isNotUndefined(x) {
 }
 
 function forIn (obj, cbFn) {
-	if (!obj) {return};
+	if (!obj) {return;}
 
 	const hasOwn = Object.hasOwnProperty;
 
@@ -170,7 +170,7 @@ function isUrl(url) {
 }
 
 function isSupported (verb) {
-	return ~SUPPORTED_VERBS.indexOf(verb.toUpperCase())
+	return ~SUPPORTED_VERBS.indexOf(verb.toUpperCase());
 }
 
 function isVerb (verb) {
@@ -309,7 +309,7 @@ function getWrapper (servant, nativeName) {
 		: getDefaultWrapper(servant, nativeName);
 }
 
-function createEventObj (nativeName) {
+function createEventObj () {
 	return {
 		queue: [],
 		wrapper: null
@@ -359,7 +359,7 @@ class AjaxServant {
 		}
 
 		// get or create eventObj
-		const eventObj = this.events[nativeName] || createEventObj(nativeName);
+		const eventObj = this.events[nativeName] || createEventObj();
 
 		// add to queue
 		eventObj.queue.push({
@@ -395,7 +395,8 @@ class AjaxServant {
 		// send
 		this.xhr.send(data);
 
-		console.log('Request:',[verb, url, data]);
+		/*eslint no-console: ["error", { allow: ["warn", "error"] }] */
+		// console.warn('Request:',[verb, url, data]);
 
 		return this;
 	}

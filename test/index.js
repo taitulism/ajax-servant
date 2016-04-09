@@ -79,5 +79,16 @@ describe('AjaxServant', function() {
 				expect(err.message).to.contain(CONSTRUCTOR_ERROR);
 			}
 		});
+
+		describe('.on()', function () {
+			it('should add an event handler', function () {
+				const servant = new AjaxServant('GET', '/api');
+				const handler = function handler () {};
+
+				servant.on('reposnse', handler);
+
+				console.log(servant.events)
+			});
+		});
 	})
 });

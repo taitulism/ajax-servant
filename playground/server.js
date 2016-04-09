@@ -40,7 +40,7 @@ aServer.start(function (req, res) {
 		const qry =  $url.parse(req.url, true).query;
 		log('');
 		log(req.method, req.url);
-		log(req.headers['content-type']);
+		log(req.headers['content-type'] || 'no headers');
 
 		if (req.method === 'POST') {
 			parsePOSTBody(req, res, function (body) {
