@@ -1,7 +1,10 @@
 // require("babel-register");
 
-import {expect} from 'chai';
-import AjaxServant from '../ajax-servant';
+// import {expect} from 'chai';
+// import AjaxServant from '../ajax-servant';
+
+var expect = require('chai').expect;
+var AjaxServant = require('../dist/ajax-servant.bundle').default;
 
 describe('AjaxServant', function() {
 	describe('class', function() {
