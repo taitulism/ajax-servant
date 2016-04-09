@@ -49,7 +49,7 @@
 
 	</script>
 		
-	<script src="compiled.js"></script>
+	<script src="dist/ajax-servant.bundle.js"></script>
 	<script>
 	//-------------------------------
 		const opts = {
@@ -62,11 +62,11 @@
 				// 'Content-type': 'text/plain',
 				// qwe:1234
 			}
-
-
 		}
-		var servant = new AjaxServant('POST','/api', opts);
 
+		console.log(AjaxServant.default.name === 'AjaxServant' && 'loaded' || 'not loaded')
+
+		var servant = new AjaxServant.default('POST','/api', opts);
 
 		servant
 			.on('end', function (response, servant, ajaxEvent) {

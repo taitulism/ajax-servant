@@ -1,7 +1,6 @@
-require("babel-register");
+// require("babel-register");
 
-const expect = require('chai').expect;
-
+import {expect} from 'chai';
 import AjaxServant from '../ajax-servant';
 
 describe('AjaxServant', function() {
@@ -80,15 +79,15 @@ describe('AjaxServant', function() {
 			}
 		});
 
-		describe('.on()', function () {
-			it('should add an event handler', function () {
-				const servant = new AjaxServant('GET', '/api');
-				const handler = function handler () {};
+		// describe('.on()', function () {
+		// 	it('should add an event handler', function () {
+		// 		const servant = new AjaxServant('GET', '/api');
+		// 		const handler = function handler () {};
 
-				servant.on('reposnse', handler);
+		// 		servant.on('reposnse', handler);
 
-				console.log(servant.events)
-			});
-		});
+		// 		console.log(servant.events)
+		// 	});
+		// });
 	})
 });

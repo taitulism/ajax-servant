@@ -1,10 +1,11 @@
 var $url = require('url');
 var qs = require('querystring');
+var send = require('send');
 
 var serveStatic = require('serve-static');
 var serve = serveStatic(`${__dirname}/public`, {'index': 'index.html'});
 
-var aServer = require('a-server')();
+var aServer = require('a-server')({port:8081});
 
 var log = console.log;
 
@@ -26,16 +27,17 @@ function parsePOSTBody(req, res, next) {
     });
 }
 
-
-
 aServer.start(function (req, res) {
 	if (req.url === '/favicon.ico') {
 		res.end();
 		return;
 	}
 
+	if (req.url === '/dist/ajax-servant.bundle.js') {
+		send(req, '.' + req.url).pipe(res);
+		return;
+	}
 	serve(req, res, function () {
-		'use strict';
 
 		const qry =  $url.parse(req.url, true).query;
 		log('');
