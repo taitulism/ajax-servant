@@ -57,7 +57,7 @@ return /******/ (function(modules) { // webpackBootstrap
   \**************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(/*! /Users/itai/Google Drive/Code/Javascript/Modules/ajax-servant/src/ajax-servant.js */1);
+	module.exports = __webpack_require__(/*! ./src/ajax-servant.js */1);
 
 
 /***/ },
