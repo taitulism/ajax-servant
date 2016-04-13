@@ -70,7 +70,7 @@ aServer.start(function (req, res) {
 				return;
 			}
 
-			res.end('body');
+			res.end('GET');
 			return;
 		}
 

@@ -184,117 +184,7 @@ describe('AjaxServant', function() {
 			});
 		});
 
-		describe('.send()', function () {
-			it('should send base data to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
-
-				servant.on('response', function (responseObj) {
-					expect(responseObj.body).to.equal('body');
-					done()
-				});
-
-				servant.send();
-			});
-
-			it('should send base queryString to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {qryStr: {'qry':'str'}});
-
-				servant.on('response', function (responseObj) {
-					expect(responseObj.body).to.equal('?qry=str');
-					done()
-				});
-
-				servant.send();
-			});
-
-			it('should send base headers to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {headers: {'X-Requested-With':'Ajax-Servant'}});
-
-				servant.on('response', function (responseObj) {
-					expect(responseObj.body).to.equal('Ajax-Servant');
-					done()
-				});
-
-				servant.send();
-			});
-
-			it('should send base URL params to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/a/b/c');
-
-				servant.on('response', function (responseObj) {
-					expect(responseObj.body).to.equal('/a/b/c');
-					done()
-				});
-
-				servant.send();
-			});
-
-			it('should send dynamic body to the server', function (done) {
-				const OK_MESSAGE = 'hello world';
-				const servant = new AjaxServant('POST', LOCAL_TEST_SERVER_URL);
-
-				servant.on('response', function (responseObj) {
-					expect(responseObj.body).to.equal(OK_MESSAGE);
-					done()
-				});
-
-				servant.send({body: OK_MESSAGE});
-			});
-
-			it('should send dynamic queryString to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
-
-				servant.on('response', function (responseObj) {
-					expect(responseObj.body).to.equal('?qry=str');
-					done()
-				});
-
-				servant.send({qryStr: {'qry':'str'}});
-			});
-
-			it('should send dynamic headers to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
-
-				servant.on('response', function (responseObj) {
-					expect(responseObj.body).to.equal('Ajax-Servant');
-					done()
-				});
-
-				servant.send({headers: {'X-Requested-With':'Ajax-Servant'}});
-			});
-
-			it('should send dynamic URL params to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
-
-				servant.on('response', function (responseObj) {
-					expect(responseObj.body).to.equal('/a/b/c');
-					done()
-				});
-
-				servant.send({params: ['a','b','c']});
-			});
-
-			describe.skip('trigger events', function () {
-				// TODO:
-			});
-		});
-
-		describe('.abort()', function () {
-			it('should add an event handler', function () {
-				const servant = new AjaxServant('GET', '/api');
-
-				servant.on('response', noopFn);
-				servant.send();
-				servant.abort('response', noopFn);
-
-			});
-
-			it('should add an event handler with a context', function () {
-				expect(true).to.equal(false);
-			});
-		});
-
-		describe('.dismiss()', function () {
+		describe.skip('.dismiss()', function () {
 			it('should add an event handler', function () {
 				const servant = new AjaxServant('GET', '/api');
 
@@ -312,6 +202,124 @@ describe('AjaxServant', function() {
 
 			it('should delete the servant\'s XHR', function () {
 				expect(true).to.equal(false);
+			});
+		});
+
+		describe('.send()', function () {
+			it('should send base data to the server', function (done) {
+				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+
+				servant.on('response', function (responseObj) {
+					expect(responseObj.body).to.equal('GET');
+					done();
+				});
+
+				servant.send();
+			});
+
+			it('should send base queryString to the server', function (done) {
+				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {qryStr: {'qry':'str'}});
+
+				servant.on('response', function (responseObj) {
+					expect(responseObj.body).to.equal('?qry=str');
+					done();
+				});
+
+				servant.send();
+			});
+
+			it('should send base headers to the server', function (done) {
+				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {headers: {'X-Requested-With':'Ajax-Servant'}});
+
+				servant.on('response', function (responseObj) {
+					expect(responseObj.body).to.equal('Ajax-Servant');
+					done();
+				});
+
+				servant.send();
+			});
+
+			it('should send base URL params to the server', function (done) {
+				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/a/b/c');
+
+				servant.on('response', function (responseObj) {
+					expect(responseObj.body).to.equal('/a/b/c');
+					done();
+				});
+
+				servant.send();
+			});
+
+			it('should send dynamic body to the server', function (done) {
+				const OK_MESSAGE = 'hello world';
+				const servant = new AjaxServant('POST', LOCAL_TEST_SERVER_URL);
+
+				servant.on('response', function (responseObj) {
+					expect(responseObj.body).to.equal(OK_MESSAGE);
+					done();
+				});
+
+				servant.send({body: OK_MESSAGE});
+			});
+
+			it('should send dynamic queryString to the server', function (done) {
+				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+
+				servant.on('response', function (responseObj) {
+					expect(responseObj.body).to.equal('?qry=str');
+					done();
+				});
+
+				servant.send({qryStr: {'qry':'str'}});
+			});
+
+			it('should send dynamic headers to the server', function (done) {
+				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+
+				servant.on('response', function (responseObj) {
+					expect(responseObj.body).to.equal('Ajax-Servant');
+					done();
+				});
+
+				servant.send({headers: {'X-Requested-With':'Ajax-Servant'}});
+			});
+
+			it('should send dynamic URL params to the server', function (done) {
+				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+
+				servant.on('response', function (responseObj) {
+					expect(responseObj.body).to.equal('/a/b/c');
+					done();
+				});
+
+				servant.send({params: ['a','b','c']});
+			});
+
+			describe.skip('trigger events', function () {
+				// TODO:
+			});
+		});
+
+		describe.skip('.abort()', function () {
+			it('should cancel the current request', function (done) {
+				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+				let response = false;
+				let ended = false;
+
+				servant.on('response', function (responseObj) {
+					response = true;
+					ended = true;
+					expect(responseObj.body).not.to.equal('GET');
+					done();
+				});
+
+				setTimeout(function () {
+					expect(response).to.equal(false);
+					!ended && done();
+				}, 1900);
+
+				servant.send();
+				// servant.abort();
 			});
 		});
 	})
