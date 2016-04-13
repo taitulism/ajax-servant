@@ -7,6 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
+    "test-server": "node ./playground/server.js",
     "test": "mocha --compilers js:babel-register",
     "lint": "eslint ajax-servant.js"
   },
