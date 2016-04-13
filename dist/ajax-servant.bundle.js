@@ -257,6 +257,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function isUrl(url) {
 		// not supporting cross domain requests. yet!
+		return true;
 		return typeof url === 'string' && url[0] === '/';
 		// TODO: add condition: || url.substr(0,4) === 'http'
 	}

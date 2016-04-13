@@ -66,7 +66,7 @@
 
 		console.log(AjaxServant.default.name === 'AjaxServant' && 'loaded' || 'not loaded')
 
-		var servant = new AjaxServant.default('POST','/api', opts);
+		var servant = new AjaxServant.default('GET','/api', opts);
 
 		servant
 			.on('end', function (response, servant, ajaxEvent) {
@@ -93,7 +93,7 @@ $('#go').on('click', e => {
 
 	servant.send({
 		params: ['a','b','c'],
-		qryStr: {filter: 'qwe'},
+		// qryStr: {filter: 'qwe'},
 		// headers: {asd:4567},
 		body: 'sababa'
 		// body: escape(dat)
