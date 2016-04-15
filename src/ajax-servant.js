@@ -157,10 +157,7 @@ function getResponseHeader (xhr) {
 }
 
 function isUrl(url) {
-	// not supporting cross domain requests. yet!
-	return true;
-	return (typeof url === 'string' && url[0] === '/');
-	// TODO: add condition: || url.substr(0,4) === 'http'
+	return (typeof url === 'string' && (url[0] === '/' || url.substr(0,4) === 'http'));
 }
 
 function isSupported (verb) {
