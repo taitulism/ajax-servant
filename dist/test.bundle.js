@@ -399,11 +399,6 @@ return /******/ (function(modules) { // webpackBootstrap
   \***********************/
 /***/ function(module, exports, __webpack_require__) {
 
-	// require("babel-register");
-
-	// import {expect} from 'chai';
-	// import AjaxServant from '../ajax-servant';
-
 	var expect      = __webpack_require__(/*! chai */ 13).expect;
 	var AjaxServant = __webpack_require__(/*! ../dist/ajax-servant.bundle */ 53).default;
 
