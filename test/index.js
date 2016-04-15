@@ -140,6 +140,8 @@ describe('AjaxServant', function() {
 				expect(servant.events.load).to.have.property('wrapper');
 				expect(servant.events.load.wrapper).to.be.a('function');
 				expect(servant.events.load.wrapper.name).to.equal('defaultWrapper');
+
+				servant.dismiss();
 			});
 
 			it('should bind only one native event handler', function () {
@@ -150,6 +152,8 @@ describe('AjaxServant', function() {
 
 				expect(Object.keys(servant.events).length).to.equal(1);
 				expect(servant.events).to.have.property('load');
+
+				servant.dismiss();
 			});
 
 			describe('bind events', function () {
@@ -166,6 +170,8 @@ describe('AjaxServant', function() {
 					expect(servant.events.load.queue[0].ctx).to.be.a('null');
 					expect(servant.events.load.queue[0].fn).to.equal(noopFn);
 					expect(servant.events.load.wrapper).to.be.a('function');
+
+					servant.dismiss();
 				});
 
 				it('should bind an event handler with a context', function () {
@@ -182,6 +188,8 @@ describe('AjaxServant', function() {
 					expect(servant.events.load.queue[0].ctx).to.equal(contextObj);
 					expect(servant.events.load.queue[0].fn).to.equal(noopFn);
 					expect(servant.events.load.wrapper).to.be.a('function');
+
+					servant.dismiss();
 				});
 			});
 		});
@@ -193,6 +201,7 @@ describe('AjaxServant', function() {
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('GET');
 					done();
+					servant.dismiss();
 				});
 
 				servant.send();
@@ -204,6 +213,7 @@ describe('AjaxServant', function() {
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('?qry=str');
 					done();
+					servant.dismiss();
 				});
 
 				servant.send();
@@ -215,6 +225,7 @@ describe('AjaxServant', function() {
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('Ajax-Servant');
 					done();
+					servant.dismiss();
 				});
 
 				servant.send();
@@ -226,6 +237,7 @@ describe('AjaxServant', function() {
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('/a/b/c');
 					done();
+					servant.dismiss();
 				});
 
 				servant.send();
@@ -238,6 +250,7 @@ describe('AjaxServant', function() {
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal(OK_MESSAGE);
 					done();
+					servant.dismiss();
 				});
 
 				servant.send({body: OK_MESSAGE});
@@ -249,6 +262,7 @@ describe('AjaxServant', function() {
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('?qry=str');
 					done();
+					servant.dismiss();
 				});
 
 				servant.send({qryStr: {'qry':'str'}});
@@ -260,6 +274,7 @@ describe('AjaxServant', function() {
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('Ajax-Servant');
 					done();
+					servant.dismiss();
 				});
 
 				servant.send({headers: {'X-Requested-With':'Ajax-Servant'}});
@@ -271,6 +286,7 @@ describe('AjaxServant', function() {
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('/a/b/c');
 					done();
+					servant.dismiss();
 				});
 
 				servant.send({params: ['a','b','c']});
@@ -298,6 +314,7 @@ describe('AjaxServant', function() {
 					setTimeout(function () {
 						expect(eventsLog).to.equal('abcd');
 						done();
+						servant.dismiss();
 					}, 500);
 				});
 
@@ -322,6 +339,7 @@ describe('AjaxServant', function() {
 					setTimeout(function () {
 						expect(eventsLog).to.equal('abcd');
 						done();
+						servant.dismiss();
 					}, 500);
 				});
 
@@ -351,6 +369,7 @@ describe('AjaxServant', function() {
 					setTimeout(function () {
 						expect(eventsLog).to.equal('abcd');
 						done();
+						servant.dismiss();
 					}, 500);
 				});
 
@@ -379,6 +398,7 @@ describe('AjaxServant', function() {
 					setTimeout(function () {
 						expect(eventsLog).to.equal('abcd');
 						done();
+						servant.dismiss();
 					}, 500);
 				});
 
@@ -392,6 +412,7 @@ describe('AjaxServant', function() {
 						*/
 						expect(this).to.equal(self);
 						done();
+						servant.dismiss();
 					});
 
 					servant.send();
@@ -404,6 +425,7 @@ describe('AjaxServant', function() {
 					servant.on('load', function (responseObj) {
 						expect(this.id).to.equal('context');
 						done();
+						servant.dismiss();
 					});
 
 					servant.send();
@@ -416,6 +438,7 @@ describe('AjaxServant', function() {
 					servant.on('load', contextObj, function (responseObj) {
 						expect(this.id).to.equal('context');
 						done();
+						servant.dismiss();
 					});
 
 					servant.send();
@@ -442,6 +465,7 @@ describe('AjaxServant', function() {
 				setTimeout(function () {
 					expect(currentState).to.equal('Successfully aborted.');
 					done();
+					servant.dismiss();
 				}, 500);
 			});
 		});

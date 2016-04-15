@@ -541,6 +541,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					expect(servant.events.load).to.have.property('wrapper');
 					expect(servant.events.load.wrapper).to.be.a('function');
 					expect(servant.events.load.wrapper.name).to.equal('defaultWrapper');
+
+					servant.dismiss();
 				});
 
 				it('should bind only one native event handler', function () {
@@ -551,6 +553,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 					expect(Object.keys(servant.events).length).to.equal(1);
 					expect(servant.events).to.have.property('load');
+
+					servant.dismiss();
 				});
 
 				describe('bind events', function () {
@@ -567,6 +571,8 @@ return /******/ (function(modules) { // webpackBootstrap
 						expect(servant.events.load.queue[0].ctx).to.be.a('null');
 						expect(servant.events.load.queue[0].fn).to.equal(noopFn);
 						expect(servant.events.load.wrapper).to.be.a('function');
+
+						servant.dismiss();
 					});
 
 					it('should bind an event handler with a context', function () {
@@ -583,6 +589,8 @@ return /******/ (function(modules) { // webpackBootstrap
 						expect(servant.events.load.queue[0].ctx).to.equal(contextObj);
 						expect(servant.events.load.queue[0].fn).to.equal(noopFn);
 						expect(servant.events.load.wrapper).to.be.a('function');
+
+						servant.dismiss();
 					});
 				});
 			});
@@ -594,6 +602,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal('GET');
 						done();
+						servant.dismiss();
 					});
 
 					servant.send();
@@ -605,6 +614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal('?qry=str');
 						done();
+						servant.dismiss();
 					});
 
 					servant.send();
@@ -616,6 +626,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal('Ajax-Servant');
 						done();
+						servant.dismiss();
 					});
 
 					servant.send();
@@ -627,6 +638,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal('/a/b/c');
 						done();
+						servant.dismiss();
 					});
 
 					servant.send();
@@ -639,6 +651,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal(OK_MESSAGE);
 						done();
+						servant.dismiss();
 					});
 
 					servant.send({body: OK_MESSAGE});
@@ -650,6 +663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal('?qry=str');
 						done();
+						servant.dismiss();
 					});
 
 					servant.send({qryStr: {'qry':'str'}});
@@ -661,6 +675,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal('Ajax-Servant');
 						done();
+						servant.dismiss();
 					});
 
 					servant.send({headers: {'X-Requested-With':'Ajax-Servant'}});
@@ -672,6 +687,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal('/a/b/c');
 						done();
+						servant.dismiss();
 					});
 
 					servant.send({params: ['a','b','c']});
@@ -699,6 +715,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						setTimeout(function () {
 							expect(eventsLog).to.equal('abcd');
 							done();
+							servant.dismiss();
 						}, 500);
 					});
 
@@ -723,6 +740,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						setTimeout(function () {
 							expect(eventsLog).to.equal('abcd');
 							done();
+							servant.dismiss();
 						}, 500);
 					});
 
@@ -752,6 +770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						setTimeout(function () {
 							expect(eventsLog).to.equal('abcd');
 							done();
+							servant.dismiss();
 						}, 500);
 					});
 
@@ -780,6 +799,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						setTimeout(function () {
 							expect(eventsLog).to.equal('abcd');
 							done();
+							servant.dismiss();
 						}, 500);
 					});
 
@@ -793,6 +813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							*/
 							expect(this).to.equal(self);
 							done();
+							servant.dismiss();
 						});
 
 						servant.send();
@@ -805,6 +826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						servant.on('load', function (responseObj) {
 							expect(this.id).to.equal('context');
 							done();
+							servant.dismiss();
 						});
 
 						servant.send();
@@ -817,6 +839,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						servant.on('load', contextObj, function (responseObj) {
 							expect(this.id).to.equal('context');
 							done();
+							servant.dismiss();
 						});
 
 						servant.send();
@@ -843,6 +866,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					setTimeout(function () {
 						expect(currentState).to.equal('Successfully aborted.');
 						done();
+						servant.dismiss();
 					}, 500);
 				});
 			});
