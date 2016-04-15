@@ -195,7 +195,7 @@ describe('AjaxServant', function() {
 				servant.send();
 			});
 
-			it('should send base queryString to the server', function (done) {
+			it('should send a base queryString to the server', function (done) {
 				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {qryStr: {'qry':'str'}});
 
 				servant.on('response', function (responseObj) {
@@ -228,7 +228,7 @@ describe('AjaxServant', function() {
 				servant.send();
 			});
 
-			it('should send dynamic body to the server', function (done) {
+			it('should send a dynamic body to the server', function (done) {
 				const OK_MESSAGE = 'hello world';
 				const servant = createServant('POST');
 
@@ -240,7 +240,7 @@ describe('AjaxServant', function() {
 				servant.send({body: OK_MESSAGE});
 			});
 
-			it('should send dynamic queryString to the server', function (done) {
+			it('should send a dynamic queryString to the server', function (done) {
 				const servant = createServant('GET');
 
 				servant.on('response', function (responseObj) {
@@ -378,6 +378,45 @@ describe('AjaxServant', function() {
 						done();
 					}, 500);
 				});
+
+				it('should run handlers with a default (global) context', function (done) {
+					const servant = createServant('GET');
+
+					servant.on('load', function (responseObj) {
+						/*
+							".self" is a window prop and is equal to the window.
+							If this test fails it could be related to the test context (browser/node)
+						*/
+						expect(this).to.equal(self);
+						done();
+					});
+
+					servant.send();
+				});
+
+				it('should run handlers with a base context', function (done) {
+					const contextObj = {id: 'context'};
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {ctx:contextObj});
+
+					servant.on('load', function (responseObj) {
+						expect(this.id).to.equal('context');
+						done();
+					});
+
+					servant.send();
+				});
+
+				it('should run handlers with a dynamic context', function (done) {
+					const servant = createServant('GET');
+					const contextObj = {id: 'context'};
+
+					servant.on('load', contextObj, function (responseObj) {
+						expect(this.id).to.equal('context');
+						done();
+					});
+
+					servant.send();
+				});
 			});
 		});
 
@@ -404,48 +443,45 @@ describe('AjaxServant', function() {
 			});
 		});
 
-		describe.skip('.dismiss()', function () {
-			it('should add an event handler', function () {
-				const servant = new AjaxServant('GET', '/api');
-
-				servant.dismiss('response', noopFn);
-			});
-
-			it('should abort a running server', function () {
-				expect(true).to.equal(false);
-			});
-
+		describe('.dismiss()', function () {
 			it('should unbind all event handlers', function () {
-				expect(true).to.equal(false);
+				const servant = createServant('GET');
+
+				expect(servant.events).to.be.empty;
+
+				servant.on('response', noopFn);
+
+				expect(servant.events).not.to.be.empty;
+
+				servant.dismiss();
+
+				expect(servant.events).to.be.empty;
+			});
+
+			it('should cancel the current request (triggers .abort())', function (done) {
+				var currentState = 'init';
+
+				const servant = createServant('GET');
+
+				servant.on('abort', function () {
+					currentState = 'Successfully aborted.';
+				});
+
+				servant.send();
+				servant.dismiss();
+
+				setTimeout(function () {
+					expect(currentState).to.equal('Successfully aborted.');
+					done();
+				}, 500);
 			});
 
 			it('should delete the servant\'s XHR', function () {
-				expect(true).to.equal(false);
+				const servant = createServant('GET');
+				servant.on('response', noopFn);
+				servant.dismiss();
+				expect(servant.xhr).to.equal(null);
 			});
 		});
 	})
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

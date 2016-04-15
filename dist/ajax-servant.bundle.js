@@ -87,8 +87,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var DEFAULT_CACHE_BREAKER_KEY = _constants2.default.DEFAULT_CACHE_BREAKER_KEY;
 	var SUPPORTED_VERBS = _constants2.default.SUPPORTED_VERBS;
-	var CONSTRUCTOR_SIGNATURE = _constants2.default.CONSTRUCTOR_SIGNATURE;
-	var DOT_ON_SIGNATURE = _constants2.default.DOT_ON_SIGNATURE;
 	var CONSTRUCTOR_INVALID_ARGS_ERR = _constants2.default.CONSTRUCTOR_INVALID_ARGS_ERR;
 	var UNKNOWN_EVENT_ERR = _constants2.default.UNKNOWN_EVENT_ERR;
 	var CALLBACK_NOT_FUNCTION_ERR = _constants2.default.CALLBACK_NOT_FUNCTION_ERR;
@@ -415,6 +413,20 @@ return /******/ (function(modules) { // webpackBootstrap
 		return servant.xhr || createXHR();
 	}
 
+	function removeAllListeners(servant) {
+		var xhr = servant.xhr;
+
+		if (!xhr) {
+			return;
+		}
+
+		forIn(servant.events, function (eventName, eventObj) {
+			xhr.removeEventListener(eventName, eventObj.wrapper);
+		});
+
+		servant.events = {};
+	}
+
 	/* Class */
 
 	var AjaxServant = function () {
@@ -520,14 +532,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'dismiss',
 			value: function dismiss() {
-				var xhr = this.xhr;
-
 				this.abort();
 
-				// remove listeners
-				forIn(this.events, function (eventName, eventObj) {
-					xhr.removeListener(eventName, eventObj.wrapper);
-				});
+				removeAllListeners(this);
 
 				this.xhr = null;
 
@@ -573,8 +580,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = {
 		DEFAULT_CACHE_BREAKER_KEY: DEFAULT_CACHE_BREAKER_KEY,
 		SUPPORTED_VERBS: SUPPORTED_VERBS,
-		CONSTRUCTOR_SIGNATURE: CONSTRUCTOR_SIGNATURE,
-		DOT_ON_SIGNATURE: DOT_ON_SIGNATURE,
 		CONSTRUCTOR_INVALID_ARGS_ERR: CONSTRUCTOR_INVALID_ARGS_ERR,
 		UNKNOWN_EVENT_ERR: UNKNOWN_EVENT_ERR,
 		CALLBACK_NOT_FUNCTION_ERR: CALLBACK_NOT_FUNCTION_ERR,

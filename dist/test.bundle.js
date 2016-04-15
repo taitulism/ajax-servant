@@ -414,6 +414,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	const noopFn = function emptyHandler () {};
 
+	function createServant(VERB) {
+		return new AjaxServant(VERB, LOCAL_TEST_SERVER_URL);
+	}
+
 	describe('AjaxServant', function() {
 		describe('class', function() {
 			it('should be a function', function() {
@@ -421,19 +425,19 @@ return /******/ (function(modules) { // webpackBootstrap
 			});
 
 			it('should have a .on() API method', function() {
-				expect(AjaxServant.prototype.on).to.be.an('function');
+				expect(AjaxServant.prototype.on).to.be.a('function');
 			});
 
 			it('should have a .send() API method', function() {
-				expect(AjaxServant.prototype.send).to.be.an('function');
+				expect(AjaxServant.prototype.send).to.be.a('function');
 			});
 
 			it('should have a .abort() API method', function() {
-				expect(AjaxServant.prototype.abort).to.be.an('function');
+				expect(AjaxServant.prototype.abort).to.be.a('function');
 			});
 
 			it('should have a .dismiss() API method', function() {
-				expect(AjaxServant.prototype.dismiss).to.be.an('function');
+				expect(AjaxServant.prototype.dismiss).to.be.a('function');
 			});
 		});
 
@@ -469,34 +473,29 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 			});
 
-			it('should have no events attached when created', function () {
-				const servant = new AjaxServant('GET', '/');
-				// expect(servant).to.have.property('on');
-			});
-
 			it('should have a .on() API method', function () {
-				const servant = new AjaxServant('GET', '/');
+				const servant = createServant('GET');
 				expect(servant).to.have.property('on');
 			});
 
 			it('should have a .send() API method', function () {
-				const servant = new AjaxServant('GET', '/');
+				const servant = createServant('GET');
 				expect(servant).to.have.property('send');
 			});
 
 			it('should have a .abort() API method', function () {
-				const servant = new AjaxServant('GET', '/');
+				const servant = createServant('GET');
 				expect(servant).to.have.property('abort');
 			});
 
 			it('should have a .dismiss() API method', function () {
-				const servant = new AjaxServant('GET', '/');
+				const servant = createServant('GET');
 				expect(servant).to.have.property('dismiss');
 			});
 
 			describe('.on()', function () {
 				it('should throw an error when called with invalid event name', function () {
-					const servant =	new AjaxServant('GET', '/api');
+					const servant =	createServant('GET');
 
 					try {
 						servant.on('laQweDeLaQwe', noopFn);
@@ -508,7 +507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				});
 
 				it('should throw an error when called with invalid event handler', function () {
-					const servant =	new AjaxServant('GET', '/api');
+					const servant =	createServant('GET');
 
 					try {
 						servant.on('load', 'not a function');
@@ -520,7 +519,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				});
 
 				it('should throw an error when called with invalid event handler with a context', function () {
-					const servant =	new AjaxServant('GET', '/api');
+					const servant =	createServant('GET');
 
 					try {
 						servant.on('load', {'la': 'qwe'}, ['not','a','function']);
@@ -531,8 +530,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 				});
 
-				it('should add an event handler', function () {
-					const servant = new AjaxServant('GET', '/api');
+				it('should bind an event handler', function () {
+					const servant = createServant('GET');
 
 					expect(servant.events).to.be.empty;
 
@@ -541,8 +540,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					expect(servant.events).not.to.be.empty;
 				});
 
-				it('should add only one native event handler', function () {
-					const servant = new AjaxServant('GET', '/api');
+				it('should bind only one native event handler', function () {
+					const servant = createServant('GET');
 
 					servant.on('response', noopFn);
 					servant.on('load', noopFn);
@@ -552,8 +551,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				});
 
 				describe('bind events', function () {
-					it('should add an event handler', function () {
-						const servant = new AjaxServant('GET', '/api');
+					it('should bind an event handler', function () {
+						const servant = createServant('GET');
 						
 						servant.on('response', noopFn);
 
@@ -567,8 +566,8 @@ return /******/ (function(modules) { // webpackBootstrap
 						expect(servant.events.load.wrapper).to.be.a('function');
 					});
 
-					it('should add an event handler with a context', function () {
-						const servant = new AjaxServant('GET', '/api');
+					it('should bind an event handler with a context', function () {
+						const servant = createServant('GET');
 						const contextObj = {id: 'context'};
 						
 						servant.on('response', contextObj, noopFn);
@@ -587,113 +586,306 @@ return /******/ (function(modules) { // webpackBootstrap
 
 			describe('.send()', function () {
 				it('should send base data to the server', function (done) {
-					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+					const servant = createServant('GET');
 
 					servant.on('response', function (responseObj) {
-						expect(responseObj.body).to.equal('body');
-						done()
+						expect(responseObj.body).to.equal('GET');
+						done();
 					});
 
 					servant.send();
 				});
 
-				it('should send body to the server', function (done) {
+				it('should send a base queryString to the server', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {qryStr: {'qry':'str'}});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('?qry=str');
+						done();
+					});
+
+					servant.send();
+				});
+
+				it('should send base headers to the server', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {headers: {'X-Requested-With':'Ajax-Servant'}});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('Ajax-Servant');
+						done();
+					});
+
+					servant.send();
+				});
+
+				it('should send base URL params to the server', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/a/b/c');
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('/a/b/c');
+						done();
+					});
+
+					servant.send();
+				});
+
+				it('should send a dynamic body to the server', function (done) {
 					const OK_MESSAGE = 'hello world';
-					const servant = new AjaxServant('POST', LOCAL_TEST_SERVER_URL);
+					const servant = createServant('POST');
 
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal(OK_MESSAGE);
-						done()
+						done();
 					});
 
 					servant.send({body: OK_MESSAGE});
 				});
 
-				it('should send queryString to the server', function () {
-					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+				it('should send a dynamic queryString to the server', function (done) {
+					const servant = createServant('GET');
 
 					servant.on('response', function (responseObj) {
-						expect(responseObj.body).to.equal('?la=qwes');
-						done()
+						expect(responseObj.body).to.equal('?qry=str');
+						done();
 					});
 
-					servant.send({qryStr: {'la':'qwe'}});
+					servant.send({qryStr: {'qry':'str'}});
 				});
 
-				it('should send headers to the server', function () {
-					expect(true).to.equal(false);
+				it('should send dynamic headers to the server', function (done) {
+					const servant = createServant('GET');
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('Ajax-Servant');
+						done();
+					});
+
+					servant.send({headers: {'X-Requested-With':'Ajax-Servant'}});
 				});
 
-				it('should send URL params to the server', function () {
-					expect(true).to.equal(false);
+				it('should send dynamic URL params to the server', function (done) {
+					const servant = createServant('GET');
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('/a/b/c');
+						done();
+					});
+
+					servant.send({params: ['a','b','c']});
 				});
 
-				describe.skip('trigger events', function () {
-					// TODO:
+				describe('trigger events', function () {
+					it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
+						const servant = createServant('GET');
+						let eventsLog = 'a';
+
+						servant.on('loadstart', function (responseObj) {
+							eventsLog += 'b';
+						});
+
+						servant.on('load', function (responseObj) {
+							eventsLog += 'c';
+						});
+
+						servant.on('loadend', function (responseObj) {
+							eventsLog += 'd';
+						});
+
+						servant.send();
+
+						setTimeout(function () {
+							expect(eventsLog).to.equal('abcd');
+							done();
+						}, 500);
+					});
+
+					it('should trigger "loadstart", "load", "loadend" events on a standard request using aliases', function (done) {
+						const servant = createServant('GET');
+						let eventsLog = 'a';
+
+						servant.on('start', function (responseObj) {
+							eventsLog += 'b';
+						});
+
+						servant.on('response', function (responseObj) {
+							eventsLog += 'c';
+						});
+
+						servant.on('end', function (responseObj) {
+							eventsLog += 'd';
+						});
+
+						servant.send();
+
+						setTimeout(function () {
+							expect(eventsLog).to.equal('abcd');
+							done();
+						}, 500);
+					});
+
+					it('should trigger "loadstart", "abort", "loadend" events on an aborted request', function (done) {
+						const servant = createServant('GET');
+						let eventsLog = 'a';
+
+						servant.on('loadstart', function (responseObj) {
+							eventsLog += 'b';
+						});
+
+						servant.on('load', function (responseObj) {
+							eventsLog += 'X';
+						});
+
+						servant.on('abort', function (responseObj) {
+							eventsLog += 'c';
+						});
+
+						servant.on('loadend', function (responseObj) {
+							eventsLog += 'd';
+						});
+
+						servant.send();
+						servant.abort();
+
+						setTimeout(function () {
+							expect(eventsLog).to.equal('abcd');
+							done();
+						}, 500);
+					});
+
+					it('should trigger "loadstart", "error", "loadend" events on an invalid request', function (done) {
+						const servant = new AjaxServant('GET', 'http://BAD_URL.com');
+						let eventsLog = 'a';
+
+						servant.on('loadstart', function (responseObj) {
+							eventsLog += 'b';
+						});
+
+						servant.on('load', function (responseObj) {
+							eventsLog += 'X';
+						});
+
+						servant.on('error', function (responseObj) {
+							eventsLog += 'c';
+						});
+
+						servant.on('loadend', function (responseObj) {
+							eventsLog += 'd';
+						});
+
+						servant.send();
+
+						setTimeout(function () {
+							expect(eventsLog).to.equal('abcd');
+							done();
+						}, 500);
+					});
+
+					it('should run handlers with a default (global) context', function (done) {
+						const servant = createServant('GET');
+
+						servant.on('load', function (responseObj) {
+							/*
+								".self" is a window prop and is equal to the window.
+								If this test fails it could be related to the test context (browser/node)
+							*/
+							expect(this).to.equal(self);
+							done();
+						});
+
+						servant.send();
+					});
+
+					it('should run handlers with a base context', function (done) {
+						const contextObj = {id: 'context'};
+						const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {ctx:contextObj});
+
+						servant.on('load', function (responseObj) {
+							expect(this.id).to.equal('context');
+							done();
+						});
+
+						servant.send();
+					});
+
+					it('should run handlers with a dynamic context', function (done) {
+						const servant = createServant('GET');
+						const contextObj = {id: 'context'};
+
+						servant.on('load', contextObj, function (responseObj) {
+							expect(this.id).to.equal('context');
+							done();
+						});
+
+						servant.send();
+					});
 				});
 			});
 
 			describe('.abort()', function () {
-				it('should add an event handler', function () {
-					const servant = new AjaxServant('GET', '/api');
+				it('should cancel the current request', function (done) {
+					var currentState = 'init';
+					const servant = createServant('GET');
 
-					servant.on('response', noopFn);
+					servant.on('response', function () {
+						currentState = 'Aborting failed. Response recieved.';
+					});
+
+					servant.on('abort', function () {
+						currentState = 'Successfully aborted.';
+					});
+
 					servant.send();
-					servant.abort('response', noopFn);
+					servant.abort();
 
-				});
-
-				it('should add an event handler with a context', function () {
-					expect(true).to.equal(false);
+					setTimeout(function () {
+						expect(currentState).to.equal('Successfully aborted.');
+						done();
+					}, 500);
 				});
 			});
 
 			describe('.dismiss()', function () {
-				it('should add an event handler', function () {
-					const servant = new AjaxServant('GET', '/api');
-
-					servant.dismiss('response', noopFn);
-
-				});
-
-				it('should abort a running server', function () {
-					expect(true).to.equal(false);
-				});
-
 				it('should unbind all event handlers', function () {
-					expect(true).to.equal(false);
+					const servant = createServant('GET');
+
+					expect(servant.events).to.be.empty;
+
+					servant.on('response', noopFn);
+
+					expect(servant.events).not.to.be.empty;
+
+					servant.dismiss();
+
+					expect(servant.events).to.be.empty;
+				});
+
+				it('should cancel the current request (triggers .abort())', function (done) {
+					var currentState = 'init';
+
+					const servant = createServant('GET');
+
+					servant.on('abort', function () {
+						currentState = 'Successfully aborted.';
+					});
+
+					servant.send();
+					servant.dismiss();
+
+					setTimeout(function () {
+						expect(currentState).to.equal('Successfully aborted.');
+						done();
+					}, 500);
 				});
 
 				it('should delete the servant\'s XHR', function () {
-					expect(true).to.equal(false);
+					const servant = createServant('GET');
+					servant.on('response', noopFn);
+					servant.dismiss();
+					expect(servant.xhr).to.equal(null);
 				});
 			});
 		})
 	});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /***/ },
@@ -8983,8 +9175,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		var DEFAULT_CACHE_BREAKER_KEY = _constants2.default.DEFAULT_CACHE_BREAKER_KEY;
 		var SUPPORTED_VERBS = _constants2.default.SUPPORTED_VERBS;
-		var CONSTRUCTOR_SIGNATURE = _constants2.default.CONSTRUCTOR_SIGNATURE;
-		var DOT_ON_SIGNATURE = _constants2.default.DOT_ON_SIGNATURE;
 		var CONSTRUCTOR_INVALID_ARGS_ERR = _constants2.default.CONSTRUCTOR_INVALID_ARGS_ERR;
 		var UNKNOWN_EVENT_ERR = _constants2.default.UNKNOWN_EVENT_ERR;
 		var CALLBACK_NOT_FUNCTION_ERR = _constants2.default.CALLBACK_NOT_FUNCTION_ERR;
@@ -9311,6 +9501,20 @@ return /******/ (function(modules) { // webpackBootstrap
 			return servant.xhr || createXHR();
 		}
 
+		function removeAllListeners(servant) {
+			var xhr = servant.xhr;
+
+			if (!xhr) {
+				return;
+			}
+
+			forIn(servant.events, function (eventName, eventObj) {
+				xhr.removeEventListener(eventName, eventObj.wrapper);
+			});
+
+			servant.events = {};
+		}
+
 		/* Class */
 
 		var AjaxServant = function () {
@@ -9416,14 +9620,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'dismiss',
 				value: function dismiss() {
-					var xhr = this.xhr;
-
 					this.abort();
 
-					// remove listeners
-					forIn(this.events, function (eventName, eventObj) {
-						xhr.removeListener(eventName, eventObj.wrapper);
-					});
+					removeAllListeners(this);
 
 					this.xhr = null;
 
@@ -9469,8 +9668,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		exports.default = {
 			DEFAULT_CACHE_BREAKER_KEY: DEFAULT_CACHE_BREAKER_KEY,
 			SUPPORTED_VERBS: SUPPORTED_VERBS,
-			CONSTRUCTOR_SIGNATURE: CONSTRUCTOR_SIGNATURE,
-			DOT_ON_SIGNATURE: DOT_ON_SIGNATURE,
 			CONSTRUCTOR_INVALID_ARGS_ERR: CONSTRUCTOR_INVALID_ARGS_ERR,
 			UNKNOWN_EVENT_ERR: UNKNOWN_EVENT_ERR,
 			CALLBACK_NOT_FUNCTION_ERR: CALLBACK_NOT_FUNCTION_ERR,

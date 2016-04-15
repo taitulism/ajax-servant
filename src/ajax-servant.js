@@ -5,8 +5,6 @@ import CONSTANTS from './constants.js';
 const {
 	DEFAULT_CACHE_BREAKER_KEY,
 	SUPPORTED_VERBS,
-	CONSTRUCTOR_SIGNATURE,
-	DOT_ON_SIGNATURE,
 	CONSTRUCTOR_INVALID_ARGS_ERR,
 	UNKNOWN_EVENT_ERR,
 	CALLBACK_NOT_FUNCTION_ERR,
@@ -316,6 +314,20 @@ function getXhr (servant) {
 	return servant.xhr || createXHR();
 }
 
+function removeAllListeners (servant) {
+	const xhr = servant.xhr;
+
+	if (!xhr) {
+		return;
+	}
+
+	forIn(servant.events, function (eventName, eventObj) {
+		xhr.removeEventListener(eventName, eventObj.wrapper);
+	});
+
+	servant.events = {};
+}
+
 /* Class */
 class AjaxServant {
 	constructor (verb, baseUrl, options = {}) {
@@ -404,14 +416,9 @@ class AjaxServant {
 	}
 
 	dismiss () {
-		var xhr = this.xhr;
-
 		this.abort();
 
-		// remove listeners
-		forIn(this.events, function (eventName, eventObj) {
-			xhr.removeListener(eventName, eventObj.wrapper);
-		});
+		removeAllListeners(this);
 
 		this.xhr = null;
 
