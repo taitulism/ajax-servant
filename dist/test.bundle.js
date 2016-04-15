@@ -538,6 +538,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.on('response', noopFn);
 
 					expect(servant.events).not.to.be.empty;
+					expect(servant.events.load).to.have.property('wrapper');
+					expect(servant.events.load.wrapper).to.be.a('function');
+					expect(servant.events.load.wrapper.name).to.equal('defaultWrapper');
 				});
 
 				it('should bind only one native event handler', function () {
@@ -9473,7 +9476,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function getDefaultWrapper(servant, nativeName) {
 			var queue = getEventQueue(servant, nativeName);
 
-			return function (ajaxEvent) {
+			return function defaultWrapper(ajaxEvent) {
 				var response = getResponse(servant.xhr);
 
 				queue.forEach(function (cbObj) {

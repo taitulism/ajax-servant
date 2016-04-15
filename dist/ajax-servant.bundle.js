@@ -385,7 +385,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function getDefaultWrapper(servant, nativeName) {
 		var queue = getEventQueue(servant, nativeName);
 
-		return function (ajaxEvent) {
+		return function defaultWrapper(ajaxEvent) {
 			var response = getResponse(servant.xhr);
 
 			queue.forEach(function (cbObj) {

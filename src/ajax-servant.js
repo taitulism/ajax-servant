@@ -286,7 +286,7 @@ function getResponse (xhr) {
 function getDefaultWrapper (servant, nativeName) {
 	const queue = getEventQueue(servant, nativeName);
 
-	return function (ajaxEvent) {
+	return function defaultWrapper (ajaxEvent) {
 		const response = getResponse(servant.xhr);
 
 		queue.forEach(cbObj => {
