@@ -184,24 +184,27 @@ describe('AjaxServant', function() {
 			});
 		});
 
-		describe.skip('.dismiss()', function () {
-			it('should add an event handler', function () {
-				const servant = new AjaxServant('GET', '/api');
 
-				servant.dismiss('response', noopFn);
+		describe('.abort()', function () {
+			it('should cancel the current request', function (done) {
+				var currentState = 'init';
+				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
 
-			});
+				servant.on('response', function () {
+					currentState = 'Aborting failed. Response recieved.';
+				});
 
-			it('should abort a running server', function () {
-				expect(true).to.equal(false);
-			});
+				servant.on('abort', function () {
+					currentState = 'Successfully aborted.';
+				});
 
-			it('should unbind all event handlers', function () {
-				expect(true).to.equal(false);
-			});
+				setTimeout(function () {
+					expect(currentState).to.equal('Successfully aborted.');
+					done();
+				}, 500);
 
-			it('should delete the servant\'s XHR', function () {
-				expect(true).to.equal(false);
+				servant.send();
+				servant.abort();
 			});
 		});
 
@@ -294,32 +297,31 @@ describe('AjaxServant', function() {
 
 				servant.send({params: ['a','b','c']});
 			});
+		});
 
-			describe.skip('trigger events', function () {
-				// TODO:
+		describe.skip('.dismiss()', function () {
+			it('should add an event handler', function () {
+				const servant = new AjaxServant('GET', '/api');
+
+				servant.dismiss('response', noopFn);
+			});
+
+			it('should abort a running server', function () {
+				expect(true).to.equal(false);
+			});
+
+			it('should unbind all event handlers', function () {
+				expect(true).to.equal(false);
+			});
+
+			it('should delete the servant\'s XHR', function () {
+				expect(true).to.equal(false);
 			});
 		});
 
-		describe.skip('.abort()', function () {
-			it('should cancel the current request', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
-				let response = false;
-				let ended = false;
+		describe('trigger events', function () {
+			it.skip('should. really.', function () {
 
-				servant.on('response', function (responseObj) {
-					response = true;
-					ended = true;
-					expect(responseObj.body).not.to.equal('GET');
-					done();
-				});
-
-				setTimeout(function () {
-					expect(response).to.equal(false);
-					!ended && done();
-				}, 1900);
-
-				servant.send();
-				// servant.abort();
 			});
 		});
 	})
