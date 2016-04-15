@@ -13,6 +13,10 @@ const LOCAL_TEST_SERVER_URL        = 'http://localhost:8081/test';
 
 const noopFn = function emptyHandler () {};
 
+function createServant(VERB) {
+	return new AjaxServant(VERB, LOCAL_TEST_SERVER_URL);
+}
+
 describe('AjaxServant', function() {
 	describe('class', function() {
 		it('should be a function', function() {
@@ -20,19 +24,19 @@ describe('AjaxServant', function() {
 		});
 
 		it('should have a .on() API method', function() {
-			expect(AjaxServant.prototype.on).to.be.an('function');
+			expect(AjaxServant.prototype.on).to.be.a('function');
 		});
 
 		it('should have a .send() API method', function() {
-			expect(AjaxServant.prototype.send).to.be.an('function');
+			expect(AjaxServant.prototype.send).to.be.a('function');
 		});
 
 		it('should have a .abort() API method', function() {
-			expect(AjaxServant.prototype.abort).to.be.an('function');
+			expect(AjaxServant.prototype.abort).to.be.a('function');
 		});
 
 		it('should have a .dismiss() API method', function() {
-			expect(AjaxServant.prototype.dismiss).to.be.an('function');
+			expect(AjaxServant.prototype.dismiss).to.be.a('function');
 		});
 	});
 
@@ -68,34 +72,29 @@ describe('AjaxServant', function() {
 			}
 		});
 
-		it('should have no events attached when created', function () {
-			const servant = new AjaxServant('GET', '/');
-			// expect(servant).to.have.property('on');
-		});
-
 		it('should have a .on() API method', function () {
-			const servant = new AjaxServant('GET', '/');
+			const servant = createServant('GET');
 			expect(servant).to.have.property('on');
 		});
 
 		it('should have a .send() API method', function () {
-			const servant = new AjaxServant('GET', '/');
+			const servant = createServant('GET');
 			expect(servant).to.have.property('send');
 		});
 
 		it('should have a .abort() API method', function () {
-			const servant = new AjaxServant('GET', '/');
+			const servant = createServant('GET');
 			expect(servant).to.have.property('abort');
 		});
 
 		it('should have a .dismiss() API method', function () {
-			const servant = new AjaxServant('GET', '/');
+			const servant = createServant('GET');
 			expect(servant).to.have.property('dismiss');
 		});
 
 		describe('.on()', function () {
 			it('should throw an error when called with invalid event name', function () {
-				const servant =	new AjaxServant('GET', '/api');
+				const servant =	createServant('GET');
 
 				try {
 					servant.on('laQweDeLaQwe', noopFn);
@@ -107,7 +106,7 @@ describe('AjaxServant', function() {
 			});
 
 			it('should throw an error when called with invalid event handler', function () {
-				const servant =	new AjaxServant('GET', '/api');
+				const servant =	createServant('GET');
 
 				try {
 					servant.on('load', 'not a function');
@@ -119,7 +118,7 @@ describe('AjaxServant', function() {
 			});
 
 			it('should throw an error when called with invalid event handler with a context', function () {
-				const servant =	new AjaxServant('GET', '/api');
+				const servant =	createServant('GET');
 
 				try {
 					servant.on('load', {'la': 'qwe'}, ['not','a','function']);
@@ -130,8 +129,8 @@ describe('AjaxServant', function() {
 				}
 			});
 
-			it('should add an event handler', function () {
-				const servant = new AjaxServant('GET', '/api');
+			it('should bind an event handler', function () {
+				const servant = createServant('GET');
 
 				expect(servant.events).to.be.empty;
 
@@ -140,8 +139,8 @@ describe('AjaxServant', function() {
 				expect(servant.events).not.to.be.empty;
 			});
 
-			it('should add only one native event handler', function () {
-				const servant = new AjaxServant('GET', '/api');
+			it('should bind only one native event handler', function () {
+				const servant = createServant('GET');
 
 				servant.on('response', noopFn);
 				servant.on('load', noopFn);
@@ -151,8 +150,8 @@ describe('AjaxServant', function() {
 			});
 
 			describe('bind events', function () {
-				it('should add an event handler', function () {
-					const servant = new AjaxServant('GET', '/api');
+				it('should bind an event handler', function () {
+					const servant = createServant('GET');
 					
 					servant.on('response', noopFn);
 
@@ -166,8 +165,8 @@ describe('AjaxServant', function() {
 					expect(servant.events.load.wrapper).to.be.a('function');
 				});
 
-				it('should add an event handler with a context', function () {
-					const servant = new AjaxServant('GET', '/api');
+				it('should bind an event handler with a context', function () {
+					const servant = createServant('GET');
 					const contextObj = {id: 'context'};
 					
 					servant.on('response', contextObj, noopFn);
@@ -184,33 +183,9 @@ describe('AjaxServant', function() {
 			});
 		});
 
-
-		describe('.abort()', function () {
-			it('should cancel the current request', function (done) {
-				var currentState = 'init';
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
-
-				servant.on('response', function () {
-					currentState = 'Aborting failed. Response recieved.';
-				});
-
-				servant.on('abort', function () {
-					currentState = 'Successfully aborted.';
-				});
-
-				setTimeout(function () {
-					expect(currentState).to.equal('Successfully aborted.');
-					done();
-				}, 500);
-
-				servant.send();
-				servant.abort();
-			});
-		});
-
 		describe('.send()', function () {
 			it('should send base data to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+				const servant = createServant('GET');
 
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('GET');
@@ -255,7 +230,7 @@ describe('AjaxServant', function() {
 
 			it('should send dynamic body to the server', function (done) {
 				const OK_MESSAGE = 'hello world';
-				const servant = new AjaxServant('POST', LOCAL_TEST_SERVER_URL);
+				const servant = createServant('POST');
 
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal(OK_MESSAGE);
@@ -266,7 +241,7 @@ describe('AjaxServant', function() {
 			});
 
 			it('should send dynamic queryString to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+				const servant = createServant('GET');
 
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('?qry=str');
@@ -277,7 +252,7 @@ describe('AjaxServant', function() {
 			});
 
 			it('should send dynamic headers to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+				const servant = createServant('GET');
 
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('Ajax-Servant');
@@ -288,7 +263,7 @@ describe('AjaxServant', function() {
 			});
 
 			it('should send dynamic URL params to the server', function (done) {
-				const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL);
+				const servant = createServant('GET');
 
 				servant.on('response', function (responseObj) {
 					expect(responseObj.body).to.equal('/a/b/c');
@@ -296,6 +271,136 @@ describe('AjaxServant', function() {
 				});
 
 				servant.send({params: ['a','b','c']});
+			});
+
+			describe('trigger events', function () {
+				it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
+					const servant = createServant('GET');
+					let eventsLog = 'a';
+
+					servant.on('loadstart', function (responseObj) {
+						eventsLog += 'b';
+					});
+
+					servant.on('load', function (responseObj) {
+						eventsLog += 'c';
+					});
+
+					servant.on('loadend', function (responseObj) {
+						eventsLog += 'd';
+					});
+
+					servant.send();
+
+					setTimeout(function () {
+						expect(eventsLog).to.equal('abcd');
+						done();
+					}, 500);
+				});
+
+				it('should trigger "loadstart", "load", "loadend" events on a standard request using aliases', function (done) {
+					const servant = createServant('GET');
+					let eventsLog = 'a';
+
+					servant.on('start', function (responseObj) {
+						eventsLog += 'b';
+					});
+
+					servant.on('response', function (responseObj) {
+						eventsLog += 'c';
+					});
+
+					servant.on('end', function (responseObj) {
+						eventsLog += 'd';
+					});
+
+					servant.send();
+
+					setTimeout(function () {
+						expect(eventsLog).to.equal('abcd');
+						done();
+					}, 500);
+				});
+
+				it('should trigger "loadstart", "abort", "loadend" events on an aborted request', function (done) {
+					const servant = createServant('GET');
+					let eventsLog = 'a';
+
+					servant.on('loadstart', function (responseObj) {
+						eventsLog += 'b';
+					});
+
+					servant.on('load', function (responseObj) {
+						eventsLog += 'X';
+					});
+
+					servant.on('abort', function (responseObj) {
+						eventsLog += 'c';
+					});
+
+					servant.on('loadend', function (responseObj) {
+						eventsLog += 'd';
+					});
+
+					servant.send();
+					servant.abort();
+
+					setTimeout(function () {
+						expect(eventsLog).to.equal('abcd');
+						done();
+					}, 500);
+				});
+
+				it('should trigger "loadstart", "error", "loadend" events on an invalid request', function (done) {
+					const servant = new AjaxServant('GET', 'http://BAD_URL.com');
+					let eventsLog = 'a';
+
+					servant.on('loadstart', function (responseObj) {
+						eventsLog += 'b';
+					});
+
+					servant.on('load', function (responseObj) {
+						eventsLog += 'X';
+					});
+
+					servant.on('error', function (responseObj) {
+						eventsLog += 'c';
+					});
+
+					servant.on('loadend', function (responseObj) {
+						eventsLog += 'd';
+					});
+
+					servant.send();
+
+					setTimeout(function () {
+						expect(eventsLog).to.equal('abcd');
+						done();
+					}, 500);
+				});
+			});
+		});
+
+		describe('.abort()', function () {
+			it('should cancel the current request', function (done) {
+				var currentState = 'init';
+				const servant = createServant('GET');
+
+				servant.on('response', function () {
+					currentState = 'Aborting failed. Response recieved.';
+				});
+
+				servant.on('abort', function () {
+					currentState = 'Successfully aborted.';
+				});
+
+				servant.send();
+				servant.abort();
+
+				setTimeout(function () {
+					expect(currentState).to.equal('Successfully aborted.');
+					done();
+				}, 500);
 			});
 		});
 
@@ -316,12 +421,6 @@ describe('AjaxServant', function() {
 
 			it('should delete the servant\'s XHR', function () {
 				expect(true).to.equal(false);
-			});
-		});
-
-		describe('trigger events', function () {
-			it.skip('should. really.', function () {
-
 			});
 		});
 	})
