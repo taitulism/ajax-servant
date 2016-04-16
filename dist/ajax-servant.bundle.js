@@ -81,6 +81,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utils = __webpack_require__(/*! ./utils.js */ 3);
 
+	var _formatResponse = __webpack_require__(/*! ./format-response.js */ 4);
+
+	var _formatResponse2 = _interopRequireDefault(_formatResponse);
+
+	var _resolveUrl = __webpack_require__(/*! ./resolve-url.js */ 5);
+
+	var _resolveUrl2 = _interopRequireDefault(_resolveUrl);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -138,62 +146,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* Private functions */
 
-	function normalizeBaseUrl(baseUrl) {
-		if (baseUrl === '/') {
-			return '';
+	function getWrapper(servant, nativeName) {
+		var eventWrapper = eventsWrappers[nativeName];
+
+		if (eventWrapper) {
+			return eventWrapper;
 		}
 
-		var len = baseUrl.length;
+		var queue = servant.events[nativeName].queue;
 
-		if (baseUrl[len - 1] === '/') {
-			return baseUrl.substr(0, len - 1);
-		}
+		return function defaultWrapper(ajaxEvent) {
+			var response = (0, _formatResponse2.default)(servant.xhr);
 
-		return baseUrl;
+			queue.forEach(function (cbObj) {
+				var ctx = cbObj.ctx;
+				var fn = cbObj.fn;
+
+
+				fn.apply(ctx, [response, servant, ajaxEvent]);
+			});
+		};
 	}
 
-	function removePreSlash(urlParamsStr) {
-		if (urlParamsStr[0] === '/') {
-			return urlParamsStr.substr(1);
-		}
-		return urlParamsStr;
-	}
-
-	function getUrlParams(urlParams) {
-		if (!urlParams || !urlParams.length) {
-			return '';
-		}
-
-		if (typeof urlParams === 'string') {
-			urlParams = removePreSlash(urlParams);
-			return '/' + urlParams;
-		}
-
-		var params = urlParams.filter(function (param) {
-			return param && typeof param === 'string';
-		});
-
-		if (!params.length) {
-			return '';
-		}
-
-		return '/' + params.join('/');
-	}
-
-	function addCacheBreaker(cacheBreaker, qryStrObj) {
-		if (cacheBreaker) {
-			qryStrObj[cacheBreaker] = Date.now();
-		}
-	}
-
-	function strigifyQryStrObj(baseQryStrObj, dynaQryStrObj, cacheBreaker) {
-		var qryStrObj = (0, _utils.copy)(baseQryStrObj, dynaQryStrObj);
-
-		addCacheBreaker(cacheBreaker, qryStrObj);
-
-		var queryString = (0, _utils.stringify)(qryStrObj);
-
-		return queryString ? '?' + queryString : '';
+	function createEventObj(servant, nativeName) {
+		return {
+			queue: [],
+			wrapper: null
+		};
 	}
 
 	function prepareBody(data, verb) {
@@ -220,98 +199,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 
 		return data.toString() || null;
-	}
-
-	function resolveUrl(servant, params, qryStr) {
-		var baseUrl = normalizeBaseUrl(servant.baseUrl);
-
-		params = getUrlParams(params);
-		qryStr = strigifyQryStrObj(servant.baseQryStr, qryStr, servant.cacheBreaker);
-
-		return baseUrl + params + qryStr;
-	}
-
-	function removeAllListeners(servant) {
-		var xhr = servant.xhr;
-
-		if (!xhr) {
-			return;
-		}
-
-		(0, _utils.forIn)(servant.events, function (eventName, eventObj) {
-			xhr.removeEventListener(eventName, eventObj.wrapper);
-		});
-
-		servant.events = {};
-	}
-
-	function formatResponse(xhr, headersObj) {
-		return {
-			status: {
-				code: xhr.status,
-				text: xhr.statusText
-			},
-			headers: headersObj,
-			body: xhr.responseText || xhr.responseXML
-		};
-	}
-
-	function objectifyHeaders(headersStr) {
-		var headersObj = {};
-		var headersAry = headersStr.split(/\n/).filter(function (header) {
-			return !!header;
-		});
-
-		headersAry.forEach(function (header) {
-			var pair = header.split(/:\s?/);
-
-			headersObj[pair[0]] = pair[1];
-		});
-
-		return headersObj;
-	}
-
-	function getResponseHeaders(xhr) {
-		var headersStr = xhr.getAllResponseHeaders();
-
-		return objectifyHeaders(headersStr);
-	}
-
-	function getResponse(xhr) {
-		var headers = getResponseHeaders(xhr);
-
-		return formatResponse(xhr, headers);
-	}
-
-	function getEventQueue(servant, nativeName) {
-		return servant.events[nativeName].queue;
-	}
-
-	function getDefaultWrapper(servant, nativeName) {
-		var queue = getEventQueue(servant, nativeName);
-
-		return function defaultWrapper(ajaxEvent) {
-			var response = getResponse(servant.xhr);
-
-			queue.forEach(function (cbObj) {
-				var ctx = cbObj.ctx;
-				var fn = cbObj.fn;
-
-
-				fn.apply(ctx, [response, servant, ajaxEvent]);
-			});
-		};
-	}
-
-	function getWrapper(servant, nativeName) {
-		return eventsWrappers[nativeName] ? eventsWrappers[nativeName].call(servant, nativeName) : getDefaultWrapper(servant, nativeName);
-	}
-
-	function createEventObj(servant, nativeName) {
-		return {
-			queue: [],
-			wrapper: null
-		};
 	}
 
 	function createXHR() {
@@ -421,7 +308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var xhr = this.xhr = getXhr(this);
 
 				var verb = this.verb;
-				var url = resolveUrl(this, params, qryStr);
+				var url = (0, _resolveUrl2.default)(this, params, qryStr);
 
 				headers = (0, _utils.copy)(this.baseHeaders, headers);
 				body = prepareBody(body, verb);
@@ -454,9 +341,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function dismiss() {
 				this.abort();
 
-				removeAllListeners(this);
+				var xhr = this.xhr;
+
+				xhr && (0, _utils.forIn)(this.events, function (eventName, eventObj) {
+					xhr.removeEventListener(eventName, eventObj.wrapper);
+				});
 
 				this.xhr = null;
+				this.events = {};
 
 				return this;
 			}
@@ -569,6 +461,135 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 
 		return Object.assign.apply(Object, [{}].concat(sources));
+	}
+
+/***/ },
+/* 4 */
+/*!********************************!*\
+  !*** ./src/format-response.js ***!
+  \********************************/
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	exports.default = function (xhr) {
+		var headersObj = getResponseHeaders(xhr);
+
+		return {
+			status: {
+				code: xhr.status,
+				text: xhr.statusText
+			},
+			headers: headersObj,
+			body: xhr.responseText || xhr.responseXML
+		};
+	};
+
+	function objectifyHeaders(headersStr) {
+		var headersObj = {};
+		var headersAry = headersStr.split(/\n/).filter(function (header) {
+			return !!header;
+		});
+
+		headersAry.forEach(function (header) {
+			var pair = header.split(/:\s?/);
+
+			headersObj[pair[0]] = pair[1];
+		});
+
+		return headersObj;
+	}
+
+	function getResponseHeaders(xhr) {
+		var headersStr = xhr.getAllResponseHeaders();
+
+		return objectifyHeaders(headersStr);
+	}
+
+/***/ },
+/* 5 */
+/*!****************************!*\
+  !*** ./src/resolve-url.js ***!
+  \****************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	exports.default = function (servant, params, qryStr) {
+		var baseUrl = normalizeBaseUrl(servant.baseUrl);
+
+		params = stringifyUrlParams(params);
+		qryStr = prepareQryStr(servant.baseQryStr, qryStr, servant.cacheBreaker);
+
+		return baseUrl + params + qryStr;
+	};
+
+	var _utils = __webpack_require__(/*! ./utils.js */ 3);
+
+	function removePreSlash(urlParamsStr) {
+		if (urlParamsStr[0] === '/') {
+			return urlParamsStr.substr(1);
+		}
+		return urlParamsStr;
+	}
+
+	function stringifyUrlParams(urlParams) {
+		if (!urlParams || !urlParams.length) {
+			return '';
+		}
+
+		if (typeof urlParams === 'string') {
+			urlParams = removePreSlash(urlParams);
+			return '/' + urlParams;
+		}
+
+		var params = urlParams.filter(function (param) {
+			return param && typeof param === 'string';
+		});
+
+		if (!params.length) {
+			return '';
+		}
+
+		return '/' + params.join('/');
+	}
+
+	function addCacheBreaker(cacheBreaker, qryStrObj) {
+		if (cacheBreaker) {
+			qryStrObj[cacheBreaker] = Date.now();
+		}
+	}
+
+	function prepareQryStr(baseQryStrObj, dynaQryStrObj, cacheBreaker) {
+		var qryStrObj = (0, _utils.copy)(baseQryStrObj, dynaQryStrObj);
+
+		addCacheBreaker(cacheBreaker, qryStrObj);
+
+		var queryString = (0, _utils.stringify)(qryStrObj);
+
+		return queryString ? '?' + queryString : '';
+	}
+
+	function normalizeBaseUrl(baseUrl) {
+		if (baseUrl === '/') {
+			return '';
+		}
+
+		var len = baseUrl.length;
+
+		if (baseUrl[len - 1] === '/') {
+			return baseUrl.substr(0, len - 1);
+		}
+
+		return baseUrl;
 	}
 
 /***/ }

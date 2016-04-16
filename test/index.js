@@ -186,6 +186,8 @@ describe('AjaxServant', function() {
 
 					servant.dismiss();
 				});
+
+				it.skip('should bind multiple same event to assert getDefaultWrapper queue');
 			});
 		});
 
@@ -286,6 +288,8 @@ describe('AjaxServant', function() {
 
 				servant.send({params: ['a','b','c']});
 			});
+
+			it.skip('should send multiple with base & dynam')
 
 			describe('trigger events', function () {
 				it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
