@@ -1,6 +1,7 @@
 'use strict';
 
 import CONSTANTS from './constants.js';
+import {getType, forIn, stringify, copy} from './utils.js';
 
 const {
 	DEFAULT_CACHE_BREAKER_KEY,
@@ -13,6 +14,7 @@ const {
 
 
 /* Private vars */
+
 const defaultOptions = {
 	async   : true,
 	ctx     : null,
@@ -56,34 +58,12 @@ const eventsWrappers = {
 };
 
 /* Private functions */
-function getType (x) {
-	let type = typeof x;
 
-	if (type === 'object') {
-		type = Object.prototype.toString.call(x);
-		type = type.substring(8, type.length -1);
-	}
 
-	return type.toLowerCase();
-}
 
-function isNotUndefined(x) {
-	return (typeof x !== 'undefined');
-}
 
-function forIn (obj, cbFn) {
-	if (!obj) {return;}
 
-	const hasOwn = Object.hasOwnProperty;
 
-	for (const key in obj) { if (hasOwn.call(obj, key)) {
-		cbFn.call(obj, key, obj[key]);
-	}}
-}
-
-function createXHR () {
-	return new XMLHttpRequest();
-}
 
 function normalizeBaseUrl (baseUrl) {
 	if (baseUrl === '/') {
@@ -97,77 +77,6 @@ function normalizeBaseUrl (baseUrl) {
 	}
 
 	return baseUrl;
-}
-
-function stringify(obj) {
-	const ary = [];
-
-	forIn(obj, function (key, value) {
-		const esc_key = encodeURIComponent(key);
-		const esc_val = encodeURIComponent(value);
-
-		ary.push(esc_key + '=' + esc_val);
-	});
-
-	return ary.join('&');
-}
-
-function objectifyHeaders (headersStr) {
-	const headersObj = {};
-	const headersAry = headersStr.split(/\n/).filter(header => !!header);
-
-	headersAry.forEach(header => {
-		const pair = header.split(/:\s?/);
-
-		headersObj[pair[0]] = pair[1];
-	});
-
-	return headersObj;
-}
-
-function formatResponse (xhr, headersObj) {
-	return {
-		status: {
-			code: xhr.status,
-			text: xhr.statusText
-		},
-		headers: headersObj,
-		body: xhr.responseText || xhr.responseXML
-	};
-}
-
-function getResponseHeader (xhr) {
-	const headersStr = xhr.getAllResponseHeaders();
-
-	return objectifyHeaders(headersStr);
-}
-
-function isUrl(url) {
-	return (typeof url === 'string' && (url[0] === '/' || url.substr(0,4) === 'http'));
-}
-
-function isSupported (verb) {
-	return ~SUPPORTED_VERBS.indexOf(verb.toUpperCase());
-}
-
-function isVerb (verb) {
-	return (typeof verb === 'string' && isSupported(verb));
-}
-
-function addCacheBreaker (cacheBreaker, qryStrObj) {
-	if (cacheBreaker) {
-		qryStrObj[cacheBreaker] = Date.now();
-	}
-}
-
-function getFullQueryString (baseQryStrObj, dynaQryStrObj, cacheBreaker) {
-	const qryStrObj = Object.assign({}, baseQryStrObj, dynaQryStrObj);
-
-	addCacheBreaker(cacheBreaker, qryStrObj);
-
-	const queryString = stringify(qryStrObj);
-
-	return queryString ? ('?' + queryString) : '';
 }
 
 function removePreSlash (urlParamsStr) {
@@ -187,7 +96,7 @@ function getUrlParams (urlParams) {
 		return `/${urlParams}`;
 	}
 
-	const params = urlParams.filter(param => (param && typeof param === 'string'));
+	const params = urlParams.filter((param) => (param && typeof param === 'string'));
 
 	if (!params.length) {
 		return '';
@@ -196,30 +105,25 @@ function getUrlParams (urlParams) {
 	return `/${params.join('/')}`;
 }
 
-function getFullUrl (servant, params, qryStr) {
-	const baseUrl = normalizeBaseUrl(servant.baseUrl);
-
-	params = getUrlParams(params);
-	qryStr = getFullQueryString(servant.baseQryStr, qryStr, servant.cacheBreaker);
-
-	return baseUrl + params + qryStr;
-}
-
-function setHeaders (servant, headers = null) {
-	const fullHeaders = Object.assign({}, servant.baseHeaders, headers);
-
-	if (!fullHeaders) {
-		return null;
+function addCacheBreaker (cacheBreaker, qryStrObj) {
+	if (cacheBreaker) {
+		qryStrObj[cacheBreaker] = Date.now();
 	}
-
-	const xhr = getXhr(servant);
-
-	forIn(fullHeaders, function (key, value) {
-		xhr.setRequestHeader(key, value);
-	});
 }
 
-function formatBody (data, verb) {
+function strigifyQryStrObj (baseQryStrObj, dynaQryStrObj, cacheBreaker) {
+	const qryStrObj = copy(baseQryStrObj, dynaQryStrObj);
+
+	addCacheBreaker(cacheBreaker, qryStrObj);
+
+	const queryString = stringify(qryStrObj);
+
+	return queryString ? ('?' + queryString) : '';
+}
+
+
+
+function prepareBody (data, verb) {
 	const type = getType(data);
 
 	if (!data || verb === 'GET' || verb === 'HEAD') {
@@ -246,14 +150,72 @@ function formatBody (data, verb) {
 	return data.toString() || null;
 }
 
-function getEventQueue (servant, nativeName) {
-	return servant.events[nativeName].queue;
+function resolveUrl (servant, params, qryStr) {
+	const baseUrl = normalizeBaseUrl(servant.baseUrl);
+
+	params = getUrlParams(params);
+	qryStr = strigifyQryStrObj(servant.baseQryStr, qryStr, servant.cacheBreaker);
+
+	return baseUrl + params + qryStr;
+}
+
+
+
+
+
+function removeAllListeners (servant) {
+	const xhr = servant.xhr;
+
+	if (!xhr) {
+		return;
+	}
+
+	forIn(servant.events, function (eventName, eventObj) {
+		xhr.removeEventListener(eventName, eventObj.wrapper);
+	});
+
+	servant.events = {};
+}
+
+
+function formatResponse (xhr, headersObj) {
+	return {
+		status: {
+			code: xhr.status,
+			text: xhr.statusText
+		},
+		headers: headersObj,
+		body: xhr.responseText || xhr.responseXML
+	};
+}
+
+function objectifyHeaders (headersStr) {
+	const headersObj = {};
+	const headersAry = headersStr.split(/\n/).filter((header) => !!header);
+
+	headersAry.forEach(header => {
+		const pair = header.split(/:\s?/);
+
+		headersObj[pair[0]] = pair[1];
+	});
+
+	return headersObj;
+}
+
+function getResponseHeaders (xhr) {
+	const headersStr = xhr.getAllResponseHeaders();
+
+	return objectifyHeaders(headersStr);
 }
 
 function getResponse (xhr) {
-	const headers = getResponseHeader(xhr);
+	const headers = getResponseHeaders(xhr);
 
 	return formatResponse(xhr, headers);
+}
+
+function getEventQueue (servant, nativeName) {
+	return servant.events[nativeName].queue;
 }
 
 function getDefaultWrapper (servant, nativeName) {
@@ -270,35 +232,46 @@ function getDefaultWrapper (servant, nativeName) {
 	};
 }
 
+
 function getWrapper (servant, nativeName) {
 	return (eventsWrappers[nativeName])
 		? eventsWrappers[nativeName].call(servant, nativeName)
 		: getDefaultWrapper(servant, nativeName);
 }
 
-function createEventObj () {
+function createEventObj (servant, nativeName) {
 	return {
-		queue: [],
+		queue: [], 
 		wrapper: null
 	};
+}
+
+
+
+function createXHR () {
+	return new XMLHttpRequest();
 }
 
 function getXhr (servant) {
 	return servant.xhr || createXHR();
 }
 
-function removeAllListeners (servant) {
-	const xhr = servant.xhr;
 
-	if (!xhr) {
-		return;
-	}
+function isSupported (verb) {
+	return ~SUPPORTED_VERBS.indexOf(verb.toUpperCase());
+}
 
-	forIn(servant.events, function (eventName, eventObj) {
-		xhr.removeEventListener(eventName, eventObj.wrapper);
-	});
 
-	servant.events = {};
+function isUrl(url) {
+	return (typeof url === 'string' && (url[0] === '/' || url.substr(0,4) === 'http'));
+}
+
+function isVerb (verb) {
+	return (typeof verb === 'string' && isSupported(verb));
+}
+
+function isNotUndefined(x) {
+	return (typeof x !== 'undefined');
 }
 
 function resolveCacheBreakerKey (breaker) {
@@ -311,6 +284,7 @@ function resolveCacheBreakerKey (breaker) {
 
 
 
+
 /* Class */
 class AjaxServant {
 	constructor (verb, baseUrl, options = {}) {
@@ -318,7 +292,7 @@ class AjaxServant {
 			throw new TypeError(CONSTRUCTOR_INVALID_ARGS_ERR);
 		}
 
-		options = Object.assign({}, defaultOptions, options);
+		options = copy(defaultOptions, options);
 
 		this.xhr          = null;
 		this.events       = {};
@@ -350,7 +324,7 @@ class AjaxServant {
 		}
 
 		// get or create eventObj
-		const eventObj = this.events[nativeName] || createEventObj();
+		const eventObj = this.events[nativeName] || createEventObj(this, nativeName);
 
 		// add to queue
 		eventObj.queue.push({
@@ -358,12 +332,9 @@ class AjaxServant {
 			fn: cbFn
 		});
 
-		// if wrapper hasn't been set -> set it
 		if (!eventObj.wrapper) {
 			this.events[nativeName] = eventObj;
-
 			eventObj.wrapper = getWrapper(this, nativeName);
-
 			this.xhr.addEventListener(nativeName, eventObj.wrapper);
 		}
 
@@ -371,23 +342,27 @@ class AjaxServant {
 	}
 
 	send ({params, qryStr, headers, body} = {}) {
-		this.xhr = getXhr(this);
+		const xhr = this.xhr = getXhr(this);
 
 		const verb = this.verb;
-		const data = formatBody(body, verb);
-		const url  = getFullUrl(this, params, qryStr);
+		const url  = resolveUrl(this, params, qryStr);
+		
+		headers = copy(this.baseHeaders, headers);
+		body    = prepareBody(body, verb);
 
 		// open
-		this.xhr.open(verb, url, this.async);
+		xhr.open(verb, url, this.async);
 
 		// set headers
-		setHeaders(this, headers, data);
+		forIn(headers, function (key, value) {
+			xhr.setRequestHeader(key, value);
+		});
 		
 		// send
-		this.xhr.send(data);
+		xhr.send(body);
 
 		/*eslint no-console: ["error", { allow: ["warn", "error"] }] */
-		// console.warn('Request:',[verb, url, data]);
+		// console.warn('Request:',[verb, url, body]);
 
 		return this;
 	}

@@ -15,6 +15,7 @@
 			<input id="d3" type="hidden" name="qwe" value="qqq" />
 			<button id="go" value="click" />GO</button>
 		</form>
+	<script src="dist/ajax-servant.bundle.js"></script>
 	<script>
 		function id(id) {
 			return document.getElementById(id);
@@ -47,11 +48,28 @@
 			});
 		}
 
-	</script>
-		
-	<script src="dist/ajax-servant.bundle.js"></script>
-	<script>
-	//-------------------------------
+		$('#go').on('click', e => {
+			e.preventDefault();
+			// debugger
+			// jqrSend();
+
+			const dat = `${d1.name}=${d1.value}${d2.name}=${d2.value}${d3.name}=${d3.value}`;
+
+			servant.send({
+				params: ['a','b','c'],
+				// qryStr: {filter: 'qwe'},
+				// headers: {asd:4567},
+				body: 'sababa'
+				// body: escape(dat)
+				// body: 'foo=bar&baz=The+first+line.%0D%0AThe+second+line.%0D%0A'
+			})
+			// .abort()
+		});
+
+
+	//--------------------------------------------------
+
+
 		const opts = {
 			ctx:{a:1},
 			// qryStr: {def: 'DEF'},
@@ -80,35 +98,6 @@
 				console.log('error')
 			})
 		;
-
-
-
-			
-$('#go').on('click', e => {
-	e.preventDefault();
-	// debugger
-	// jqrSend();
-
-	const dat = `${d1.name}=${d1.value}${d2.name}=${d2.value}${d3.name}=${d3.value}`;
-
-	servant.send({
-		params: ['a','b','c'],
-		// qryStr: {filter: 'qwe'},
-		// headers: {asd:4567},
-		body: 'sababa'
-		// body: escape(dat)
-		// body: 'foo=bar&baz=The+first+line.%0D%0AThe+second+line.%0D%0A'
-	})
-	// .abort()
-});
-
-
-
-
-
-
-
-
 
 
 

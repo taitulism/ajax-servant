@@ -75,11 +75,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 	var _constants = __webpack_require__(/*! ./constants.js */ 2);
 
 	var _constants2 = _interopRequireDefault(_constants);
+
+	var _utils = __webpack_require__(/*! ./utils.js */ 3);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -137,38 +137,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	/* Private functions */
-	function getType(x) {
-		var type = typeof x === 'undefined' ? 'undefined' : _typeof(x);
-
-		if (type === 'object') {
-			type = Object.prototype.toString.call(x);
-			type = type.substring(8, type.length - 1);
-		}
-
-		return type.toLowerCase();
-	}
-
-	function isNotUndefined(x) {
-		return typeof x !== 'undefined';
-	}
-
-	function forIn(obj, cbFn) {
-		if (!obj) {
-			return;
-		}
-
-		var hasOwn = Object.hasOwnProperty;
-
-		for (var key in obj) {
-			if (hasOwn.call(obj, key)) {
-				cbFn.call(obj, key, obj[key]);
-			}
-		}
-	}
-
-	function createXHR() {
-		return new XMLHttpRequest();
-	}
 
 	function normalizeBaseUrl(baseUrl) {
 		if (baseUrl === '/') {
@@ -182,79 +150,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 
 		return baseUrl;
-	}
-
-	function stringify(obj) {
-		var ary = [];
-
-		forIn(obj, function (key, value) {
-			var esc_key = encodeURIComponent(key);
-			var esc_val = encodeURIComponent(value);
-
-			ary.push(esc_key + '=' + esc_val);
-		});
-
-		return ary.join('&');
-	}
-
-	function objectifyHeaders(headersStr) {
-		var headersObj = {};
-		var headersAry = headersStr.split(/\n/).filter(function (header) {
-			return !!header;
-		});
-
-		headersAry.forEach(function (header) {
-			var pair = header.split(/:\s?/);
-
-			headersObj[pair[0]] = pair[1];
-		});
-
-		return headersObj;
-	}
-
-	function formatResponse(xhr, headersObj) {
-		return {
-			status: {
-				code: xhr.status,
-				text: xhr.statusText
-			},
-			headers: headersObj,
-			body: xhr.responseText || xhr.responseXML
-		};
-	}
-
-	function getResponseHeader(xhr) {
-		var headersStr = xhr.getAllResponseHeaders();
-
-		return objectifyHeaders(headersStr);
-	}
-
-	function isUrl(url) {
-		return typeof url === 'string' && (url[0] === '/' || url.substr(0, 4) === 'http');
-	}
-
-	function isSupported(verb) {
-		return ~SUPPORTED_VERBS.indexOf(verb.toUpperCase());
-	}
-
-	function isVerb(verb) {
-		return typeof verb === 'string' && isSupported(verb);
-	}
-
-	function addCacheBreaker(cacheBreaker, qryStrObj) {
-		if (cacheBreaker) {
-			qryStrObj[cacheBreaker] = Date.now();
-		}
-	}
-
-	function getFullQueryString(baseQryStrObj, dynaQryStrObj, cacheBreaker) {
-		var qryStrObj = Object.assign({}, baseQryStrObj, dynaQryStrObj);
-
-		addCacheBreaker(cacheBreaker, qryStrObj);
-
-		var queryString = stringify(qryStrObj);
-
-		return queryString ? '?' + queryString : '';
 	}
 
 	function removePreSlash(urlParamsStr) {
@@ -285,33 +180,24 @@ return /******/ (function(modules) { // webpackBootstrap
 		return '/' + params.join('/');
 	}
 
-	function getFullUrl(servant, params, qryStr) {
-		var baseUrl = normalizeBaseUrl(servant.baseUrl);
-
-		params = getUrlParams(params);
-		qryStr = getFullQueryString(servant.baseQryStr, qryStr, servant.cacheBreaker);
-
-		return baseUrl + params + qryStr;
-	}
-
-	function setHeaders(servant) {
-		var headers = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-		var fullHeaders = Object.assign({}, servant.baseHeaders, headers);
-
-		if (!fullHeaders) {
-			return null;
+	function addCacheBreaker(cacheBreaker, qryStrObj) {
+		if (cacheBreaker) {
+			qryStrObj[cacheBreaker] = Date.now();
 		}
-
-		var xhr = getXhr(servant);
-
-		forIn(fullHeaders, function (key, value) {
-			xhr.setRequestHeader(key, value);
-		});
 	}
 
-	function formatBody(data, verb) {
-		var type = getType(data);
+	function strigifyQryStrObj(baseQryStrObj, dynaQryStrObj, cacheBreaker) {
+		var qryStrObj = (0, _utils.copy)(baseQryStrObj, dynaQryStrObj);
+
+		addCacheBreaker(cacheBreaker, qryStrObj);
+
+		var queryString = (0, _utils.stringify)(qryStrObj);
+
+		return queryString ? '?' + queryString : '';
+	}
+
+	function prepareBody(data, verb) {
+		var type = (0, _utils.getType)(data);
 
 		if (!data || verb === 'GET' || verb === 'HEAD') {
 			return null;
@@ -336,14 +222,69 @@ return /******/ (function(modules) { // webpackBootstrap
 		return data.toString() || null;
 	}
 
-	function getEventQueue(servant, nativeName) {
-		return servant.events[nativeName].queue;
+	function resolveUrl(servant, params, qryStr) {
+		var baseUrl = normalizeBaseUrl(servant.baseUrl);
+
+		params = getUrlParams(params);
+		qryStr = strigifyQryStrObj(servant.baseQryStr, qryStr, servant.cacheBreaker);
+
+		return baseUrl + params + qryStr;
+	}
+
+	function removeAllListeners(servant) {
+		var xhr = servant.xhr;
+
+		if (!xhr) {
+			return;
+		}
+
+		(0, _utils.forIn)(servant.events, function (eventName, eventObj) {
+			xhr.removeEventListener(eventName, eventObj.wrapper);
+		});
+
+		servant.events = {};
+	}
+
+	function formatResponse(xhr, headersObj) {
+		return {
+			status: {
+				code: xhr.status,
+				text: xhr.statusText
+			},
+			headers: headersObj,
+			body: xhr.responseText || xhr.responseXML
+		};
+	}
+
+	function objectifyHeaders(headersStr) {
+		var headersObj = {};
+		var headersAry = headersStr.split(/\n/).filter(function (header) {
+			return !!header;
+		});
+
+		headersAry.forEach(function (header) {
+			var pair = header.split(/:\s?/);
+
+			headersObj[pair[0]] = pair[1];
+		});
+
+		return headersObj;
+	}
+
+	function getResponseHeaders(xhr) {
+		var headersStr = xhr.getAllResponseHeaders();
+
+		return objectifyHeaders(headersStr);
 	}
 
 	function getResponse(xhr) {
-		var headers = getResponseHeader(xhr);
+		var headers = getResponseHeaders(xhr);
 
 		return formatResponse(xhr, headers);
+	}
+
+	function getEventQueue(servant, nativeName) {
+		return servant.events[nativeName].queue;
 	}
 
 	function getDefaultWrapper(servant, nativeName) {
@@ -366,29 +307,35 @@ return /******/ (function(modules) { // webpackBootstrap
 		return eventsWrappers[nativeName] ? eventsWrappers[nativeName].call(servant, nativeName) : getDefaultWrapper(servant, nativeName);
 	}
 
-	function createEventObj() {
+	function createEventObj(servant, nativeName) {
 		return {
 			queue: [],
 			wrapper: null
 		};
 	}
 
+	function createXHR() {
+		return new XMLHttpRequest();
+	}
+
 	function getXhr(servant) {
 		return servant.xhr || createXHR();
 	}
 
-	function removeAllListeners(servant) {
-		var xhr = servant.xhr;
+	function isSupported(verb) {
+		return ~SUPPORTED_VERBS.indexOf(verb.toUpperCase());
+	}
 
-		if (!xhr) {
-			return;
-		}
+	function isUrl(url) {
+		return typeof url === 'string' && (url[0] === '/' || url.substr(0, 4) === 'http');
+	}
 
-		forIn(servant.events, function (eventName, eventObj) {
-			xhr.removeEventListener(eventName, eventObj.wrapper);
-		});
+	function isVerb(verb) {
+		return typeof verb === 'string' && isSupported(verb);
+	}
 
-		servant.events = {};
+	function isNotUndefined(x) {
+		return typeof x !== 'undefined';
 	}
 
 	function resolveCacheBreakerKey(breaker) {
@@ -411,7 +358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				throw new TypeError(CONSTRUCTOR_INVALID_ARGS_ERR);
 			}
 
-			options = Object.assign({}, defaultOptions, options);
+			options = (0, _utils.copy)(defaultOptions, options);
 
 			this.xhr = null;
 			this.events = {};
@@ -445,7 +392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 
 				// get or create eventObj
-				var eventObj = this.events[nativeName] || createEventObj();
+				var eventObj = this.events[nativeName] || createEventObj(this, nativeName);
 
 				// add to queue
 				eventObj.queue.push({
@@ -453,12 +400,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					fn: cbFn
 				});
 
-				// if wrapper hasn't been set -> set it
 				if (!eventObj.wrapper) {
 					this.events[nativeName] = eventObj;
-
 					eventObj.wrapper = getWrapper(this, nativeName);
-
 					this.xhr.addEventListener(nativeName, eventObj.wrapper);
 				}
 
@@ -474,23 +418,27 @@ return /******/ (function(modules) { // webpackBootstrap
 				var headers = _ref.headers;
 				var body = _ref.body;
 
-				this.xhr = getXhr(this);
+				var xhr = this.xhr = getXhr(this);
 
 				var verb = this.verb;
-				var data = formatBody(body, verb);
-				var url = getFullUrl(this, params, qryStr);
+				var url = resolveUrl(this, params, qryStr);
+
+				headers = (0, _utils.copy)(this.baseHeaders, headers);
+				body = prepareBody(body, verb);
 
 				// open
-				this.xhr.open(verb, url, this.async);
+				xhr.open(verb, url, this.async);
 
 				// set headers
-				setHeaders(this, headers, data);
+				(0, _utils.forIn)(headers, function (key, value) {
+					xhr.setRequestHeader(key, value);
+				});
 
 				// send
-				this.xhr.send(data);
+				xhr.send(body);
 
 				/*eslint no-console: ["error", { allow: ["warn", "error"] }] */
-				// console.warn('Request:',[verb, url, data]);
+				// console.warn('Request:',[verb, url, body]);
 
 				return this;
 			}
@@ -557,6 +505,71 @@ return /******/ (function(modules) { // webpackBootstrap
 		CALLBACK_NOT_FUNCTION_ERR: CALLBACK_NOT_FUNCTION_ERR,
 		EVENT_NAME: EVENT_NAME
 	};
+
+/***/ },
+/* 3 */
+/*!**********************!*\
+  !*** ./src/utils.js ***!
+  \**********************/
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	exports.forIn = forIn;
+	exports.stringify = stringify;
+	exports.getType = getType;
+	exports.copy = copy;
+	function forIn(obj, cbFn) {
+		if (!obj) {
+			return;
+		}
+
+		var hasOwn = Object.hasOwnProperty;
+
+		for (var key in obj) {
+			if (hasOwn.call(obj, key)) {
+				cbFn.call(obj, key, obj[key]);
+			}
+		}
+	}
+
+	function stringify(obj) {
+		var ary = [];
+
+		forIn(obj, function (key, value) {
+			var esc_key = encodeURIComponent(key);
+			var esc_val = encodeURIComponent(value);
+
+			ary.push(esc_key + '=' + esc_val);
+		});
+
+		return ary.join('&');
+	}
+
+	function getType(x) {
+		var type = typeof x === 'undefined' ? 'undefined' : _typeof(x);
+
+		if (type === 'object') {
+			type = Object.prototype.toString.call(x);
+			type = type.substring(8, type.length - 1);
+		}
+
+		return type.toLowerCase();
+	}
+
+	function copy() {
+		for (var _len = arguments.length, sources = Array(_len), _key = 0; _key < _len; _key++) {
+			sources[_key] = arguments[_key];
+		}
+
+		return Object.assign.apply(Object, [{}].concat(sources));
+	}
 
 /***/ }
 /******/ ])
