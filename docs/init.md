@@ -31,7 +31,7 @@ Options
 ```js
 {
   async: true,
-  breakCache: false,
+  cacheBreaker: false,
   ctx: null,
   qryStr: null,
   headers: null
@@ -44,10 +44,10 @@ Options
 When set to `false` the AJAX request will be synchronous (but why would you do that?).
 
 
-####breakCache
+####cacheBreaker
 **type:** boolean | string  
 **default:** `'timestamp'`  
-Adds a timestamp to the querystring (`key=value`) to get a fresh response. Pass `true` to use the default key (`timestamp=123456`). Pass a string to set your own cache breaker (e.g. `myCacheBreaker=123456`).
+Adds a timestamp to the querystring (`key=value`) to get a fresh response. Pass `true` to use the default key (`timestamp=123456`). Pass a string to set your own cache breaker key (e.g. `myCacheBreaker=123456`).
 
 
 ####ctx
