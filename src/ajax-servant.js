@@ -14,11 +14,11 @@ const {
 
 /* Private vars */
 const defaultOptions = {
-	async     : true,
-	breakCache: false,
-	ctx       : null,
-	qryStr    : null,
-	headers   : null
+	async   : true,
+	ctx     : null,
+	qryStr  : null,
+	headers : null,
+	cacheBreaker : false
 };
 
 const eventsDict = {
@@ -81,16 +81,6 @@ function forIn (obj, cbFn) {
 	}}
 }
 
-function mixin(target, ...sources) {
-	sources.forEach(srcObj => {
-		srcObj && forIn(srcObj, (key, value) => {
-			target[key] = value;
-		});
-	});
-
-	return target;
-}
-
 function createXHR () {
 	return new XMLHttpRequest();
 }
@@ -109,18 +99,14 @@ function normalizeBaseUrl (baseUrl) {
 	return baseUrl;
 }
 
-function stringifyAll (...objects) {
+function stringify(obj) {
 	const ary = [];
 
-	objects.forEach(obj => {
-		if (!obj || typeof obj !== 'object') {return;}
+	forIn(obj, function (key, value) {
+		const esc_key = encodeURIComponent(key);
+		const esc_val = encodeURIComponent(value);
 
-		forIn(obj, function (key, value) {
-			const esc_key = encodeURIComponent(key);
-			const esc_val = encodeURIComponent(value);
-
-			ary.push(esc_key + '=' + esc_val);
-		});
+		ary.push(esc_key + '=' + esc_val);
 	});
 
 	return ary.join('&');
@@ -168,18 +154,18 @@ function isVerb (verb) {
 	return (typeof verb === 'string' && isSupported(verb));
 }
 
-function getFullQueryString (baseQryStr, dynaQryStr, cacheBreaker) {
-	let cacheBreakerObj;
-
+function addCacheBreaker (cacheBreaker, qryStrObj) {
 	if (cacheBreaker) {
-		cacheBreakerObj = {};
-		cacheBreakerObj[cacheBreaker] = Date.now();
+		qryStrObj[cacheBreaker] = Date.now();
 	}
-	else {
-		cacheBreakerObj = null;
-	}
+}
 
-	const queryString = stringifyAll(baseQryStr, dynaQryStr, cacheBreakerObj);
+function getFullQueryString (baseQryStrObj, dynaQryStrObj, cacheBreaker) {
+	const qryStrObj = Object.assign({}, baseQryStrObj, dynaQryStrObj);
+
+	addCacheBreaker(cacheBreaker, qryStrObj);
+
+	const queryString = stringify(qryStrObj);
 
 	return queryString ? ('?' + queryString) : '';
 }
@@ -220,7 +206,7 @@ function getFullUrl (servant, params, qryStr) {
 }
 
 function setHeaders (servant, headers = null) {
-	const fullHeaders = mixin({}, servant.baseHeaders, headers);
+	const fullHeaders = Object.assign({}, servant.baseHeaders, headers);
 
 	if (!fullHeaders) {
 		return null;
@@ -258,16 +244,6 @@ function formatBody (data, verb) {
 	}
 
 	return data.toString() || null;
-}
-
-function getCacheBreaker (breaker) {
-	if (!breaker) {
-		return false;
-	}
-
-	const type = typeof breaker;
-
-	return (type === 'string') ? breaker : DEFAULT_CACHE_BREAKER_KEY;
 }
 
 function getEventQueue (servant, nativeName) {
@@ -325,6 +301,16 @@ function removeAllListeners (servant) {
 	servant.events = {};
 }
 
+function resolveCacheBreakerKey (breaker) {
+	if (!breaker) {
+		return null;
+	}
+
+	return (typeof breaker === 'string') ? breaker : DEFAULT_CACHE_BREAKER_KEY;
+}
+
+
+
 /* Class */
 class AjaxServant {
 	constructor (verb, baseUrl, options = {}) {
@@ -332,17 +318,17 @@ class AjaxServant {
 			throw new TypeError(CONSTRUCTOR_INVALID_ARGS_ERR);
 		}
 
-		options = mixin({}, defaultOptions, options);
+		options = Object.assign({}, defaultOptions, options);
 
 		this.xhr          = null;
 		this.events       = {};
 		this.baseUrl      = baseUrl;
 		this.verb         = verb.toUpperCase();
 		this.ctx          = options.ctx;
-		this.baseQryStr   = options.qryStr;
 		this.baseHeaders  = options.headers;
+		this.baseQryStr   = options.qryStr;
 		this.async        = isNotUndefined(options.async) ? options.async : true;
-		this.cacheBreaker = getCacheBreaker(options.breakCache);
+		this.cacheBreaker = resolveCacheBreakerKey(options.cacheBreaker);
 	}
 
 	on (eventName, ctx, cbFn) {

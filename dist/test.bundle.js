@@ -9206,10 +9206,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		var defaultOptions = {
 			async: true,
-			breakCache: false,
 			ctx: null,
 			qryStr: null,
-			headers: null
+			headers: null,
+			cacheBreaker: false
 		};
 
 		var eventsDict = {
@@ -9276,20 +9276,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 		}
 
-		function mixin(target) {
-			for (var _len = arguments.length, sources = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-				sources[_key - 1] = arguments[_key];
-			}
-
-			sources.forEach(function (srcObj) {
-				srcObj && forIn(srcObj, function (key, value) {
-					target[key] = value;
-				});
-			});
-
-			return target;
-		}
-
 		function createXHR() {
 			return new XMLHttpRequest();
 		}
@@ -9308,24 +9294,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			return baseUrl;
 		}
 
-		function stringifyAll() {
+		function stringify(obj) {
 			var ary = [];
 
-			for (var _len2 = arguments.length, objects = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-				objects[_key2] = arguments[_key2];
-			}
+			forIn(obj, function (key, value) {
+				var esc_key = encodeURIComponent(key);
+				var esc_val = encodeURIComponent(value);
 
-			objects.forEach(function (obj) {
-				if (!obj || (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== 'object') {
-					return;
-				}
-
-				forIn(obj, function (key, value) {
-					var esc_key = encodeURIComponent(key);
-					var esc_val = encodeURIComponent(value);
-
-					ary.push(esc_key + '=' + esc_val);
-				});
+				ary.push(esc_key + '=' + esc_val);
 			});
 
 			return ary.join('&');
@@ -9375,17 +9351,18 @@ return /******/ (function(modules) { // webpackBootstrap
 			return typeof verb === 'string' && isSupported(verb);
 		}
 
-		function getFullQueryString(baseQryStr, dynaQryStr, cacheBreaker) {
-			var cacheBreakerObj = void 0;
-
+		function addCacheBreaker(cacheBreaker, qryStrObj) {
 			if (cacheBreaker) {
-				cacheBreakerObj = {};
-				cacheBreakerObj[cacheBreaker] = Date.now();
-			} else {
-				cacheBreakerObj = null;
+				qryStrObj[cacheBreaker] = Date.now();
 			}
+		}
 
-			var queryString = stringifyAll(baseQryStr, dynaQryStr, cacheBreakerObj);
+		function getFullQueryString(baseQryStrObj, dynaQryStrObj, cacheBreaker) {
+			var qryStrObj = Object.assign({}, baseQryStrObj, dynaQryStrObj);
+
+			addCacheBreaker(cacheBreaker, qryStrObj);
+
+			var queryString = stringify(qryStrObj);
 
 			return queryString ? '?' + queryString : '';
 		}
@@ -9430,7 +9407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function setHeaders(servant) {
 			var headers = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
 
-			var fullHeaders = mixin({}, servant.baseHeaders, headers);
+			var fullHeaders = Object.assign({}, servant.baseHeaders, headers);
 
 			if (!fullHeaders) {
 				return null;
@@ -9467,16 +9444,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 
 			return data.toString() || null;
-		}
-
-		function getCacheBreaker(breaker) {
-			if (!breaker) {
-				return false;
-			}
-
-			var type = typeof breaker === 'undefined' ? 'undefined' : _typeof(breaker);
-
-			return type === 'string' ? breaker : DEFAULT_CACHE_BREAKER_KEY;
 		}
 
 		function getEventQueue(servant, nativeName) {
@@ -9534,6 +9501,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			servant.events = {};
 		}
 
+		function resolveCacheBreakerKey(breaker) {
+			if (!breaker) {
+				return null;
+			}
+
+			return typeof breaker === 'string' ? breaker : DEFAULT_CACHE_BREAKER_KEY;
+		}
+
 		/* Class */
 
 		var AjaxServant = function () {
@@ -9546,17 +9521,17 @@ return /******/ (function(modules) { // webpackBootstrap
 					throw new TypeError(CONSTRUCTOR_INVALID_ARGS_ERR);
 				}
 
-				options = mixin({}, defaultOptions, options);
+				options = Object.assign({}, defaultOptions, options);
 
 				this.xhr = null;
 				this.events = {};
 				this.baseUrl = baseUrl;
 				this.verb = verb.toUpperCase();
 				this.ctx = options.ctx;
-				this.baseQryStr = options.qryStr;
 				this.baseHeaders = options.headers;
+				this.baseQryStr = options.qryStr;
 				this.async = isNotUndefined(options.async) ? options.async : true;
-				this.cacheBreaker = getCacheBreaker(options.breakCache);
+				this.cacheBreaker = resolveCacheBreakerKey(options.cacheBreaker);
 			}
 
 			_createClass(AjaxServant, [{
