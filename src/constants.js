@@ -5,6 +5,15 @@ const DOT_ON_SIGNATURE             = 'AjaxServant.on(eventName, optionalContext,
 const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;
 const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest eventName: ' + DOT_ON_SIGNATURE;
 const CALLBACK_NOT_FUNCTION_ERR    = 'eventHandler should be a function: ' + DOT_ON_SIGNATURE;
+
+const DEFAULT_OPTIONS = {
+	async   : true,
+	ctx     : null,
+	qryStr  : null,
+	headers : null,
+	cacheBreaker : false
+};
+
 const EVENT_NAME = {
 	ABORT           : 'abort',
 	TIMEOUT         : 'timeout',
@@ -18,6 +27,7 @@ const EVENT_NAME = {
 
 
 export default {
+	DEFAULT_OPTIONS,
 	DEFAULT_CACHE_BREAKER_KEY,
 	SUPPORTED_VERBS,
 	CONSTRUCTOR_INVALID_ARGS_ERR,

@@ -93,6 +93,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var DEFAULT_OPTIONS = _constants2.default.DEFAULT_OPTIONS;
 	var DEFAULT_CACHE_BREAKER_KEY = _constants2.default.DEFAULT_CACHE_BREAKER_KEY;
 	var SUPPORTED_VERBS = _constants2.default.SUPPORTED_VERBS;
 	var CONSTRUCTOR_INVALID_ARGS_ERR = _constants2.default.CONSTRUCTOR_INVALID_ARGS_ERR;
@@ -102,15 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* Private vars */
 
-	var defaultOptions = {
-		async: true,
-		ctx: null,
-		qryStr: null,
-		headers: null,
-		cacheBreaker: false
-	};
-
-	var eventsDict = {
+	var eventsDictionary = {
 		abort: EVENT_NAME.ABORT,
 		error: EVENT_NAME.ERROR,
 		timeout: EVENT_NAME.TIMEOUT,
@@ -245,7 +238,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				throw new TypeError(CONSTRUCTOR_INVALID_ARGS_ERR);
 			}
 
-			options = (0, _utils.copy)(defaultOptions, options);
+			options = (0, _utils.copy)(DEFAULT_OPTIONS, options);
 
 			this.xhr = null;
 			this.events = {};
@@ -270,7 +263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 
 				// validate eventName
-				var nativeName = eventsDict.resolve(eventName);
+				var nativeName = eventsDictionary.resolve(eventName);
 				if (!nativeName || typeof cbFn !== 'function') {
 					if (!nativeName) {
 						throw new TypeError(UNKNOWN_EVENT_ERR);
@@ -378,6 +371,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	var CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;
 	var UNKNOWN_EVENT_ERR = 'An unknown XMLHttpRequest eventName: ' + DOT_ON_SIGNATURE;
 	var CALLBACK_NOT_FUNCTION_ERR = 'eventHandler should be a function: ' + DOT_ON_SIGNATURE;
+
+	var DEFAULT_OPTIONS = {
+		async: true,
+		ctx: null,
+		qryStr: null,
+		headers: null,
+		cacheBreaker: false
+	};
+
 	var EVENT_NAME = {
 		ABORT: 'abort',
 		TIMEOUT: 'timeout',
@@ -390,6 +392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	exports.default = {
+		DEFAULT_OPTIONS: DEFAULT_OPTIONS,
 		DEFAULT_CACHE_BREAKER_KEY: DEFAULT_CACHE_BREAKER_KEY,
 		SUPPORTED_VERBS: SUPPORTED_VERBS,
 		CONSTRUCTOR_INVALID_ARGS_ERR: CONSTRUCTOR_INVALID_ARGS_ERR,

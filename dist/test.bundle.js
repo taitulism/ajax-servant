@@ -9227,7 +9227,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			cacheBreaker: false
 		};
 
-		var eventsDict = {
+		var eventsDictionary = {
 			abort: EVENT_NAME.ABORT,
 			error: EVENT_NAME.ERROR,
 			timeout: EVENT_NAME.TIMEOUT,
@@ -9264,8 +9264,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		/* Private functions */
 
 		function getWrapper(servant, nativeName) {
-			if (eventsWrappers[nativeName]) {
-				return eventsWrappers[nativeName];
+			var eventWrapper = eventsWrappers[nativeName];
+
+			if (eventWrapper) {
+				return eventWrapper;
 			}
 
 			var queue = servant.events[nativeName].queue;
@@ -9385,7 +9387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 
 					// validate eventName
-					var nativeName = eventsDict.resolve(eventName);
+					var nativeName = eventsDictionary.resolve(eventName);
 					if (!nativeName || typeof cbFn !== 'function') {
 						if (!nativeName) {
 							throw new TypeError(UNKNOWN_EVENT_ERR);

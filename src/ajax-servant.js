@@ -6,6 +6,7 @@ import formatResponse from './format-response.js';
 import resolveUrl from './resolve-url.js';
 
 const {
+	DEFAULT_OPTIONS,
 	DEFAULT_CACHE_BREAKER_KEY,
 	SUPPORTED_VERBS,
 	CONSTRUCTOR_INVALID_ARGS_ERR,
@@ -17,15 +18,7 @@ const {
 
 /* Private vars */
 
-const defaultOptions = {
-	async   : true,
-	ctx     : null,
-	qryStr  : null,
-	headers : null,
-	cacheBreaker : false
-};
-
-const eventsDict = {
+const eventsDictionary = {
 	abort            : EVENT_NAME.ABORT,
 	error            : EVENT_NAME.ERROR,
 	timeout          : EVENT_NAME.TIMEOUT,
@@ -158,7 +151,7 @@ class AjaxServant {
 			throw new TypeError(CONSTRUCTOR_INVALID_ARGS_ERR);
 		}
 
-		options = copy(defaultOptions, options);
+		options = copy(DEFAULT_OPTIONS, options);
 
 		this.xhr          = null;
 		this.events       = {};
@@ -181,7 +174,7 @@ class AjaxServant {
 		}
 
 		// validate eventName
-		const nativeName = eventsDict.resolve(eventName);
+		const nativeName = eventsDictionary.resolve(eventName);
 		if (!nativeName || typeof cbFn !== 'function') {
 			if (!nativeName) {
 				throw new TypeError(UNKNOWN_EVENT_ERR);
