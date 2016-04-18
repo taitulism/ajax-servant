@@ -532,7 +532,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					const servant = createServant('GET');
 
 					expect(servant.events).to.be.empty;
-
+	debugger
 					servant.on('response', noopFn);
 
 					expect(servant.events).not.to.be.empty;
@@ -9210,6 +9210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+		var DEFAULT_OPTIONS = _constants2.default.DEFAULT_OPTIONS;
 		var DEFAULT_CACHE_BREAKER_KEY = _constants2.default.DEFAULT_CACHE_BREAKER_KEY;
 		var SUPPORTED_VERBS = _constants2.default.SUPPORTED_VERBS;
 		var CONSTRUCTOR_INVALID_ARGS_ERR = _constants2.default.CONSTRUCTOR_INVALID_ARGS_ERR;
@@ -9218,14 +9219,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		var EVENT_NAME = _constants2.default.EVENT_NAME;
 
 		/* Private vars */
-
-		var defaultOptions = {
-			async: true,
-			ctx: null,
-			qryStr: null,
-			headers: null,
-			cacheBreaker: false
-		};
 
 		var eventsDictionary = {
 			abort: EVENT_NAME.ABORT,
@@ -9285,11 +9278,23 @@ return /******/ (function(modules) { // webpackBootstrap
 			};
 		}
 
+		/*----------------------------------------------------------
+		|  example event object for the "load" event:
+		|
+		|  servant.events['load'] = {
+		|      wrapper: defaultWrapper // <-- see "getWrapper()"
+		|      queue: []
+		|  }
+		*/
 		function createEventObj(servant, nativeName) {
-			return {
-				queue: [],
-				wrapper: null
-			};
+			var eventObj = servant.events[nativeName] = {};
+
+			eventObj.queue = [];
+			eventObj.wrapper = getWrapper(servant, nativeName);
+
+			servant.xhr.addEventListener(nativeName, eventObj.wrapper);
+
+			return eventObj;
 		}
 
 		function prepareBody(data, verb) {
@@ -9362,7 +9367,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					throw new TypeError(CONSTRUCTOR_INVALID_ARGS_ERR);
 				}
 
-				options = (0, _utils.copy)(defaultOptions, options);
+				options = (0, _utils.copy)(DEFAULT_OPTIONS, options);
 
 				this.xhr = null;
 				this.events = {};
@@ -9403,12 +9408,6 @@ return /******/ (function(modules) { // webpackBootstrap
 						ctx: ctx,
 						fn: cbFn
 					});
-
-					if (!eventObj.wrapper) {
-						this.events[nativeName] = eventObj;
-						eventObj.wrapper = getWrapper(this, nativeName);
-						this.xhr.addEventListener(nativeName, eventObj.wrapper);
-					}
 
 					return this;
 				}
@@ -9495,6 +9494,15 @@ return /******/ (function(modules) { // webpackBootstrap
 		var CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;
 		var UNKNOWN_EVENT_ERR = 'An unknown XMLHttpRequest eventName: ' + DOT_ON_SIGNATURE;
 		var CALLBACK_NOT_FUNCTION_ERR = 'eventHandler should be a function: ' + DOT_ON_SIGNATURE;
+
+		var DEFAULT_OPTIONS = {
+			async: true,
+			ctx: null,
+			qryStr: null,
+			headers: null,
+			cacheBreaker: false
+		};
+
 		var EVENT_NAME = {
 			ABORT: 'abort',
 			TIMEOUT: 'timeout',
@@ -9507,6 +9515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		};
 
 		exports.default = {
+			DEFAULT_OPTIONS: DEFAULT_OPTIONS,
 			DEFAULT_CACHE_BREAKER_KEY: DEFAULT_CACHE_BREAKER_KEY,
 			SUPPORTED_VERBS: SUPPORTED_VERBS,
 			CONSTRUCTOR_INVALID_ARGS_ERR: CONSTRUCTOR_INVALID_ARGS_ERR,

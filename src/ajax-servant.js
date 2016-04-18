@@ -74,11 +74,23 @@ function getWrapper (servant, nativeName) {
 	};
 }
 
+ /*----------------------------------------------------------
+ |  example event object for the "load" event:
+ |
+ |  servant.events['load'] = {
+ |      wrapper: defaultWrapper // <-- see "getWrapper()"
+ |      queue: []
+ |  }
+*/
 function createEventObj (servant, nativeName) {
-	return {
-		queue: [],
-		wrapper: null
-	};
+	const eventObj = servant.events[nativeName] = {};
+
+	eventObj.queue = [];
+	eventObj.wrapper = getWrapper(servant, nativeName);
+
+	servant.xhr.addEventListener(nativeName, eventObj.wrapper);
+	
+	return eventObj;	
 }
 
 function prepareBody (data, verb) {
@@ -190,12 +202,6 @@ class AjaxServant {
 			ctx,
 			fn: cbFn
 		});
-
-		if (!eventObj.wrapper) {
-			this.events[nativeName] = eventObj;
-			eventObj.wrapper = getWrapper(this, nativeName);
-			this.xhr.addEventListener(nativeName, eventObj.wrapper);
-		}
 
 		return this;
 	}
