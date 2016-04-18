@@ -532,7 +532,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					const servant = createServant('GET');
 
 					expect(servant.events).to.be.empty;
-	debugger
+
 					servant.on('response', noopFn);
 
 					expect(servant.events).not.to.be.empty;
@@ -695,7 +695,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 				it.skip('should send multiple with base & dynam')
 
-				describe('trigger events', function () {
+				describe.only('trigger events', function () {
+					it('should trigger 4 "readystatechange" events on a standard request', function (done) {
+						const servant = createServant('GET');
+						let eventsLog = 0;
+
+						servant.on('readystatechange', function (readyState) {
+							eventsLog += readyState;
+						});
+
+						servant.send();
+
+						setTimeout(function () {
+							// 0+1+2+3+4 (readyState native values)
+							expect(eventsLog).to.equal(10);
+							done();
+							servant.dismiss();
+						}, 500);
+					});
+
 					it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
 						const servant = createServant('GET');
 						let eventsLog = 'a';
@@ -9218,7 +9236,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		var CALLBACK_NOT_FUNCTION_ERR = _constants2.default.CALLBACK_NOT_FUNCTION_ERR;
 		var EVENT_NAME = _constants2.default.EVENT_NAME;
 
-		/* Private vars */
 
 		var eventsDictionary = {
 			abort: EVENT_NAME.ABORT,
@@ -9249,18 +9266,31 @@ return /******/ (function(modules) { // webpackBootstrap
 		};
 
 		var eventsWrappers = {
-			readystatechange: function readystatechange() {},
+			readystatechange: function readystatechange(servant, nativeName) {
+				var queue = servant.events[nativeName].queue;
+
+				return function rscWrapper(ajaxEvent) {
+					var response = (0, _formatResponse2.default)(servant.xhr);
+					var readyState = servant.xhr.readyState;
+
+					queue.forEach(function (cbObj) {
+						var ctx = cbObj.ctx;
+						var fn = cbObj.fn;
+
+
+						fn.apply(ctx, [readyState, response, servant, ajaxEvent]);
+					});
+				};
+			},
 			progress: function progress() {},
 			timeout: function timeout() {}
 		};
-
-		/* Private functions */
 
 		function getWrapper(servant, nativeName) {
 			var eventWrapper = eventsWrappers[nativeName];
 
 			if (eventWrapper) {
-				return eventWrapper;
+				return eventWrapper(servant, nativeName);
 			}
 
 			var queue = servant.events[nativeName].queue;

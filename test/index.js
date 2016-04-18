@@ -291,7 +291,25 @@ describe('AjaxServant', function() {
 
 			it.skip('should send multiple with base & dynam')
 
-			describe('trigger events', function () {
+			describe.only('trigger events', function () {
+				it('should trigger 4 "readystatechange" events on a standard request', function (done) {
+					const servant = createServant('GET');
+					let eventsLog = 0;
+
+					servant.on('readystatechange', function (readyState) {
+						eventsLog += readyState;
+					});
+
+					servant.send();
+
+					setTimeout(function () {
+						// 0+1+2+3+4 (readyState native values)
+						expect(eventsLog).to.equal(10);
+						done();
+						servant.dismiss();
+					}, 500);
+				});
+
 				it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
 					const servant = createServant('GET');
 					let eventsLog = 'a';

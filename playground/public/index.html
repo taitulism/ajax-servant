@@ -87,14 +87,17 @@
 		var servant = new AjaxServant.default('GET','/api', opts);
 
 		servant
+			// .on('readystatechange', function (readyState, response, servant, ajaxEvent) {
+			// 	console.log('rsc:', readyState)
+			// })
 			.on('end', function (response, servant, ajaxEvent) {
 				console.log('Response Headers:', response.headers)
 				console.log('Response body:', response.body)
 			})
-			.on('abort', (resonse, servant, ajaxEvent) => {
+			.on('abort', (response, servant, ajaxEvent) => {
 				console.log('aborted')
 			})
-			.on('error', (resonse, servant, ajaxEvent) => {
+			.on('error', (response, servant, ajaxEvent) => {
 				console.log('error')
 			})
 		;

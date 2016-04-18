@@ -15,9 +15,6 @@ const {
 	EVENT_NAME
 } = CONSTANTS;
 
-
-/* Private vars */
-
 const eventsDictionary = {
 	abort            : EVENT_NAME.ABORT,
 	error            : EVENT_NAME.ERROR,
@@ -47,18 +44,29 @@ const eventsDictionary = {
 };
 
 const eventsWrappers = {
-	readystatechange () {},
+	readystatechange (servant, nativeName) {
+		const queue = servant.events[nativeName].queue;
+
+		return function rscWrapper (ajaxEvent) {
+			const response = formatResponse(servant.xhr);
+			const readyState = servant.xhr.readyState;
+
+			queue.forEach(cbObj => {
+				const {ctx, fn} = cbObj;
+
+				fn.apply(ctx, [readyState, response, servant, ajaxEvent]);
+			});
+		};
+	},
 	progress () {},
 	timeout () {}
 };
-
-/* Private functions */
 
 function getWrapper (servant, nativeName) {
 	const eventWrapper = eventsWrappers[nativeName];
 
 	if (eventWrapper) {
-		return eventWrapper;
+		return eventWrapper(servant, nativeName);
 	}
 
 	const queue = servant.events[nativeName].queue;
