@@ -1,6 +1,7 @@
 var expect      = require('chai').expect;
 var AjaxServant = require('../dist/ajax-servant.bundle').default;
 
+const DELAY = 250;
 const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings';
 const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest eventName:';
 const CALLBACK_NOT_FUNCTION_ERR    = 'eventHandler should be a function:';
@@ -307,7 +308,7 @@ describe('AjaxServant', function() {
 						expect(eventsLog).to.equal(10);
 						done();
 						servant.dismiss();
-					}, 500);
+					}, DELAY);
 				});
 
 				it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
@@ -332,7 +333,7 @@ describe('AjaxServant', function() {
 						expect(eventsLog).to.equal('abcd');
 						done();
 						servant.dismiss();
-					}, 500);
+					}, DELAY);
 				});
 
 				it('should trigger "loadstart", "load", "loadend" events on a standard request using aliases', function (done) {
@@ -357,7 +358,7 @@ describe('AjaxServant', function() {
 						expect(eventsLog).to.equal('abcd');
 						done();
 						servant.dismiss();
-					}, 500);
+					}, DELAY);
 				});
 
 				it('should trigger "loadstart", "abort", "loadend" events on an aborted request', function (done) {
@@ -387,7 +388,7 @@ describe('AjaxServant', function() {
 						expect(eventsLog).to.equal('abcd');
 						done();
 						servant.dismiss();
-					}, 500);
+					}, DELAY);
 				});
 
 				it('should trigger "loadstart", "error", "loadend" events on an invalid request', function (done) {
@@ -416,7 +417,7 @@ describe('AjaxServant', function() {
 						expect(eventsLog).to.equal('abcd');
 						done();
 						servant.dismiss();
-					}, 500);
+					}, DELAY);
 				});
 
 				it('should run handlers with a default (global) context', function (done) {
@@ -483,7 +484,7 @@ describe('AjaxServant', function() {
 					expect(currentState).to.equal('Successfully aborted.');
 					done();
 					servant.dismiss();
-				}, 500);
+				}, DELAY);
 			});
 		});
 
@@ -517,7 +518,7 @@ describe('AjaxServant', function() {
 				setTimeout(function () {
 					expect(currentState).to.equal('Successfully aborted.');
 					done();
-				}, 500);
+				}, DELAY);
 			});
 
 			it('should delete the servant\'s XHR', function () {

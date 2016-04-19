@@ -405,6 +405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var expect      = __webpack_require__(/*! chai */ 16).expect;
 	var AjaxServant = __webpack_require__(/*! ../dist/ajax-servant.bundle */ 56).default;
 
+	const DELAY = 250;
 	const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings';
 	const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest eventName:';
 	const CALLBACK_NOT_FUNCTION_ERR    = 'eventHandler should be a function:';
@@ -711,7 +712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(eventsLog).to.equal(10);
 							done();
 							servant.dismiss();
-						}, 500);
+						}, DELAY);
 					});
 
 					it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
@@ -736,7 +737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(eventsLog).to.equal('abcd');
 							done();
 							servant.dismiss();
-						}, 500);
+						}, DELAY);
 					});
 
 					it('should trigger "loadstart", "load", "loadend" events on a standard request using aliases', function (done) {
@@ -761,7 +762,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(eventsLog).to.equal('abcd');
 							done();
 							servant.dismiss();
-						}, 500);
+						}, DELAY);
 					});
 
 					it('should trigger "loadstart", "abort", "loadend" events on an aborted request', function (done) {
@@ -791,7 +792,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(eventsLog).to.equal('abcd');
 							done();
 							servant.dismiss();
-						}, 500);
+						}, DELAY);
 					});
 
 					it('should trigger "loadstart", "error", "loadend" events on an invalid request', function (done) {
@@ -820,7 +821,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(eventsLog).to.equal('abcd');
 							done();
 							servant.dismiss();
-						}, 500);
+						}, DELAY);
 					});
 
 					it('should run handlers with a default (global) context', function (done) {
@@ -887,7 +888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						expect(currentState).to.equal('Successfully aborted.');
 						done();
 						servant.dismiss();
-					}, 500);
+					}, DELAY);
 				});
 			});
 
@@ -921,7 +922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					setTimeout(function () {
 						expect(currentState).to.equal('Successfully aborted.');
 						done();
-					}, 500);
+					}, DELAY);
 				});
 
 				it('should delete the servant\'s XHR', function () {
