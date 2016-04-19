@@ -83,59 +83,42 @@
 			}
 		}
 
-		var servant = new AjaxServant.default('GET','/test/timeout', opts);
+		var servant = new AjaxServant.default('GET','/test/progress', opts);
 
 		servant
-			// .on('readystatechange', function (readyState, response, servant, ajaxEvent) {
-			// 	console.log('rsc:', readyState)
-			// })
 			.on('timeout', function (servant, ajaxEvent) {
 				console.log('timeout:', ajaxEvent)
 			})
 			.on('load', function (response, servant, ajaxEvent) {
-				console.log('load:', response.body)
-			})
-			// .on('end', function (response, servant, ajaxEvent) {
-			// 	console.log('end')
-			// 	console.log('    Response Headers:', response.headers)
-			// 	console.log('    Response body:', response.body)
-			// })
-			.on('abort', (response, servant, ajaxEvent) => {
-				console.log('aborted')
+				console.log('load:', (response.body.length < 200) ? response.body : '<long response...>')
 			})
 			.on('error', (response, servant, ajaxEvent) => {
 				console.log('error')
 				console.log('    xhr', servant.xhr)
 				console.log('    ajaxEvent', ajaxEvent)
 			})
+			/*.on('readystatechange', function (readyState, response, servant, ajaxEvent) {
+				console.log('rsc:', readyState)
+			})*/
+			/*.on('abort', (response, servant, ajaxEvent) => {
+				console.log('aborted')
+			})*/
+			/*.on('progress', function (ajaxEvent) {
+				console.log('progress:', ajaxEvent)
+				if (ajaxEvent.lengthComputable) {
+					var percentComplete = ajaxEvent.loaded / ajaxEvent.total * 100;
+					console.log('    ', Math.round(percentComplete) + '%')
+				}
+				else {
+					console.log('Unable to compute progress information since the total size is unknown')
+				}
+			})*/
+			/*.on('end', function (response, servant, ajaxEvent) {
+				console.log('end')
+				console.log('    Response Headers:', response.headers)
+				console.log('    Response body:', response.body)
+			})*/
 		;
-
-
-
-		// console.log(servant)
-
-			// .on('start', {ctx:1}, function (response, servant, ajaxEvent) {
-			// 	console.log('first ("before send")')
-			// })
-
-
-			// .on('abort', function (response, servant, ajaxEvent) {
-			// 	console.log('aborted')
-			// })
-
-			// .on('error', function (response, servant, ajaxEvent) {
-			// 	console.log('error')
-			// })
-
-			// .on('end', function (response, servant, ajaxEvent) {
-			// 	console.log(3, this)
-			// 	console.log('last')
-			// })
-
-
-
-
-
 	//-------------------------------
 	</script>
 	</body>

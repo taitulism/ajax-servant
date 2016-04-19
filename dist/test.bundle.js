@@ -9282,7 +9282,19 @@ return /******/ (function(modules) { // webpackBootstrap
 					});
 				};
 			},
-			progress: function progress() {},
+			progress: function progress(servant, nativeName) {
+				var queue = servant.events[nativeName].queue;
+
+				return function rscWrapper(ajaxEvent) {
+					queue.forEach(function (cbObj) {
+						var ctx = cbObj.ctx;
+						var fn = cbObj.fn;
+
+
+						fn.apply(ctx, [ajaxEvent, servant]);
+					});
+				};
+			},
 			timeout: function timeout(servant, nativeName) {
 				var queue = servant.events[nativeName].queue;
 

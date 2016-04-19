@@ -58,7 +58,17 @@ const eventsWrappers = {
 			});
 		};
 	},
-	progress () {},
+	progress (servant, nativeName) {
+		const queue = servant.events[nativeName].queue;
+
+		return function rscWrapper (ajaxEvent) {
+			queue.forEach(cbObj => {
+				const {ctx, fn} = cbObj;
+
+				fn.apply(ctx, [ajaxEvent, servant]);
+			});
+		};
+	},
 	timeout (servant, nativeName) {
 		const queue = servant.events[nativeName].queue;
 
