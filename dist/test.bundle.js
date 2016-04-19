@@ -413,8 +413,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	const noopFn = function emptyHandler () {};
 
-	function createServant(VERB) {
-		return new AjaxServant(VERB, LOCAL_TEST_SERVER_URL);
+	function createServant(VERB, urlParam) {
+		var url = LOCAL_TEST_SERVER_URL + (urlParam || '');
+		// console.log('URL:', url)
+		return new AjaxServant(VERB, url);
 	}
 
 	describe('AjaxServant', function() {
@@ -634,7 +636,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				});
 
 				it('should send base URL params to the server', function (done) {
-					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/a/b/c');
+					const servant = createServant('GET', '/a/b/c');
 
 					servant.on('response', function (responseObj) {
 						expect(responseObj.body).to.equal('/a/b/c');
@@ -710,6 +712,33 @@ return /******/ (function(modules) { // webpackBootstrap
 						setTimeout(function () {
 							// 0+1+2+3+4 (readyState native values)
 							expect(eventsLog).to.equal(10);
+							done();
+							servant.dismiss();
+						}, DELAY);
+					});
+
+					it('should trigger 4 "progress" events on a standard request', function (done) {
+						const servant = createServant('GET', '/progress');
+						let eventsLog = 0;
+
+						servant.on('progress', function (ajaxEvent) {
+	                        /*console.log('progress:', ajaxEvent)
+							if (ajaxEvent.lengthComputable) {
+								var percentComplete = ajaxEvent.loaded / ajaxEvent.total * 100;
+								console.log('    ', Math.round(percentComplete) + '%')
+							}
+							else {
+								console.log('Unable to compute progress information since the total size is unknown')
+							}*/
+
+							eventsLog += 1;
+						});
+
+						servant.send();
+
+						setTimeout(function () {
+							// response is long and split into 4 chunks
+							expect(eventsLog).to.equal(4);
 							done();
 							servant.dismiss();
 						}, DELAY);
