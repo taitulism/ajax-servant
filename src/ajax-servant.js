@@ -59,7 +59,17 @@ const eventsWrappers = {
 		};
 	},
 	progress () {},
-	timeout () {}
+	timeout (servant, nativeName) {
+		const queue = servant.events[nativeName].queue;
+
+		return function rscWrapper (ajaxEvent) {
+			queue.forEach(cbObj => {
+				const {ctx, fn} = cbObj;
+
+				fn.apply(ctx, [servant, ajaxEvent]);
+			});
+		};
+	}
 };
 
 function getWrapper (servant, nativeName) {
@@ -133,7 +143,11 @@ function createXHR () {
 }
 
 function getXhr (servant) {
-	return servant.xhr || createXHR();
+	const xhr = servant.xhr || createXHR();
+
+	xhr.timeout = servant.timeout;
+
+	return xhr;
 }
 
 function isSupported (verb) {
@@ -178,6 +192,7 @@ class AjaxServant {
 		this.baseUrl      = baseUrl;
 		this.verb         = verb.toUpperCase();
 		this.ctx          = options.ctx;
+		this.timeout      = options.timeout;
 		this.baseHeaders  = options.headers;
 		this.baseQryStr   = options.qryStr;
 		this.async        = isNotUndefined(options.async) ? options.async : true;

@@ -7,6 +7,7 @@ const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest eventName: ' + D
 const CALLBACK_NOT_FUNCTION_ERR    = 'eventHandler should be a function: ' + DOT_ON_SIGNATURE;
 
 const DEFAULT_OPTIONS = {
+	timeout : 0,
 	async   : true,
 	ctx     : null,
 	qryStr  : null,

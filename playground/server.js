@@ -5,7 +5,7 @@ var send = require('send');
 var serveStatic = require('serve-static');
 var serve = serveStatic(`${__dirname}/public`, {'index': false});
 
-var aServer = require('a-server')({port:8081});
+var aServer = require('a-server')({port:8081, timeout: 20000});
 
 var log = console.log;
 
@@ -45,7 +45,7 @@ aServer.start(function (req, res) {
 		const qry = urlObj.query;
 		log('');
 		log(req.method, req.url);
-		log(req.headers['x-requested-with'] || 'no headers');
+		(req.headers['x-requested-with']) && log('x-requested-with:', req.headers['x-requested-with']);
 
 		if (req.method === 'POST') {
 			parsePOSTBody(req, res, function (body) {
@@ -67,6 +67,13 @@ aServer.start(function (req, res) {
 
 			if (req.url === '/test/a/b/c') {
 				res.end('/a/b/c');
+				return;
+			}
+
+			if (req.url === '/test/timeout') {
+				setTimeout(function() {
+					res.end('thanks for waiting');
+				}, 19000);
 				return;
 			}
 

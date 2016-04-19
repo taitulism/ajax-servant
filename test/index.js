@@ -291,7 +291,7 @@ describe('AjaxServant', function() {
 
 			it.skip('should send multiple with base & dynam')
 
-			describe.only('trigger events', function () {
+			describe('trigger events', function () {
 				it('should trigger 4 "readystatechange" events on a standard request', function (done) {
 					const servant = createServant('GET');
 					let eventsLog = 0;

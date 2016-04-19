@@ -695,7 +695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 				it.skip('should send multiple with base & dynam')
 
-				describe.only('trigger events', function () {
+				describe('trigger events', function () {
 					it('should trigger 4 "readystatechange" events on a standard request', function (done) {
 						const servant = createServant('GET');
 						let eventsLog = 0;
@@ -9283,7 +9283,19 @@ return /******/ (function(modules) { // webpackBootstrap
 				};
 			},
 			progress: function progress() {},
-			timeout: function timeout() {}
+			timeout: function timeout(servant, nativeName) {
+				var queue = servant.events[nativeName].queue;
+
+				return function rscWrapper(ajaxEvent) {
+					queue.forEach(function (cbObj) {
+						var ctx = cbObj.ctx;
+						var fn = cbObj.fn;
+
+
+						fn.apply(ctx, [servant, ajaxEvent]);
+					});
+				};
+			}
 		};
 
 		function getWrapper(servant, nativeName) {
@@ -9358,7 +9370,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 
 		function getXhr(servant) {
-			return servant.xhr || createXHR();
+			var xhr = servant.xhr || createXHR();
+
+			xhr.timeout = servant.timeout;
+
+			return xhr;
 		}
 
 		function isSupported(verb) {
@@ -9404,6 +9420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				this.baseUrl = baseUrl;
 				this.verb = verb.toUpperCase();
 				this.ctx = options.ctx;
+				this.timeout = options.timeout;
 				this.baseHeaders = options.headers;
 				this.baseQryStr = options.qryStr;
 				this.async = isNotUndefined(options.async) ? options.async : true;
@@ -9526,6 +9543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		var CALLBACK_NOT_FUNCTION_ERR = 'eventHandler should be a function: ' + DOT_ON_SIGNATURE;
 
 		var DEFAULT_OPTIONS = {
+			timeout: 0,
 			async: true,
 			ctx: null,
 			qryStr: null,
