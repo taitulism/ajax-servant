@@ -103,7 +103,7 @@
 			/*.on('abort', (response, servant, ajaxEvent) => {
 				console.log('aborted')
 			})*/
-			/*.on('progress', function (ajaxEvent) {
+			.on('progress', function (ajaxEvent) {
 				console.log('progress:', ajaxEvent)
 				if (ajaxEvent.lengthComputable) {
 					var percentComplete = ajaxEvent.loaded / ajaxEvent.total * 100;
@@ -112,7 +112,7 @@
 				else {
 					console.log('Unable to compute progress information since the total size is unknown')
 				}
-			})*/
+			})
 			/*.on('end', function (response, servant, ajaxEvent) {
 				console.log('end')
 				console.log('    Response Headers:', response.headers)

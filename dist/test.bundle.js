@@ -722,17 +722,20 @@ return /******/ (function(modules) { // webpackBootstrap
 						let eventsLog = 0;
 
 						servant.on('progress', function (ajaxEvent) {
-	                        /*console.log('progress:', ajaxEvent)
+							
+						/*
+	                        console.log('progress:', ajaxEvent)
 							if (ajaxEvent.lengthComputable) {
 								var percentComplete = ajaxEvent.loaded / ajaxEvent.total * 100;
 								console.log('    ', Math.round(percentComplete) + '%')
 							}
 							else {
 								console.log('Unable to compute progress information since the total size is unknown')
-							}*/
+							}
+						*/
 
 							eventsLog += 1;
-						});
+						})
 
 						servant.send();
 
@@ -741,7 +744,26 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(eventsLog).to.equal(4);
 							done();
 							servant.dismiss();
-						}, DELAY);
+						}, 1000);
+					});
+
+					it('should trigger a "timeout" event when response is delayed', function (done) {
+						const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/timeout', {timeout: 1000});
+						let timeoutWorks = null;
+						servant
+							.on('load', function (res) {
+								timeoutWorks = false;
+							})
+							.on('timeout', function (servant, ajaxEvent) {
+								timeoutWorks = true;							
+							})
+							.send();
+
+							setTimeout(function () {
+								expect(timeoutWorks).to.be.equal(true);
+								done();
+								servant.dismiss();
+							}, 1500);
 					});
 
 					it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
