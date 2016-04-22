@@ -111,7 +111,7 @@ function getWrapper (servant, nativeName) {
  |  }
 */
 function createEventObj (servant, nativeName) {
-	const eventObj = servant.events[nativeName] = {};
+	const eventObj = servant.events[nativeName] = Object.create(null);
 
 	eventObj.queue = [];
 	eventObj.wrapper = getWrapper(servant, nativeName);

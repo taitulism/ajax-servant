@@ -206,7 +206,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	|  }
 	*/
 	function createEventObj(servant, nativeName) {
-		var eventObj = servant.events[nativeName] = {};
+		var eventObj = servant.events[nativeName] = Object.create(null);
 
 		eventObj.queue = [];
 		eventObj.wrapper = getWrapper(servant, nativeName);
