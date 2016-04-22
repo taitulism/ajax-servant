@@ -593,13 +593,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 						servant.dismiss();
 					});
-
-					it.skip('should bind multiple same event to assert getDefaultWrapper queue');
 				});
 			});
 
 			describe('.send()', function () {
-				it('should send base data to the server', function (done) {
+				it('should send a blank request when invoked without arguments', function (done) {
 					const servant = createServant('GET');
 
 					servant.on('response', function (responseObj) {
@@ -696,7 +694,155 @@ return /******/ (function(modules) { // webpackBootstrap
 					servant.send({params: ['a','b','c']});
 				});
 
-				it.skip('should send multiple with base & dynam')
+				it('should send both base and dynamic queryString', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {qryStr: {'qry1':'str1'}});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('?qry1=str1&qry2=str2');
+						done();
+						servant.dismiss();
+					});
+
+					servant.send({qryStr: {'qry2':'str2'}});
+				});
+
+				it('should send both base and dynamic headers', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {headers: {'hdrA':'hdr1'}});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('hdr1hdr2');
+						done();
+						servant.dismiss();
+					});
+
+					servant.send({headers: {'hdrB':'hdr2'}});
+				});
+
+				it('should send a cacheBreaker with no queryString', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {cacheBreaker: 'mytimestamp'});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body.substr(0, 19)).to.equal('/test?mytimestamp=1');
+						done();
+						servant.dismiss();
+					});
+
+					servant.send();
+				});
+
+				it('should send a cacheBreaker with URL params', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {cacheBreaker: 'mytimestamp'});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('params/qry');
+						done();
+						servant.dismiss();
+					});
+
+					servant.send({params: ['params','qry']});
+				});
+
+				it('should send a cacheBreaker with base queryString', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/baseqrycache', {
+						cacheBreaker: true,
+						qryStr: {qry:'str'}
+					});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('baseqrycache');
+						done();
+						servant.dismiss();
+					});
+
+					servant.send();
+				});
+
+				it('should send a cacheBreaker with dynamic queryString', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/dynaqrycache', {cacheBreaker: true});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('dynaqrycache');
+						done();
+						servant.dismiss();
+					});
+
+					servant.send({qryStr: {qry:'str'}});
+				});
+
+				it('should send a cacheBreaker with both base and dynamic queryString', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/bothqrycache', {
+						cacheBreaker: true,
+						qryStr: {qry1:'str1'}
+					});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('bothqrycache');
+						done();
+						servant.dismiss();
+					});
+
+					servant.send({qryStr: {qry2:'str2'}});
+				});
+
+				it('should send a cacheBreaker with both base and dynamic queryString and URL params', function (done) {
+					const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {
+						cacheBreaker: true,
+						qryStr: {qry1:'str1'}
+					});
+
+					servant.on('response', function (responseObj) {
+						expect(responseObj.body).to.equal('params/bothqry/cache');
+						done();
+						servant.dismiss();
+					});
+
+					servant.send({
+						params:['params','bothqry','cache'],
+						qryStr: {qry2:'str2'}
+					});
+				});
+				
+				it('should cancel ongoing request when re-send', function (done) {
+					const servant = createServant('GET');
+
+					servant
+						.on('load', function (responseObj) {
+							expect(responseObj.body).to.equal('/y');
+							done();
+							servant.dismiss();
+						})
+						.send({params: ['x']})
+						.send({params: ['y']})
+					;
+				});
+
+				it.skip('can send a synchronous request', function (done) {
+					if (window.Worker) {
+						var myWorker = new Worker("worker.js");
+
+						myWorker.onmessage = function(e) {
+							const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/test/sync', {async:false});
+
+							let response = false;
+
+							servant.on('load', function (responseObj) {
+								response = responseObj.body;
+							});
+
+							servant.send();
+
+							expect(response).to.be.equal(5);
+							done();
+							console.log('Message received from worker');
+						};	
+						
+						myWorker.postMessage('go');
+					}
+					else {
+						console.log('XMLHttpRequest spec does not allow synchronous requests outside workers.')
+						expect(true).to.be.ok;
+					}
+				});
 
 				describe('trigger events', function () {
 					it('should trigger 4 "readystatechange" events on a standard request', function (done) {
@@ -751,10 +897,10 @@ return /******/ (function(modules) { // webpackBootstrap
 						const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL + '/timeout', {timeout: 1000});
 						let timeoutWorks = null;
 						servant
-							.on('load', function (res) {
+							.on('load', function () {
 								timeoutWorks = false;
 							})
-							.on('timeout', function (servant, ajaxEvent) {
+							.on('timeout', function () {
 								timeoutWorks = true;							
 							})
 							.send();
@@ -795,15 +941,15 @@ return /******/ (function(modules) { // webpackBootstrap
 						const servant = createServant('GET');
 						let eventsLog = 'a';
 
-						servant.on('start', function (responseObj) {
+						servant.on('start', function () {
 							eventsLog += 'b';
 						});
 
-						servant.on('response', function (responseObj) {
+						servant.on('response', function () {
 							eventsLog += 'c';
 						});
 
-						servant.on('end', function (responseObj) {
+						servant.on('end', function () {
 							eventsLog += 'd';
 						});
 
@@ -820,19 +966,19 @@ return /******/ (function(modules) { // webpackBootstrap
 						const servant = createServant('GET');
 						let eventsLog = 'a';
 
-						servant.on('loadstart', function (responseObj) {
+						servant.on('loadstart', function () {
 							eventsLog += 'b';
 						});
 
-						servant.on('load', function (responseObj) {
+						servant.on('load', function () {
 							eventsLog += 'X';
 						});
 
-						servant.on('abort', function (responseObj) {
+						servant.on('abort', function () {
 							eventsLog += 'c';
 						});
 
-						servant.on('loadend', function (responseObj) {
+						servant.on('loadend', function () {
 							eventsLog += 'd';
 						});
 
@@ -850,19 +996,19 @@ return /******/ (function(modules) { // webpackBootstrap
 						const servant = new AjaxServant('GET', 'http://BAD_URL.com');
 						let eventsLog = 'a';
 
-						servant.on('loadstart', function (responseObj) {
+						servant.on('loadstart', function () {
 							eventsLog += 'b';
 						});
 
-						servant.on('load', function (responseObj) {
+						servant.on('load', function () {
 							eventsLog += 'X';
 						});
 
-						servant.on('error', function (responseObj) {
+						servant.on('error', function () {
 							eventsLog += 'c';
 						});
 
-						servant.on('loadend', function (responseObj) {
+						servant.on('loadend', function () {
 							eventsLog += 'd';
 						});
 
@@ -878,7 +1024,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					it('should run handlers with a default (global) context', function (done) {
 						const servant = createServant('GET');
 
-						servant.on('load', function (responseObj) {
+						servant.on('load', function () {
 							/*
 								".self" is a window prop and is equal to the window.
 								If this test fails it could be related to the test context (browser/node)
@@ -895,7 +1041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						const contextObj = {id: 'context'};
 						const servant = new AjaxServant('GET', LOCAL_TEST_SERVER_URL, {ctx:contextObj});
 
-						servant.on('load', function (responseObj) {
+						servant.on('load', function () {
 							expect(this.id).to.equal('context');
 							done();
 							servant.dismiss();
@@ -908,7 +1054,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						const servant = createServant('GET');
 						const contextObj = {id: 'context'};
 
-						servant.on('load', contextObj, function (responseObj) {
+						servant.on('load', contextObj, function () {
 							expect(this.id).to.equal('context');
 							done();
 							servant.dismiss();
@@ -9552,7 +9698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					xhr.send(body);
 
 					/*eslint no-console: ["error", { allow: ["warn", "error"] }] */
-					// console.warn('Request:',[verb, url, body]);
+					console.warn('Request:', [verb, url, body]);
 
 					return this;
 				}

@@ -58,7 +58,7 @@
 			servant.send({
 				// params: ['a','b','c'],
 				// qryStr: {filter: 'qwe'},
-				// headers: {asd:4567},
+				headers: {asd:4567},
 				body: 'sababa'
 				// body: escape(dat)
 				// body: 'foo=bar&baz=The+first+line.%0D%0AThe+second+line.%0D%0A'
@@ -76,14 +76,14 @@
 			// qryStr: {def: 'DEF'},
 			// cacheBreaker: '_',
 			headers: {
-				'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+				// 'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
 				// 'Content-type': 'application/json;charset=UTF-8',
 				// 'Content-type': 'text/plain',
-				// qwe:1234
+				qwe:1234
 			}
 		}
 
-		var servant = new AjaxServant.default('GET','/test/progress', opts);
+		var servant = new AjaxServant.default('GET','/test', opts);
 
 		servant
 			.on('timeout', function (servant, ajaxEvent) {
@@ -103,7 +103,7 @@
 			/*.on('abort', (response, servant, ajaxEvent) => {
 				console.log('aborted')
 			})*/
-			.on('progress', function (ajaxEvent) {
+			/*.on('progress', function (ajaxEvent) {
 				console.log('progress:', ajaxEvent)
 				if (ajaxEvent.lengthComputable) {
 					var percentComplete = ajaxEvent.loaded / ajaxEvent.total * 100;
@@ -112,7 +112,7 @@
 				else {
 					console.log('Unable to compute progress information since the total size is unknown')
 				}
-			})
+			})*/
 			/*.on('end', function (response, servant, ajaxEvent) {
 				console.log('end')
 				console.log('    Response Headers:', response.headers)

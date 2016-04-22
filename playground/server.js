@@ -20,11 +20,7 @@ function getLongString(len) {
 
 var longLongString = getLongString(2e7);
 var size = Buffer.byteLength(longLongString);
-console.log('size', size)
-
-
-
-log(__dirname);
+// console.log('size', size)
 
 function parsePOSTBody(req, res, next) {
 	var body = '';
@@ -41,25 +37,30 @@ function parsePOSTBody(req, res, next) {
 }
 
 aServer.start(function (req, res) {
+	const headers = req.headers;
 	if (req.url === '/favicon.ico') {
 		res.end();
 		return;
 	}
 
 	res.setHeader('Access-Control-Allow-Origin', '*');
-	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, hdrA, hdrB');
 
 	if (req.url === '/dist/ajax-servant.bundle.js') {
 		send(req, '.' + req.url).pipe(res);
 		return;
 	}
 	serve(req, res, function () {
-		var urlObj = $url.parse(req.url, true);
-		var qry = urlObj.query;
+		var urlObj   = $url.parse(req.url, true);
+		var qryObj   = urlObj.query;
+		var queryLen = Object.keys(qryObj).length;
+
 		log('');
 		log(req.method, req.url);
-		(req.headers['x-requested-with']) && log('x-requested-with:', req.headers['x-requested-with']);
-
+		// log('urlObj', urlObj);
+		// log('headers', headers);
+		// log('headers', headers);
+		
 		if (req.method === 'POST') {
 			parsePOSTBody(req, res, function (body) {
 				res.end(body);
@@ -68,13 +69,53 @@ aServer.start(function (req, res) {
 		}
 
 		if (req.url.substr(0,5) === '/test') {
-			if (Object.keys(qry).length) {
+			if (urlObj.pathname === '/test/x' || urlObj.pathname === '/test/y') {
+				res.end(urlObj.pathname.substr(5));
+				return;
+			}
+
+			if (urlObj.pathname === '/test/params/qry') {
+				res.end('params/qry');
+				return;
+			}
+
+			if (urlObj.pathname === '/test/baseqrycache') {
+				res.end('baseqrycache');
+				return;
+			}
+
+			if (urlObj.pathname === '/test/dynaqrycache') {
+				res.end('dynaqrycache');
+				return;
+			}
+
+			if (urlObj.pathname === '/test/bothqrycache') {
+				res.end('bothqrycache');
+				return;
+			}
+
+			if (urlObj.pathname === '/test/params/bothqry/cache') {
+				res.end('params/bothqry/cache');
+				return;
+			}
+
+			if (queryLen) {
+				if (queryLen === 1 && qryObj.mytimestamp) {
+					res.end(req.url);
+					return;
+				}
+				
 				res.end(urlObj.search);
 				return;
 			}
 
-			if (req.headers['x-requested-with']) {
-				res.end(req.headers['x-requested-with']);
+			if (headers['x-requested-with']) {
+				res.end(headers['x-requested-with']);
+				return;
+			}
+
+			if (headers.hdra && headers.hdrb) {
+				res.end(headers.hdra + headers.hdrb);
 				return;
 			}
 
