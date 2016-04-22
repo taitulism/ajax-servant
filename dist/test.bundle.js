@@ -863,7 +863,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						}, DELAY);
 					});
 
-					it('should trigger 4 "progress" events on a standard request', function (done) {
+					it('should trigger ~4 "progress" events on a standard request', function (done) {
 						const servant = createServant('GET', '/progress');
 						let eventsLog = 0;
 
@@ -886,8 +886,8 @@ return /******/ (function(modules) { // webpackBootstrap
 						servant.send();
 
 						setTimeout(function () {
-							// response is long and split into 4 chunks
-							expect(eventsLog).to.equal(4);
+							// response is long and split into ~4 chunks
+							expect(eventsLog).not.to.equal(0);
 							done();
 							servant.dismiss();
 						}, 1000);

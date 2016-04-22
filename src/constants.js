@@ -16,14 +16,14 @@ const DEFAULT_OPTIONS = {
 };
 
 const EVENT_NAME = {
-	ABORT           : 'abort',
-	TIMEOUT         : 'timeout',
-	PROGRESS        : 'progress',
-	ERROR           : 'error',
-	LOADSTART       : 'loadstart',
-	LOAD            : 'load',
-	LOADEND         : 'loadend',
-	READYSTATECHANGE: 'readystatechange'
+	ABORT            : 'abort',
+	TIMEOUT          : 'timeout',
+	PROGRESS         : 'progress',
+	ERROR            : 'error',
+	LOADSTART        : 'loadstart',
+	LOAD             : 'load',
+	LOADEND          : 'loadend',
+	READYSTATECHANGE : 'readystatechange'
 };
 
 
