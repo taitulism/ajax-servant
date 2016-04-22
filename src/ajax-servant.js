@@ -260,7 +260,7 @@ class AjaxServant {
 		xhr.send(body);
 
 		/*eslint no-console: ["error", { allow: ["warn", "error"] }] */
-		// console.warn('Request:',[verb, url, body]);
+		console.warn('Request:',[verb, url, body]);
 
 		return this;
 	}
