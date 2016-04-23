@@ -9598,6 +9598,21 @@ return /******/ (function(modules) { // webpackBootstrap
 						fn.apply(ctx, [response, servant, ajaxEvent]);
 					});
 				};
+			},
+			loadend: function loadend(servant, nativeName) {
+				var queue = servant.events[nativeName].queue;
+
+				return function loadEndWrapper(ajaxEvent) {
+					var response = (0, _formatResponse2.default)(servant.xhr);
+
+					queue.forEach(function (cbObj) {
+						var ctx = cbObj.ctx;
+						var fn = cbObj.fn;
+
+
+						fn.apply(ctx, [response, servant, ajaxEvent]);
+					});
+				};
 			}
 		};
 

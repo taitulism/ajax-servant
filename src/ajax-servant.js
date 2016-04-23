@@ -70,6 +70,19 @@ const eventsWrappers = {
 				fn.apply(ctx, [response, servant, ajaxEvent]);
 			});
 		};
+	},
+	loadend (servant, nativeName) {
+		const queue = servant.events[nativeName].queue;
+
+		return function loadEndWrapper (ajaxEvent) {
+			const response = formatResponse(servant.xhr);
+
+			queue.forEach(cbObj => {
+				const {ctx, fn} = cbObj;
+
+				fn.apply(ctx, [response, servant, ajaxEvent]);
+			});
+		};
 	}
 };
 
