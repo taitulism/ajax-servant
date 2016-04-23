@@ -2,9 +2,8 @@
 
 Import
 ------
-Currently it's just a global class. Will become an "import/export" eventually.
 ```js
-AjaxServant // global for now
+import AjaxServant from 'Ajax-servant';
 ```
 
 
@@ -37,7 +36,7 @@ Calling the `.send()` method of a servant will execute a request. You can pass s
 Aborting a request is done with an `.abort()` call.
 ```js
 var dynamicDataObj = {
-	params  : ['param1', 'param2'], // -> baseURL + /param1/param2
+	params  : ['param1', 'param2'], // -> <Base URL>/param1/param2
 	qryStr   : {query: 'string'},
 	headers : {key: 'value'},
 	body    : '*'
@@ -54,7 +53,7 @@ Sending a servant while it is "away" with another request, will cancel the runni
 ```js
 servant.send({body: 1});
 servant.send({body: 2});
-// the later cancles the former. server will get: 2
+// the later cancles the former.
 ```
 **Aborting a servant doesn't delete its XHR object nor unbind any handler.**
 
