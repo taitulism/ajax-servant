@@ -60,6 +60,8 @@ servant.on('load', function () {
   console.log(this); // -> {a:1}
 });
 ```
+>**NOTE:** Given no context (default `null`) will make `this` refer to the global scope (`window`).
+
 You can set a specific context for event handlers. See [Events](./events.md#optionalcontext).  
 tl;dr:
 ```js
