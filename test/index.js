@@ -142,7 +142,7 @@ describe('AjaxServant', function() {
 				expect(servant.events).not.to.be.empty;
 				expect(servant.events.load).to.have.property('wrapper');
 				expect(servant.events.load.wrapper).to.be.a('function');
-				expect(servant.events.load.wrapper.name).to.equal('defaultWrapper');
+				expect(servant.events.load.wrapper.name).to.equal('loadWrapper');
 
 				servant.dismiss();
 			});
@@ -559,7 +559,7 @@ describe('AjaxServant', function() {
 					const servant = createServant('/progress');
 					let eventsLog = 0;
 
-					servant.on('progress', function (ajaxEvent) {
+					servant.on('progress', function (/* servant, ajaxEvent */) {
                         /*console.log('progress:', ajaxEvent)
 						if (ajaxEvent.lengthComputable) {
 							var percentComplete = ajaxEvent.loaded / ajaxEvent.total * 100;
@@ -608,15 +608,15 @@ describe('AjaxServant', function() {
 					const servant = createServant('/blank');
 					let eventsLog = 'a';
 
-					servant.on('loadstart', function (responseObj) {
+					servant.on('loadstart', function () {
 						eventsLog += 'b';
 					});
 
-					servant.on('load', function (responseObj) {
+					servant.on('load', function () {
 						eventsLog += 'c';
 					});
 
-					servant.on('loadend', function (responseObj) {
+					servant.on('loadend', function () {
 						eventsLog += 'd';
 					});
 

@@ -58,25 +58,16 @@ const eventsWrappers = {
 			});
 		};
 	},
-	progress (servant, nativeName) {
+	load (servant, nativeName) {
 		const queue = servant.events[nativeName].queue;
 
-		return function rscWrapper (ajaxEvent) {
+		return function loadWrapper (ajaxEvent) {
+			const response = formatResponse(servant.xhr);
+
 			queue.forEach(cbObj => {
 				const {ctx, fn} = cbObj;
 
-				fn.apply(ctx, [ajaxEvent, servant]);
-			});
-		};
-	},
-	timeout (servant, nativeName) {
-		const queue = servant.events[nativeName].queue;
-
-		return function rscWrapper (ajaxEvent) {
-			queue.forEach(cbObj => {
-				const {ctx, fn} = cbObj;
-
-				fn.apply(ctx, [servant, ajaxEvent]);
+				fn.apply(ctx, [response, servant, ajaxEvent]);
 			});
 		};
 	}
@@ -92,12 +83,10 @@ function getWrapper (servant, nativeName) {
 	const queue = servant.events[nativeName].queue;
 
 	return function defaultWrapper (ajaxEvent) {
-		const response = formatResponse(servant.xhr);
-
 		queue.forEach(cbObj => {
 			const {ctx, fn} = cbObj;
 
-			fn.apply(ctx, [response, servant, ajaxEvent]);
+			fn.apply(ctx, [servant, ajaxEvent]);
 		});
 	};
 }

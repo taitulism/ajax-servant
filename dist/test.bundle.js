@@ -546,7 +546,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					expect(servant.events).not.to.be.empty;
 					expect(servant.events.load).to.have.property('wrapper');
 					expect(servant.events.load.wrapper).to.be.a('function');
-					expect(servant.events.load.wrapper.name).to.equal('defaultWrapper');
+					expect(servant.events.load.wrapper.name).to.equal('loadWrapper');
 
 					servant.dismiss();
 				});
@@ -643,7 +643,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(requestObj.headers).to.have.property('x-requested-with');
 							expect(requestObj.headers['x-requested-with']).to.equal('Ajax-Servant');
 							done();
-							
+
 							servant.dismiss();
 						});
 
@@ -677,7 +677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 						servant.on('response', function (responseObj) {
 							const requestObj = getRequestObj(responseObj);
-							
+
 							expect(requestObj.params).to.eql(['a','b','c']);
 							done();
 
@@ -729,7 +729,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 							expect(requestObj.qryStr).to.eql(qryStr);
 							done();
-							
+
 							servant.dismiss();
 						});
 
@@ -826,7 +826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(requestObj.qryStr['qry']).to.equal('str');
 							expect(requestObj.qryStr['timestamp'].substr(0,4)).to.equal('1461');
 							done();
-							
+
 							servant.dismiss();
 						});
 
@@ -848,7 +848,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(requestObj.qryStr['qry']).to.equal('str');
 							expect(requestObj.qryStr['timestamp'].substr(0,4)).to.equal('1461');
 							done();
-							
+
 							servant.dismiss();
 						});
 
@@ -864,7 +864,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						servant.on('response', function (responseObj) {
 							expect(responseObj.body).to.equal('blank');
 							done();
-							
+
 							servant.dismiss();
 						});
 
@@ -889,7 +889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							expect(requestObj.qryStr['qry2']).to.equal('str2');
 							expect(requestObj.qryStr['timestamp'].substr(0,4)).to.equal('1461');
 							done();
-							
+
 							servant.dismiss();
 						});
 
@@ -954,7 +954,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							// 0+1+2+3+4 = 10 (readyState native values)
 							expect(eventsLog).to.equal(10);
 							done();
-							
+
 							servant.dismiss();
 						}, DELAY);
 					});
@@ -963,7 +963,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						const servant = createServant('/progress');
 						let eventsLog = 0;
 
-						servant.on('progress', function (ajaxEvent) {
+						servant.on('progress', function (/* servant, ajaxEvent */) {
 	                        /*console.log('progress:', ajaxEvent)
 							if (ajaxEvent.lengthComputable) {
 								var percentComplete = ajaxEvent.loaded / ajaxEvent.total * 100;
@@ -980,15 +980,11 @@ return /******/ (function(modules) { // webpackBootstrap
 							// response is long and split into ~3 chunks
 							expect(eventsLog).to.be.within(2,4);
 							done();
-							
-							servant.dismiss();						
+
+							servant.dismiss();
 						});
 
-
 						servant.send();
-
-						// setTimeout(function () {
-						// }, 1000);
 					});
 
 					it('should trigger a "timeout" event when response is delayed', function (done) {
@@ -1016,15 +1012,15 @@ return /******/ (function(modules) { // webpackBootstrap
 						const servant = createServant('/blank');
 						let eventsLog = 'a';
 
-						servant.on('loadstart', function (responseObj) {
+						servant.on('loadstart', function () {
 							eventsLog += 'b';
 						});
 
-						servant.on('load', function (responseObj) {
+						servant.on('load', function () {
 							eventsLog += 'c';
 						});
 
-						servant.on('loadend', function (responseObj) {
+						servant.on('loadend', function () {
 							eventsLog += 'd';
 						});
 
@@ -1149,7 +1145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						servant.on('load', function () {
 							expect(this.id).to.equal('context');
 							done();
-							
+
 							servant.dismiss();
 						});
 
@@ -1163,7 +1159,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						servant.on('load', contextObj, function () {
 							expect(this.id).to.equal('context');
 							done();
-							
+
 							servant.dismiss();
 						});
 
@@ -1191,7 +1187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					setTimeout(function () {
 						expect(currentState).to.equal('Successfully aborted.');
 						done();
-						
+
 						servant.dismiss();
 					}, DELAY);
 				});
@@ -9588,29 +9584,18 @@ return /******/ (function(modules) { // webpackBootstrap
 					});
 				};
 			},
-			progress: function progress(servant, nativeName) {
+			load: function load(servant, nativeName) {
 				var queue = servant.events[nativeName].queue;
 
-				return function rscWrapper(ajaxEvent) {
+				return function loadWrapper(ajaxEvent) {
+					var response = (0, _formatResponse2.default)(servant.xhr);
+
 					queue.forEach(function (cbObj) {
 						var ctx = cbObj.ctx;
 						var fn = cbObj.fn;
 
 
-						fn.apply(ctx, [ajaxEvent, servant]);
-					});
-				};
-			},
-			timeout: function timeout(servant, nativeName) {
-				var queue = servant.events[nativeName].queue;
-
-				return function rscWrapper(ajaxEvent) {
-					queue.forEach(function (cbObj) {
-						var ctx = cbObj.ctx;
-						var fn = cbObj.fn;
-
-
-						fn.apply(ctx, [servant, ajaxEvent]);
+						fn.apply(ctx, [response, servant, ajaxEvent]);
 					});
 				};
 			}
@@ -9626,14 +9611,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			var queue = servant.events[nativeName].queue;
 
 			return function defaultWrapper(ajaxEvent) {
-				var response = (0, _formatResponse2.default)(servant.xhr);
-
 				queue.forEach(function (cbObj) {
 					var ctx = cbObj.ctx;
 					var fn = cbObj.fn;
 
 
-					fn.apply(ctx, [response, servant, ajaxEvent]);
+					fn.apply(ctx, [servant, ajaxEvent]);
 				});
 			};
 		}

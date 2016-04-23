@@ -147,29 +147,18 @@ return /******/ (function(modules) { // webpackBootstrap
 				});
 			};
 		},
-		progress: function progress(servant, nativeName) {
+		load: function load(servant, nativeName) {
 			var queue = servant.events[nativeName].queue;
 
-			return function rscWrapper(ajaxEvent) {
+			return function loadWrapper(ajaxEvent) {
+				var response = (0, _formatResponse2.default)(servant.xhr);
+
 				queue.forEach(function (cbObj) {
 					var ctx = cbObj.ctx;
 					var fn = cbObj.fn;
 
 
-					fn.apply(ctx, [ajaxEvent, servant]);
-				});
-			};
-		},
-		timeout: function timeout(servant, nativeName) {
-			var queue = servant.events[nativeName].queue;
-
-			return function rscWrapper(ajaxEvent) {
-				queue.forEach(function (cbObj) {
-					var ctx = cbObj.ctx;
-					var fn = cbObj.fn;
-
-
-					fn.apply(ctx, [servant, ajaxEvent]);
+					fn.apply(ctx, [response, servant, ajaxEvent]);
 				});
 			};
 		}
@@ -185,14 +174,12 @@ return /******/ (function(modules) { // webpackBootstrap
 		var queue = servant.events[nativeName].queue;
 
 		return function defaultWrapper(ajaxEvent) {
-			var response = (0, _formatResponse2.default)(servant.xhr);
-
 			queue.forEach(function (cbObj) {
 				var ctx = cbObj.ctx;
 				var fn = cbObj.fn;
 
 
-				fn.apply(ctx, [response, servant, ajaxEvent]);
+				fn.apply(ctx, [servant, ajaxEvent]);
 			});
 		};
 	}
