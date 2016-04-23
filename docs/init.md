@@ -33,7 +33,8 @@ Options
   cacheBreaker: false,
   ctx: null,
   qryStr: null,
-  headers: null
+  headers: null,
+  timeout: 0
 }
 ```
 
