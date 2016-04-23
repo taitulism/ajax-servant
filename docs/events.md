@@ -17,6 +17,9 @@ One of the servant lifecycle event:
 * **loadEnd** - gets called after a "load", "abort" and "error" events
 * **abort** - gets called when when the request is being aborted
 * **error** - gets called when an error occured something is wrong with the request
+* **timeout** - gets called if no response from the server. See [`options.timeout`](./init.md#timeout)
+* **progress** - gets called while resonse is transfered. Could get called multiple times.
+* **readyStateChange** - gets called up to 4 times during a request. ([W3scholls  Link](http://www.w3schools.com/ajax/ajax_xmlhttprequest_onreadystatechange.asp))
 
 Some of them have an alias (and all are case-insensitive):
 
@@ -30,7 +33,7 @@ example:
 ```js
 servant.on('loadEnd', callback);
 // is same as
-servant.on('complete', callback);
+servant.on('end', callback);
 ```
 
 
@@ -49,9 +52,19 @@ servant.on('load', {b:2}, function () {
 ####callback
 **type:** function  
 The function to run when the event occurs. The `this` keyword context can be set individually or globaly. [See optionalContext above](#optionalcontext).  
-Events are triggerd with the following arguments:  
+
+Event handlers have with different signatures. Most have the same default signature: `handler(servant, ajaxEvent)` when `servant` is the current AjaxServant instance (`this`) and `ajaxHandler` is the native event object passed by the XHR.
+
+Example:
 ```js
-callback(response, currentServant, ajaxEvent)
+servant.on('start', function (servant, ajaxEvent) {...})
+```
+
+The event handlers that have their own signature are: `load`, `loadEnd`, `progress` and `readyStateChange`.
+```js
+servant.on('load', function (responseObj, servant, ajaxEvent) {...})
+servant.on('loadEnd', function (responseObj, servant, ajaxEvent) {...})
+servant.on('readyStateChange', function (readyState, responseObj, servant, ajaxEvent) {...})
 ```
 
 `response` is a formatted object containing three props:
