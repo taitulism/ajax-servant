@@ -8,19 +8,18 @@ Create
 var servant = new AjaxServant(verb, url, options);
 ```
 
-The constructor requires an HTTP verb and a RELATIVE URL. 
+The constructor requires an HTTP verb and a relative URL. 
 
->**NOTE:** there's no support for cross domain requests. yet!
+>**NOTE:** there's no support for cross-domain requests, yet.
 
 Options are optional.
 * `verb` (string, required*) - one of: `'GET'`, `'POST'`, `'PUT'`, `'DELETE'`.
-* `url` (string, required*) - the URL to assign the servant to. Should start with a slash e.g. `'/api'`.
+* `url` (string, required*) - the URL to assign the servant to. Should start with a slash (e.g. `'/api'`).
 * `options` (object, optional) - a configuration object (covered later).  
 
->**NOTE:** Currently, only the 4 HTTP verbs listed above are supported formally but you can set `servant.verb` to whatever, after instanciation.
+>**NOTE:** Currently, only the 4 HTTP verbs listed above are supported formally but you can set `servant.verb` to whatever, after instantiation.
 
-A string could be either the HTTP `VERB` or the `/baseURL`:  
-If it starts with a slash `'/'` it's the base URL. Else, it's the VERB. An error is thrown if two strings were passed and none or both starts with a `'/'`.
+An error will be thrown if any of the `verb` or the `url` are invalid.
 
 
 
@@ -41,7 +40,7 @@ Options
 ####async
 **type:** boolean  
 **default:** `true`  
-When set to `false` the AJAX request will be synchronous (but why would you do that?).
+When set to `false` the AJAX request will be synchronous (but why would you do that?). Chrome (50) doesn't allow synchronous request sent from the window. You will need a `web Worker` ([MDN link](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)) for that.
 
 
 ####cacheBreaker
@@ -59,6 +58,15 @@ var servant = new AjaxServant('GET', '/api', {ctx: {a:1}});
 
 servant.on('load', function () {
   console.log(this); // -> {a:1}
+});
+```
+You can set a specific context for event handlers. See [Events](./events.md#optionalcontext).  
+tl;dr:
+```js
+var servant = new AjaxServant('GET', '/api', {ctx: {a:1}});
+
+servant.on('load', {b:2}, function () {
+  console.log(this); // -> {b:2}
 });
 ```
 
