@@ -56,9 +56,8 @@ The function to run when the event occurs. The `this` keyword context can be set
 Event handlers have with different signatures. Most have the same default signature: `handler(servant, ajaxEvent)` when `servant` is the current AjaxServant instance (`this`) and `ajaxHandler` is the native XHR event that is passed to the handler.
 
 The events handlers with this signature are: `loadStart`, `abort`, `progress`, `error` and `timeout`.
-Example:
 ```js
-servant.on('start', function (servant, ajaxEvent) {...})
+servant.on('error', function (servant, ajaxEvent) {...})
 ```
 
 The event handlers that have their own signature are: `load`, `loadEnd`, `progress` and `readyStateChange`.
