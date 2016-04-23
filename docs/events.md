@@ -19,7 +19,7 @@ One of the servant lifecycle event:
 * **error** - gets called when an error occured something is wrong with the request
 * **timeout** - gets called if no response from the server. See [`options.timeout`](./init.md#timeout)
 * **progress** - gets called while resonse is transfered. Could get called multiple times.
-* **readyStateChange** - gets called up to 4 times during a request. ([W3scholls  Link](http://www.w3schools.com/ajax/ajax_xmlhttprequest_onreadystatechange.asp))
+* **readyStateChange** - gets called up to 4 times during a request. ([W3schools  Link](http://www.w3schools.com/ajax/ajax_xmlhttprequest_onreadystatechange.asp))
 
 Some of them have an alias (and all are case-insensitive):
 
