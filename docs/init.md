@@ -99,3 +99,16 @@ headers: {
   'token': 'secret'
 }
 ```
+
+
+####timeout
+**type:** number  
+**default:** 0
+Maximum time (in milliseconds) to wait for a response from the server. On timeout, a `timeout` event will be triggered.
+```js
+var servant = new AjaxServant(verb, url, {timeout: 3000}); // => wait 3 seconds
+
+servant.on('timeout', function () {
+  // handle no response
+});
+```
