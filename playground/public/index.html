@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Ajax Servant - Dev</title>
+		<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	</head>
+	<body>
+
+		<!-- <form id="qwe" method="POST" action="/api" enctype="text/plain"> -->
+		<!-- <form id="qwe" method="POST" action="/api" enctype="multipart/form-data"> -->
+		<form id="qwe" method="POST" action="/api" enctype="application/x-www-form-urlencoded;charset=UTF-8">
+			<input id="d1" type="text" name="name" />
+			<textarea id="d2" type="text" name="txt" /></textarea>
+			<input id="d3" type="hidden" name="qwe" value="qqq" />
+			<button id="go" value="click" />GO</button>
+		</form>
+	<script src="dist/ajax-servant.bundle.js"></script>
+	<script>
+		function id(id) {
+			return document.getElementById(id);
+		}
+		const d1 = id('d1');
+		const d2 = id('d2');
+		const d3 = id('d3');
+		let bound = false;
+
+		function jqrSend() {
+			if (bound) {return}
+			$("#qwe").submit(function(e) {
+				bound = true;
+
+			    var url = "/form";
+			    var data = $("#qwe").serialize();
+
+			    console.log(data)
+
+			    $.ajax({
+			           type: "POST",
+			           url: url,
+			           data,
+			           success: function(data) {
+			               alert(data);
+			           }
+			         });
+
+			    e.preventDefault();
+			});
+		}
+
+		$('#go').on('click', e => {
+			e.preventDefault();
+			// debugger
+			// jqrSend();
+
+			const dat = `${d1.name}=${d1.value}${d2.name}=${d2.value}${d3.name}=${d3.value}`;
+
+			servant.send({
+				// params: ['a','b','c'],
+				// qryStr: {filter: 'qwe'},
+				headers: {asd:4567},
+				body: 'sababa'
+				// body: escape(dat)
+				// body: 'foo=bar&baz=The+first+line.%0D%0AThe+second+line.%0D%0A'
+			})
+			// .abort()
+		});
+
+
+	//--------------------------------------------------
+
+
+		const opts = {
+			ctx:{a:1},
+			timeout: 2500,
+			// qryStr: {def: 'DEF'},
+			// cacheBreaker: '_',
+			headers: {
+				// 'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+				// 'Content-type': 'application/json;charset=UTF-8',
+				// 'Content-type': 'text/plain',
+				qwe:1234
+			}
+		}
+
+		var servant = new AjaxServant.default('GET','/test', opts);
+
+		servant
+			.on('timeout', function (servant, ajaxEvent) {
+				console.log('timeout:', ajaxEvent)
+			})
+			.on('load', function (response, servant, ajaxEvent) {
+				console.log('load:', (response.body.length < 200) ? response.body : '<long response...>')
+			})
+			.on('error', (response, servant, ajaxEvent) => {
+				console.log('error')
+				console.log('    xhr', servant.xhr)
+				console.log('    ajaxEvent', ajaxEvent)
+			})
+			/*.on('readystatechange', function (readyState, response, servant, ajaxEvent) {
+				console.log('rsc:', readyState)
+			})*/
+			/*.on('abort', (response, servant, ajaxEvent) => {
+				console.log('aborted')
+			})*/
+			/*.on('progress', function (ajaxEvent) {
+				console.log('progress:', ajaxEvent)
+				if (ajaxEvent.lengthComputable) {
+					var percentComplete = ajaxEvent.loaded / ajaxEvent.total * 100;
+					console.log('    ', Math.round(percentComplete) + '%')
+				}
+				else {
+					console.log('Unable to compute progress information since the total size is unknown')
+				}
+			})*/
+			/*.on('end', function (response, servant, ajaxEvent) {
+				console.log('end')
+				console.log('    Response Headers:', response.headers)
+				console.log('    Response body:', response.body)
+			})*/
+		;
+	//-------------------------------
+	</script>
+	</body>
+</html>

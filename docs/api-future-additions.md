@@ -1,4 +1,7 @@
-import / require
+**THIS MODULE IS A WORK IN PROGRESS**
+
+Usage
+-----
 ```js
 import AjaxServant from 'ajax-servant';
 // OR
@@ -7,7 +10,8 @@ const AjaxServant = require('ajax-servant');
 
 
 
-init
+Init
+----
 ```js
 const options = {
 	async: true,
@@ -29,37 +33,37 @@ servant.config(options);
 
 
 
-config
+Bind events
+-----------
 ```js
-servant.beforeSend(pushState);
-servant.onResponse(validateResponse);
-servant.onComplete(updateSomething);
-
-servant.on('abort', abortFn);
-servant.on('timeout', timeoutFn);
-
 servant.onStatus(200, OKFn);
 servant.onStatus(404, notOKFn);
+servant.onSuccess(OKFn);
+servant.onFail(notOKFn);
 ```
 
 
 
-send / abort
+Send / Abort
+------------
 ```js
-servat.send(['id', 3], {qry: 'str'});
-
-OR
-
-servat.send({
-	params: ['id', 3],
-	qrStr: {qry: 'str'},
-	headers: {k: 'v'},
-	body: 'bla bla bla'
-});
+servant.send(requestObj);
 
 servant.abort();
 ```
 
+
+
+Request Object
+--------------
+```js
+{
+	urlParams : ['id', 3],
+	qrStr     : {qry: 'str'},
+	headers   : {k: 'v'},
+	body      : 'bla bla bla'
+}
+```
 
 
 
