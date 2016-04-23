@@ -53,8 +53,9 @@ servant.on('load', {b:2}, function () {
 **type:** function  
 The function to run when the event occurs. The `this` keyword context can be set individually or globaly. [See optionalContext above](#optionalcontext).  
 
-Event handlers have with different signatures. Most have the same default signature: `handler(servant, ajaxEvent)` when `servant` is the current AjaxServant instance (`this`) and `ajaxHandler` is the native event object passed by the XHR.
+Event handlers have with different signatures. Most have the same default signature: `handler(servant, ajaxEvent)` when `servant` is the current AjaxServant instance (`this`) and `ajaxHandler` is the native XHR event that is passed to the handler.
 
+The events handlers with this signature are: `loadStart`, `abort`, `progress`, `error` and `timeout`.
 Example:
 ```js
 servant.on('start', function (servant, ajaxEvent) {...})
@@ -62,21 +63,19 @@ servant.on('start', function (servant, ajaxEvent) {...})
 
 The event handlers that have their own signature are: `load`, `loadEnd`, `progress` and `readyStateChange`.
 ```js
-servant.on('load', function (responseObj, servant, ajaxEvent) {...})
-servant.on('loadEnd', function (responseObj, servant, ajaxEvent) {...})
-servant.on('readyStateChange', function (readyState, responseObj, servant, ajaxEvent) {...})
+servant.on('load', function (response, servant, ajaxEvent) {...})
+
+servant.on('loadEnd', function (response, servant, ajaxEvent) {...})
+
+servant.on('readyStateChange', function (readyState, response, servant, ajaxEvent) {...})
 ```
 
 `response` is a formatted object containing three props:
 
-1. response.status ( = {code: 200, text: 'ok'} )
-2. response.headers
-3. response.body
+1. response.status ( e.g. {code: 200, text: 'ok'} )
+2. response.headers (e.g. {'Content-Type': 'text/plain'})
+3. response.body (whatever response from the server)
 
-`currentServant` is very self explanatory.  
-`ajaxEvent` is a native XHR event that is passed to the event handler.
-
-examlpe:  
 ```js
 servant.on('load', function(response, currentServant, ajaxEvent){
   if (response.status.code === 200) {
