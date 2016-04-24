@@ -1,7 +1,9 @@
+const $path       = require('path');
 const send        = require('send');
 const serveStatic = require('serve-static');
 
-const serve = serveStatic(`../${__dirname}/public`, {'index': false});
+const publicPath = $path.resolve(`${__dirname}`, '../public');
+const serve      = serveStatic(publicPath, {'index': false});
 
 module.exports = function (io) {
 	const req = io.req;

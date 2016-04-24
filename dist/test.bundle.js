@@ -9851,7 +9851,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: true
 		});
 		var DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
-		var SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE'];
+		var SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'];
 		var CONSTRUCTOR_SIGNATURE = 'new AjaxServant(verb, url, options)';
 		var DOT_ON_SIGNATURE = 'AjaxServant.on(eventName, optionalContext, eventHandler)';
 		var CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;

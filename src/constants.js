@@ -1,5 +1,5 @@
 const DEFAULT_CACHE_BREAKER_KEY    = 'timestamp';
-const SUPPORTED_VERBS              = ['GET', 'POST', 'PUT', 'DELETE'];
+const SUPPORTED_VERBS              = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'];
 const CONSTRUCTOR_SIGNATURE        = 'new AjaxServant(verb, url, options)';
 const DOT_ON_SIGNATURE             = 'AjaxServant.on(eventName, optionalContext, eventHandler)';
 const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;

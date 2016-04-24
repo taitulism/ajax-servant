@@ -83,7 +83,7 @@
 			}
 		}
 
-		var servant = new AjaxServant.default('GET','/test', opts);
+		var servant = new AjaxServant.default('HEAD','/test/request', opts);
 
 		servant
 			.on('timeout', function (servant, ajaxEvent) {
