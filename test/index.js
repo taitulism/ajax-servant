@@ -3,8 +3,8 @@ var AjaxServant = require('../dist/ajax-servant.bundle').default;
 
 const DELAY = 250;
 const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings';
-const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest eventName:';
-const CALLBACK_NOT_FUNCTION_ERR    = 'eventHandler should be a function:';
+const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest event name:';
+const CALLBACK_NOT_FUNCTION_ERR    = '"eventHandler" should be a function:';
 const LOCAL_TEST_SERVER_URL        = 'http://localhost:8081/test';
 
 const noopFn = function emptyHandler () {};

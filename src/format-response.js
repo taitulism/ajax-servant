@@ -26,6 +26,6 @@ export default function (xhr) {
 			text: xhr.statusText
 		},
 		headers: headersObj,
-		body: xhr.responseText || xhr.responseXML
+		body: xhr.responseText || xhr.responseXML || ''
 	};
 }

@@ -15,6 +15,10 @@ module.exports = function (io) {
 	if (req.url === '/favicon.ico') {
 		res.end();
 	}
+	else if (req.url === '/qwe') {
+		res.writeHead(500);
+		res.end();
+	}
 	else if (req.url === '/dist/ajax-servant.bundle.js') {
 		send(req, '.' + req.url).pipe(res);
 	}

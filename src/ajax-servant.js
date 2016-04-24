@@ -10,6 +10,7 @@ const {
 	DEFAULT_CACHE_BREAKER_KEY,
 	SUPPORTED_VERBS,
 	CONSTRUCTOR_INVALID_ARGS_ERR,
+	INVALID_STATUS_CODE_ERR,
 	UNKNOWN_EVENT_ERR,
 	CALLBACK_NOT_FUNCTION_ERR,
 	EVENT_NAME
@@ -212,22 +213,22 @@ class AjaxServant {
 	}
 
 	on (eventName, ctx, cbFn) {
-		this.xhr = getXhr(this);
+		const nativeName = eventsDictionary.resolve(eventName);
+		if (!nativeName) {
+			throw new TypeError(UNKNOWN_EVENT_ERR);
+		}
 
 		// shift args: no ctx
 		if (!cbFn && typeof ctx === 'function') {
 			cbFn = ctx;
-			ctx = this.ctx;
+			ctx  = this.ctx;
 		}
 
-		// validate eventName
-		const nativeName = eventsDictionary.resolve(eventName);
-		if (!nativeName || typeof cbFn !== 'function') {
-			if (!nativeName) {
-				throw new TypeError(UNKNOWN_EVENT_ERR);
-			}
+		if (typeof cbFn !== 'function') {
 			throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
 		}
+
+		this.xhr = getXhr(this);
 
 		// get or create eventObj
 		const eventObj = this.events[nativeName] || createEventObj(this, nativeName);
@@ -238,6 +239,30 @@ class AjaxServant {
 			fn: cbFn
 		});
 
+		return this;
+	}
+
+	onStatus (statusCode, ctx, cbFn) {
+		if (typeof statusCode !== 'number') {
+			throw new TypeError(INVALID_STATUS_CODE_ERR);
+		}
+
+		// shift args: no ctx
+		if (!cbFn && typeof ctx === 'function') {
+			cbFn = ctx;
+			ctx  = this.ctx;
+		}
+
+		if (typeof cbFn !== 'function') {
+			throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
+		}
+
+		this.on('load', ctx, function (responseObj, servant, ajaxEvent) {
+			if (responseObj.status.code === statusCode) {
+				cbFn.apply(ctx, [responseObj, servant, ajaxEvent]);
+			}
+		});
+		
 		return this;
 	}
 

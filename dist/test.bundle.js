@@ -407,8 +407,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	const DELAY = 250;
 	const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings';
-	const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest eventName:';
-	const CALLBACK_NOT_FUNCTION_ERR    = 'eventHandler should be a function:';
+	const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest event name:';
+	const CALLBACK_NOT_FUNCTION_ERR    = '"eventHandler" should be a function:';
 	const LOCAL_TEST_SERVER_URL        = 'http://localhost:8081/test';
 
 	const noopFn = function emptyHandler () {};
@@ -9534,6 +9534,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		var DEFAULT_CACHE_BREAKER_KEY = _constants2.default.DEFAULT_CACHE_BREAKER_KEY;
 		var SUPPORTED_VERBS = _constants2.default.SUPPORTED_VERBS;
 		var CONSTRUCTOR_INVALID_ARGS_ERR = _constants2.default.CONSTRUCTOR_INVALID_ARGS_ERR;
+		var INVALID_STATUS_CODE_ERR = _constants2.default.INVALID_STATUS_CODE_ERR;
 		var UNKNOWN_EVENT_ERR = _constants2.default.UNKNOWN_EVENT_ERR;
 		var CALLBACK_NOT_FUNCTION_ERR = _constants2.default.CALLBACK_NOT_FUNCTION_ERR;
 		var EVENT_NAME = _constants2.default.EVENT_NAME;
@@ -9746,7 +9747,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			_createClass(AjaxServant, [{
 				key: 'on',
 				value: function on(eventName, ctx, cbFn) {
-					this.xhr = getXhr(this);
+					var nativeName = eventsDictionary.resolve(eventName);
+					if (!nativeName) {
+						throw new TypeError(UNKNOWN_EVENT_ERR);
+					}
 
 					// shift args: no ctx
 					if (!cbFn && typeof ctx === 'function') {
@@ -9754,14 +9758,11 @@ return /******/ (function(modules) { // webpackBootstrap
 						ctx = this.ctx;
 					}
 
-					// validate eventName
-					var nativeName = eventsDictionary.resolve(eventName);
-					if (!nativeName || typeof cbFn !== 'function') {
-						if (!nativeName) {
-							throw new TypeError(UNKNOWN_EVENT_ERR);
-						}
+					if (typeof cbFn !== 'function') {
 						throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
 					}
+
+					this.xhr = getXhr(this);
 
 					// get or create eventObj
 					var eventObj = this.events[nativeName] || createEventObj(this, nativeName);
@@ -9770,6 +9771,31 @@ return /******/ (function(modules) { // webpackBootstrap
 					eventObj.queue.push({
 						ctx: ctx,
 						fn: cbFn
+					});
+
+					return this;
+				}
+			}, {
+				key: 'onStatus',
+				value: function onStatus(statusCode, ctx, cbFn) {
+					if (typeof statusCode !== 'number') {
+						throw new TypeError(INVALID_STATUS_CODE_ERR);
+					}
+
+					// shift args: no ctx
+					if (!cbFn && typeof ctx === 'function') {
+						cbFn = ctx;
+						ctx = this.ctx;
+					}
+
+					if (typeof cbFn !== 'function') {
+						throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
+					}
+
+					this.on('load', ctx, function (responseObj, servant, ajaxEvent) {
+						if (responseObj.status.code === statusCode) {
+							cbFn.apply(ctx, [responseObj, servant, ajaxEvent]);
+						}
 					});
 
 					return this;
@@ -9850,14 +9876,20 @@ return /******/ (function(modules) { // webpackBootstrap
 		Object.defineProperty(exports, "__esModule", {
 			value: true
 		});
+		// method Signatures
+		var CONSTRUCTOR_SIGNATURE = 'new AjaxServant(verb, url, options)';
+		var ON_SIGNATURE = 'servant.on(eventName, optionalContext, eventHandler)';
+		var ON_STATUS_SIGNATURE = 'servant.onStatus(statusCode, optionalContext, eventHandler)';
+
+		// error messages
+		var CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;
+		var UNKNOWN_EVENT_ERR = 'An unknown XMLHttpRequest event name: ' + ON_SIGNATURE;
+		var CALLBACK_NOT_FUNCTION_ERR = '"eventHandler" should be a function: ' + ON_SIGNATURE;
+		var INVALID_STATUS_CODE_ERR = '"statusCode" should be a number: ' + ON_STATUS_SIGNATURE;
+
+		//
 		var DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
 		var SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'];
-		var CONSTRUCTOR_SIGNATURE = 'new AjaxServant(verb, url, options)';
-		var DOT_ON_SIGNATURE = 'AjaxServant.on(eventName, optionalContext, eventHandler)';
-		var CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;
-		var UNKNOWN_EVENT_ERR = 'An unknown XMLHttpRequest eventName: ' + DOT_ON_SIGNATURE;
-		var CALLBACK_NOT_FUNCTION_ERR = 'eventHandler should be a function: ' + DOT_ON_SIGNATURE;
-
 		var DEFAULT_OPTIONS = {
 			timeout: 0,
 			async: true,
@@ -9883,6 +9915,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			DEFAULT_CACHE_BREAKER_KEY: DEFAULT_CACHE_BREAKER_KEY,
 			SUPPORTED_VERBS: SUPPORTED_VERBS,
 			CONSTRUCTOR_INVALID_ARGS_ERR: CONSTRUCTOR_INVALID_ARGS_ERR,
+			INVALID_STATUS_CODE_ERR: INVALID_STATUS_CODE_ERR,
 			UNKNOWN_EVENT_ERR: UNKNOWN_EVENT_ERR,
 			CALLBACK_NOT_FUNCTION_ERR: CALLBACK_NOT_FUNCTION_ERR,
 			EVENT_NAME: EVENT_NAME
@@ -9960,7 +9993,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  \********************************/
 	/***/ function(module, exports) {
 
-		"use strict";
+		'use strict';
 
 		Object.defineProperty(exports, "__esModule", {
 			value: true
@@ -9975,7 +10008,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					text: xhr.statusText
 				},
 				headers: headersObj,
-				body: xhr.responseText || xhr.responseXML
+				body: xhr.responseText || xhr.responseXML || ''
 			};
 		};
 
