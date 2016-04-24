@@ -281,6 +281,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		return typeof breaker === 'string' ? breaker : DEFAULT_CACHE_BREAKER_KEY;
 	}
 
+	function removeAllListeners(servant) {
+		var xhr = servant.xhr;
+
+		xhr && (0, _utils.forIn)(servant.events, function (eventName, eventObj) {
+			xhr.removeEventListener(eventName, eventObj.wrapper);
+		});
+	}
+
 	/* Class */
 
 	var AjaxServant = function () {
@@ -409,11 +417,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function dismiss() {
 				this.abort();
 
-				var xhr = this.xhr;
-
-				xhr && (0, _utils.forIn)(this.events, function (eventName, eventObj) {
-					xhr.removeEventListener(eventName, eventObj.wrapper);
-				});
+				removeAllListeners(this);
 
 				this.xhr = null;
 				this.events = {};

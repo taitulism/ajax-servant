@@ -187,6 +187,14 @@ function resolveCacheBreakerKey (breaker) {
 	return (typeof breaker === 'string') ? breaker : DEFAULT_CACHE_BREAKER_KEY;
 }
 
+function removeAllListeners (servant) {
+	const xhr = servant.xhr;
+
+	xhr && forIn(servant.events, (eventName, eventObj) => {
+		xhr.removeEventListener(eventName, eventObj.wrapper);
+	});
+}
+
 
 
 
@@ -301,11 +309,7 @@ class AjaxServant {
 	dismiss () {
 		this.abort();
 
-		const xhr = this.xhr;
-
-		xhr && forIn(this.events, (eventName, eventObj) => {
-			xhr.removeEventListener(eventName, eventObj.wrapper);
-		});
+		removeAllListeners(this);
 
 		this.xhr    = null;
 		this.events = {};
