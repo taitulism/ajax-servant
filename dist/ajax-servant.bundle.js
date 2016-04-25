@@ -310,7 +310,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			this.ctx = options.ctx;
 			this.timeout = options.timeout;
 			this.baseHeaders = options.headers;
-			this.baseQryStr = options.qryStr;
+			this.baseQryStr = options.query;
 			this.async = isNotUndefined(options.async) ? options.async : true;
 			this.cacheBreaker = resolveCacheBreakerKey(options.cacheBreaker);
 		}
@@ -377,14 +377,14 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
 				var params = _ref.params;
-				var qryStr = _ref.qryStr;
+				var query = _ref.query;
 				var headers = _ref.headers;
 				var body = _ref.body;
 
 				var xhr = this.xhr = getXhr(this);
 
 				var verb = this.verb;
-				var url = (0, _resolveUrl2.default)(this, params, qryStr);
+				var url = (0, _resolveUrl2.default)(this, params, query);
 
 				headers = (0, _utils.copy)(this.baseHeaders, headers);
 				body = prepareBody(body, verb);
@@ -461,7 +461,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		timeout: 0,
 		async: true,
 		ctx: null,
-		qryStr: null,
+		query: null,
 		headers: null,
 		cacheBreaker: false
 	};

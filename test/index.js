@@ -301,8 +301,8 @@ describe('AjaxServant', function() {
 
 			describe('qryStr', function () {
 				it('should send a base queryString to the server', function (done) {
-					const qryStr = {'qry':'str'};
-					const servant = createServant('/request', {qryStr});
+					const qryStr = {'query':'str'};
+					const servant = createServant('/request', {query: qryStr});
 
 					servant.on('response', function (responseObj) {
 						const requestObj = getRequestObj(responseObj);
@@ -329,14 +329,14 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr});
+					servant.send({query:qryStr});
 				});
 
 				it('should send both base and dynamic queryString', function (done) {
 					const qry1 = {'qry1':'str1'};
 					const qry2 = {'qry2':'str2'};
 
-					const servant = createServant('/request', {qryStr: qry1});
+					const servant = createServant('/request', {query: qry1});
 
 					servant.on('response', function (responseObj) {
 						const requestObj = getRequestObj(responseObj);
@@ -347,7 +347,7 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr: qry2});
+					servant.send({query: qry2});
 				});
 			});
 
@@ -409,7 +409,7 @@ describe('AjaxServant', function() {
 				it('should send a cacheBreaker with base queryString', function (done) {
 					const servant = createServant('/request', {
 						cacheBreaker: true,
-						qryStr: {qry:'str'}
+						query: {qry:'str'}
 					});
 
 					servant.on('response', function (responseObj) {
@@ -448,13 +448,13 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr: {qry:'str'}});
+					servant.send({query: {qry:'str'}});
 				});
 
 				it('should send a cacheBreaker with both base and dynamic queryString', function (done) {
 					const servant = createServant('/blank', {
 						cacheBreaker: true,
-						qryStr: {qry1:'str1'}
+						query: {qry1:'str1'}
 					});
 
 					servant.on('response', function (responseObj) {
@@ -464,13 +464,13 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr: {qry2:'str2'}});
+					servant.send({query: {qry2:'str2'}});
 				});
 
 				it('should send a cacheBreaker with both base and dynamic queryString and URL params', function (done) {
 					const servant = createServant('/request', {
 						cacheBreaker: true,
-						qryStr: {qry2: 'str2'}
+						query: {qry2: 'str2'}
 					});
 
 					servant.on('response', function (responseObj) {
@@ -489,7 +489,7 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr: {qry1:'str1'}});
+					servant.send({query: {qry1:'str1'}});
 				});
 			});
 

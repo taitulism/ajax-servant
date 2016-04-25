@@ -215,7 +215,7 @@ class AjaxServant {
 		this.ctx          = options.ctx;
 		this.timeout      = options.timeout;
 		this.baseHeaders  = options.headers;
-		this.baseQryStr   = options.qryStr;
+		this.baseQryStr   = options.query;
 		this.async        = isNotUndefined(options.async) ? options.async : true;
 		this.cacheBreaker = resolveCacheBreakerKey(options.cacheBreaker);
 	}
@@ -274,11 +274,11 @@ class AjaxServant {
 		return this;
 	}
 
-	send ({params, qryStr, headers, body} = {}) {
+	send ({params, query, headers, body} = {}) {
 		const xhr = this.xhr = getXhr(this);
 
 		const verb = this.verb;
-		const url  = resolveUrl(this, params, qryStr);
+		const url  = resolveUrl(this, params, query);
 		
 		headers = copy(this.baseHeaders, headers);
 		body    = prepareBody(body, verb);

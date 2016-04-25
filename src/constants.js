@@ -16,7 +16,7 @@ const DEFAULT_OPTIONS = {
 	timeout : 0,
 	async   : true,
 	ctx     : null,
-	qryStr  : null,
+	query   : null,
 	headers : null,
 	cacheBreaker : false
 };
