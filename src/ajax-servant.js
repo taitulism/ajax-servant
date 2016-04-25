@@ -212,7 +212,7 @@ class AjaxServant {
 		this.events       = {};
 		this.baseUrl      = baseUrl;
 		this.verb         = verb.toUpperCase();
-		this.ctx          = options.ctx;
+		this.ctx          = options.context;
 		this.timeout      = options.timeout;
 		this.baseHeaders  = options.headers;
 		this.baseQryStr   = options.query;

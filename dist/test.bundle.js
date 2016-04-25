@@ -1140,7 +1140,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 					it('should run handlers with a base context', function (done) {
 						const contextObj = {id: 'context'};
-						const servant = createServant('/blank', {ctx:contextObj});
+						const servant = createServant('/blank', {context:contextObj});
 
 						servant.on('load', function () {
 							expect(this.id).to.equal('context');
@@ -9744,10 +9744,10 @@ return /******/ (function(modules) { // webpackBootstrap
 				this.events = {};
 				this.baseUrl = baseUrl;
 				this.verb = verb.toUpperCase();
-				this.ctx = options.ctx;
+				this.ctx = options.context;
 				this.timeout = options.timeout;
 				this.baseHeaders = options.headers;
-				this.baseQryStr = options.qryStr;
+				this.baseQryStr = options.query;
 				this.async = isNotUndefined(options.async) ? options.async : true;
 				this.cacheBreaker = resolveCacheBreakerKey(options.cacheBreaker);
 			}
@@ -9814,14 +9814,14 @@ return /******/ (function(modules) { // webpackBootstrap
 					var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
 					var params = _ref.params;
-					var qryStr = _ref.qryStr;
+					var query = _ref.query;
 					var headers = _ref.headers;
 					var body = _ref.body;
 
 					var xhr = this.xhr = getXhr(this);
 
 					var verb = this.verb;
-					var url = (0, _resolveUrl2.default)(this, params, qryStr);
+					var url = (0, _resolveUrl2.default)(this, params, query);
 
 					headers = (0, _utils.copy)(this.baseHeaders, headers);
 					body = prepareBody(body, verb);
@@ -9897,8 +9897,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		var DEFAULT_OPTIONS = {
 			timeout: 0,
 			async: true,
-			ctx: null,
-			qryStr: null,
+			context: null,
+			query: null,
 			headers: null,
 			cacheBreaker: false
 		};

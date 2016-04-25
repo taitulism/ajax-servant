@@ -736,7 +736,7 @@ describe('AjaxServant', function() {
 
 				it('should run handlers with a base context', function (done) {
 					const contextObj = {id: 'context'};
-					const servant = createServant('/blank', {ctx:contextObj});
+					const servant = createServant('/blank', {context:contextObj});
 
 					servant.on('load', function () {
 						expect(this.id).to.equal('context');

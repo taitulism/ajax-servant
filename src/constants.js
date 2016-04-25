@@ -15,7 +15,7 @@ const SUPPORTED_VERBS           = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'];
 const DEFAULT_OPTIONS = {
 	timeout : 0,
 	async   : true,
-	ctx     : null,
+	context : null,
 	query   : null,
 	headers : null,
 	cacheBreaker : false

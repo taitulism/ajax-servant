@@ -307,7 +307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			this.events = {};
 			this.baseUrl = baseUrl;
 			this.verb = verb.toUpperCase();
-			this.ctx = options.ctx;
+			this.ctx = options.context;
 			this.timeout = options.timeout;
 			this.baseHeaders = options.headers;
 			this.baseQryStr = options.query;
@@ -460,7 +460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var DEFAULT_OPTIONS = {
 		timeout: 0,
 		async: true,
-		ctx: null,
+		context: null,
 		query: null,
 		headers: null,
 		cacheBreaker: false
