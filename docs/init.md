@@ -13,7 +13,7 @@ The constructor requires an HTTP verb and a relative URL.
 >**NOTE:** there's no support for cross-domain requests, yet.
 
 Options are optional.
-* `verb` (string, required*) - one of: `'GET'`, `'POST'`, `'PUT'`, `'DELETE'`.
+* `verb` (string, required*) - one of: `'GET'`, `'POST'`, `'PUT'`, `'DELETE'`, `'HEAD'`.
 * `url` (string, required*) - the URL to assign the servant to. Should start with a slash (e.g. `'/api'`).
 * `options` (object, optional) - a configuration object (covered later).  
 
@@ -31,8 +31,8 @@ Options
 {
   async: true,
   cacheBreaker: false,
-  ctx: null,
-  qryStr: null,
+  context: null,
+  query: null,
   headers: null,
   timeout: 0
 }
@@ -50,12 +50,12 @@ When set to `false` the AJAX request will be synchronous (but why would you do t
 Adds a timestamp to the querystring (`key=value`) to get a fresh response. Pass `true` to use the default key (`timestamp=123456`). Pass a string to set your own cache breaker key (e.g. `myCacheBreaker=123456`).
 
 
-####ctx
+####context
 **type:** any  
 **default:** `null`  
 The context of the `this` keyword to run your callbacks with.
 ```js
-var servant = new AjaxServant('GET', '/api', {ctx: {a:1}});
+var servant = new AjaxServant('GET', '/api', {context: {a:1}});
 
 servant.on('load', function () {
   console.log(this); // -> {a:1}
@@ -66,7 +66,7 @@ servant.on('load', function () {
 You can set a specific context for event handlers. See [Events](./events.md#optionalcontext).  
 tl;dr:
 ```js
-var servant = new AjaxServant('GET', '/api', {ctx: {a:1}});
+var servant = new AjaxServant('GET', '/api', {context: {a:1}});
 
 servant.on('load', {b:2}, function () {
   console.log(this); // -> {b:2}
@@ -74,13 +74,13 @@ servant.on('load', {b:2}, function () {
 ```
 
 
-####qryStr
+####query
 **type:** object  
 **default:** `null`  
 An object that will be stringified and added to the request URL as the querystring (for all requests). Its keys and values will be encoded with the native `encodeURIComponent()`
 
 ```js
-qryStr: {
+query: {
   name: 'John',
   age: 30,
   bla: 'key=value'
