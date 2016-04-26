@@ -363,7 +363,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
 				}
 
-				this.on('load', ctx, function (responseObj, servant, ajaxEvent) {
+				this.on('load', ctx, function statusWrapper(responseObj, servant, ajaxEvent) {
 					if (responseObj.status.code === statusCode) {
 						cbFn.apply(ctx, [responseObj, servant, ajaxEvent]);
 					}

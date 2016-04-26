@@ -12,11 +12,8 @@ module.exports = function (io) {
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, hdr-A, hdr-B');
 
+
 	if (req.url === '/favicon.ico') {
-		res.end();
-	}
-	else if (req.url === '/qwe') {
-		res.writeHead(500);
 		res.end();
 	}
 	else if (req.url === '/dist/ajax-servant.bundle.js') {

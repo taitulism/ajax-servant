@@ -408,6 +408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	const DELAY = 250;
 	const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings';
 	const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest event name:';
+	const INVALID_STATUS_CODE_ERR      = '"statusCode" should be a number:';
 	const CALLBACK_NOT_FUNCTION_ERR    = '"eventHandler" should be a function:';
 	const LOCAL_TEST_SERVER_URL        = 'http://localhost:8081/test';
 
@@ -598,6 +599,67 @@ return /******/ (function(modules) { // webpackBootstrap
 
 						servant.dismiss();
 					});
+				});
+			});
+
+			describe('.onStatus()', function () {
+				it('should throw an error when called with invalid status code', function () {
+					const servant =	createServant();
+
+					try {
+						servant.onStatus('not a status code', noopFn);
+					}
+					catch (err) {
+						expect(err.name).to.equal('TypeError');
+						expect(err.message).to.contain(INVALID_STATUS_CODE_ERR);
+					}
+				});
+
+				it('should throw an error when called with invalid callback function', function () {
+					const servant =	createServant();
+
+					try {
+						servant.onStatus(200, 'not a function');
+					}
+					catch (err) {
+						expect(err.name).to.equal('TypeError');
+						expect(err.message).to.contain(CALLBACK_NOT_FUNCTION_ERR);
+					}
+				});
+
+				it('should bind a "load" event handler', function () {
+					const servant = createServant();
+					
+					servant.onStatus(200, noopFn);
+
+					expect(servant.events).to.have.property('load');
+					expect(servant.events.load).to.have.property('queue');
+					expect(servant.events.load).to.have.property('wrapper');
+					expect(servant.events.load.queue.length).to.equal(1);
+					expect(servant.events.load.queue[0]).to.have.property('ctx');
+					expect(servant.events.load.queue[0].ctx).to.be.a('null');
+					expect(servant.events.load.queue[0].fn.name).to.equal('statusWrapper');
+					expect(servant.events.load.wrapper).to.be.a('function');
+
+					servant.dismiss();
+				});
+
+				it('should bind a "load" event handler with a context', function () {
+					const servant = createServant();
+					const contextObj = {id: 'context'};
+					
+					servant.onStatus(200, contextObj, noopFn);
+
+					expect(servant.events).to.have.property('load');
+					expect(servant.events.load).to.have.property('queue');
+					expect(servant.events.load).to.have.property('wrapper');
+					expect(servant.events.load.queue.length).to.equal(1);
+					expect(servant.events.load.queue[0]).to.have.property('ctx');
+					expect(servant.events.load.queue[0].ctx).to.equal(contextObj);
+					expect(servant.events.load.queue[0].fn.name).to.equal('statusWrapper');
+					expect(servant.events.load.wrapper).to.be.a('function');
+
+					servant.dismiss();
 				});
 			});
 
@@ -1000,12 +1062,12 @@ return /******/ (function(modules) { // webpackBootstrap
 							})
 							.send();
 
-							setTimeout(function () {
-								expect(timeoutWorks).to.be.ok;
-								done();
+						setTimeout(function () {
+							expect(timeoutWorks).to.be.ok;
+							done();
 
-								servant.dismiss();
-							}, 1500);
+							servant.dismiss();
+						}, 1500);
 					});
 
 					it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
@@ -1119,6 +1181,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 							servant.dismiss();
 						}, DELAY);
+					});
+
+					it('should trigger an "onStatus" event when response is 200 ok', function (done) {
+						const servant = createServant('/blank');
+
+						servant.onStatus(200, function (responseObj) {
+							expect(responseObj.status.code).to.equal(200);
+							done();
+
+							servant.dismiss();
+						});
+						
+						servant.send();
+					});
+
+					it('should trigger an "onStatus" event when response is 404 not found', function (done) {
+						const servant = createServant('/status/404/NotFound');
+
+						servant.onStatus(404, function (responseObj) {
+							expect(responseObj.status.code).to.equal(404);
+							expect(responseObj.status.text).to.equal('NotFound');
+							done();
+
+							servant.dismiss();
+						});
+						
+						servant.send();
 					});
 
 					it('should run handlers with a default (global) context', function (done) {
@@ -9800,7 +9889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
 					}
 
-					this.on('load', ctx, function (responseObj, servant, ajaxEvent) {
+					this.on('load', ctx, function statusWrapper(responseObj, servant, ajaxEvent) {
 						if (responseObj.status.code === statusCode) {
 							cbFn.apply(ctx, [responseObj, servant, ajaxEvent]);
 						}
