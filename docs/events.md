@@ -69,6 +69,8 @@ servant.on('loadEnd', function (response, servant, ajaxEvent) {...})
 servant.on('readyStateChange', function (readyState, response, servant, ajaxEvent) {...})
 ```
 
+
+#####response
 `response` is a formatted object containing three props:
 
 1. response.status ( e.g. {code: 200, text: 'ok'} )
