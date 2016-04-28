@@ -69,6 +69,8 @@ servant.on('loadEnd', function (response, servant, ajaxEvent) {...})
 servant.on('readyStateChange', function (readyState, response, servant, ajaxEvent) {...})
 ```
 
+
+#####response
 `response` is a formatted object containing three props:
 
 1. response.status ( e.g. {code: 200, text: 'ok'} )
@@ -81,3 +83,22 @@ servant.on('load', function(response, currentServant, ajaxEvent){
     console.log(response.body);
   }
 });
+```
+
+
+
+###.onStatus()
+```js
+var servant = new AjaxServant('GET', '/api');
+
+servant.onStatus(statusCode, optionalContext, callback)
+```
+This binds a "load" event to the servant and will be triggered on response.
+`statusCode` should be a number.
+
+```js
+var servant = new AjaxServant('GET', '/api');
+
+servant.onStatus(200, successFn);
+servant.onStatus(404, notFoundFn);
+```

@@ -407,8 +407,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	const DELAY = 250;
 	const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings';
-	const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest eventName:';
-	const CALLBACK_NOT_FUNCTION_ERR    = 'eventHandler should be a function:';
+	const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest event name:';
+	const INVALID_STATUS_CODE_ERR      = '"statusCode" should be a number:';
+	const CALLBACK_NOT_FUNCTION_ERR    = '"eventHandler" should be a function:';
 	const LOCAL_TEST_SERVER_URL        = 'http://localhost:8081/test';
 
 	const noopFn = function emptyHandler () {};
@@ -601,6 +602,67 @@ return /******/ (function(modules) { // webpackBootstrap
 				});
 			});
 
+			describe('.onStatus()', function () {
+				it('should throw an error when called with invalid status code', function () {
+					const servant =	createServant();
+
+					try {
+						servant.onStatus('not a status code', noopFn);
+					}
+					catch (err) {
+						expect(err.name).to.equal('TypeError');
+						expect(err.message).to.contain(INVALID_STATUS_CODE_ERR);
+					}
+				});
+
+				it('should throw an error when called with invalid callback function', function () {
+					const servant =	createServant();
+
+					try {
+						servant.onStatus(200, 'not a function');
+					}
+					catch (err) {
+						expect(err.name).to.equal('TypeError');
+						expect(err.message).to.contain(CALLBACK_NOT_FUNCTION_ERR);
+					}
+				});
+
+				it('should bind a "load" event handler', function () {
+					const servant = createServant();
+					
+					servant.onStatus(200, noopFn);
+
+					expect(servant.events).to.have.property('load');
+					expect(servant.events.load).to.have.property('queue');
+					expect(servant.events.load).to.have.property('wrapper');
+					expect(servant.events.load.queue.length).to.equal(1);
+					expect(servant.events.load.queue[0]).to.have.property('ctx');
+					expect(servant.events.load.queue[0].ctx).to.be.a('null');
+					expect(servant.events.load.queue[0].fn.name).to.equal('statusWrapper');
+					expect(servant.events.load.wrapper).to.be.a('function');
+
+					servant.dismiss();
+				});
+
+				it('should bind a "load" event handler with a context', function () {
+					const servant = createServant();
+					const contextObj = {id: 'context'};
+					
+					servant.onStatus(200, contextObj, noopFn);
+
+					expect(servant.events).to.have.property('load');
+					expect(servant.events.load).to.have.property('queue');
+					expect(servant.events.load).to.have.property('wrapper');
+					expect(servant.events.load.queue.length).to.equal(1);
+					expect(servant.events.load.queue[0]).to.have.property('ctx');
+					expect(servant.events.load.queue[0].ctx).to.equal(contextObj);
+					expect(servant.events.load.queue[0].fn.name).to.equal('statusWrapper');
+					expect(servant.events.load.wrapper).to.be.a('function');
+
+					servant.dismiss();
+				});
+			});
+
 			describe('.send()', function () {
 				it('should send a blank request when invoked with no arguments', function (done) {
 					const servant = createServant('/blank');
@@ -705,8 +767,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 				describe('qryStr', function () {
 					it('should send a base queryString to the server', function (done) {
-						const qryStr = {'qry':'str'};
-						const servant = createServant('/request', {qryStr});
+						const qryStr = {'query':'str'};
+						const servant = createServant('/request', {query: qryStr});
 
 						servant.on('response', function (responseObj) {
 							const requestObj = getRequestObj(responseObj);
@@ -733,14 +795,14 @@ return /******/ (function(modules) { // webpackBootstrap
 							servant.dismiss();
 						});
 
-						servant.send({qryStr});
+						servant.send({query:qryStr});
 					});
 
 					it('should send both base and dynamic queryString', function (done) {
 						const qry1 = {'qry1':'str1'};
 						const qry2 = {'qry2':'str2'};
 
-						const servant = createServant('/request', {qryStr: qry1});
+						const servant = createServant('/request', {query: qry1});
 
 						servant.on('response', function (responseObj) {
 							const requestObj = getRequestObj(responseObj);
@@ -751,7 +813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							servant.dismiss();
 						});
 
-						servant.send({qryStr: qry2});
+						servant.send({query: qry2});
 					});
 				});
 
@@ -813,7 +875,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					it('should send a cacheBreaker with base queryString', function (done) {
 						const servant = createServant('/request', {
 							cacheBreaker: true,
-							qryStr: {qry:'str'}
+							query: {qry:'str'}
 						});
 
 						servant.on('response', function (responseObj) {
@@ -852,13 +914,13 @@ return /******/ (function(modules) { // webpackBootstrap
 							servant.dismiss();
 						});
 
-						servant.send({qryStr: {qry:'str'}});
+						servant.send({query: {qry:'str'}});
 					});
 
 					it('should send a cacheBreaker with both base and dynamic queryString', function (done) {
 						const servant = createServant('/blank', {
 							cacheBreaker: true,
-							qryStr: {qry1:'str1'}
+							query: {qry1:'str1'}
 						});
 
 						servant.on('response', function (responseObj) {
@@ -868,13 +930,13 @@ return /******/ (function(modules) { // webpackBootstrap
 							servant.dismiss();
 						});
 
-						servant.send({qryStr: {qry2:'str2'}});
+						servant.send({query: {qry2:'str2'}});
 					});
 
 					it('should send a cacheBreaker with both base and dynamic queryString and URL params', function (done) {
 						const servant = createServant('/request', {
 							cacheBreaker: true,
-							qryStr: {qry2: 'str2'}
+							query: {qry2: 'str2'}
 						});
 
 						servant.on('response', function (responseObj) {
@@ -893,7 +955,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							servant.dismiss();
 						});
 
-						servant.send({qryStr: {qry1:'str1'}});
+						servant.send({query: {qry1:'str1'}});
 					});
 				});
 
@@ -1000,12 +1062,12 @@ return /******/ (function(modules) { // webpackBootstrap
 							})
 							.send();
 
-							setTimeout(function () {
-								expect(timeoutWorks).to.be.ok;
-								done();
+						setTimeout(function () {
+							expect(timeoutWorks).to.be.ok;
+							done();
 
-								servant.dismiss();
-							}, 1500);
+							servant.dismiss();
+						}, 1500);
 					});
 
 					it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
@@ -1121,6 +1183,33 @@ return /******/ (function(modules) { // webpackBootstrap
 						}, DELAY);
 					});
 
+					it('should trigger an "onStatus" event when response is 200 ok', function (done) {
+						const servant = createServant('/blank');
+
+						servant.onStatus(200, function (responseObj) {
+							expect(responseObj.status.code).to.equal(200);
+							done();
+
+							servant.dismiss();
+						});
+						
+						servant.send();
+					});
+
+					it('should trigger an "onStatus" event when response is 404 not found', function (done) {
+						const servant = createServant('/status/404/NotFound');
+
+						servant.onStatus(404, function (responseObj) {
+							expect(responseObj.status.code).to.equal(404);
+							expect(responseObj.status.text).to.equal('NotFound');
+							done();
+
+							servant.dismiss();
+						});
+						
+						servant.send();
+					});
+
 					it('should run handlers with a default (global) context', function (done) {
 						const servant = createServant('/blank');
 
@@ -1140,7 +1229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 					it('should run handlers with a base context', function (done) {
 						const contextObj = {id: 'context'};
-						const servant = createServant('/blank', {ctx:contextObj});
+						const servant = createServant('/blank', {context:contextObj});
 
 						servant.on('load', function () {
 							expect(this.id).to.equal('context');
@@ -9534,6 +9623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		var DEFAULT_CACHE_BREAKER_KEY = _constants2.default.DEFAULT_CACHE_BREAKER_KEY;
 		var SUPPORTED_VERBS = _constants2.default.SUPPORTED_VERBS;
 		var CONSTRUCTOR_INVALID_ARGS_ERR = _constants2.default.CONSTRUCTOR_INVALID_ARGS_ERR;
+		var INVALID_STATUS_CODE_ERR = _constants2.default.INVALID_STATUS_CODE_ERR;
 		var UNKNOWN_EVENT_ERR = _constants2.default.UNKNOWN_EVENT_ERR;
 		var CALLBACK_NOT_FUNCTION_ERR = _constants2.default.CALLBACK_NOT_FUNCTION_ERR;
 		var EVENT_NAME = _constants2.default.EVENT_NAME;
@@ -9717,6 +9807,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			return typeof breaker === 'string' ? breaker : DEFAULT_CACHE_BREAKER_KEY;
 		}
 
+		function removeAllListeners(servant) {
+			var xhr = servant.xhr;
+
+			xhr && (0, _utils.forIn)(servant.events, function (eventName, eventObj) {
+				xhr.removeEventListener(eventName, eventObj.wrapper);
+			});
+		}
+
 		/* Class */
 
 		var AjaxServant = function () {
@@ -9735,10 +9833,10 @@ return /******/ (function(modules) { // webpackBootstrap
 				this.events = {};
 				this.baseUrl = baseUrl;
 				this.verb = verb.toUpperCase();
-				this.ctx = options.ctx;
+				this.ctx = options.context;
 				this.timeout = options.timeout;
 				this.baseHeaders = options.headers;
-				this.baseQryStr = options.qryStr;
+				this.baseQryStr = options.query;
 				this.async = isNotUndefined(options.async) ? options.async : true;
 				this.cacheBreaker = resolveCacheBreakerKey(options.cacheBreaker);
 			}
@@ -9746,7 +9844,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			_createClass(AjaxServant, [{
 				key: 'on',
 				value: function on(eventName, ctx, cbFn) {
-					this.xhr = getXhr(this);
+					var nativeName = eventsDictionary.resolve(eventName);
+					if (!nativeName) {
+						throw new TypeError(UNKNOWN_EVENT_ERR);
+					}
 
 					// shift args: no ctx
 					if (!cbFn && typeof ctx === 'function') {
@@ -9754,14 +9855,11 @@ return /******/ (function(modules) { // webpackBootstrap
 						ctx = this.ctx;
 					}
 
-					// validate eventName
-					var nativeName = eventsDictionary.resolve(eventName);
-					if (!nativeName || typeof cbFn !== 'function') {
-						if (!nativeName) {
-							throw new TypeError(UNKNOWN_EVENT_ERR);
-						}
+					if (typeof cbFn !== 'function') {
 						throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
 					}
+
+					this.xhr = getXhr(this);
 
 					// get or create eventObj
 					var eventObj = this.events[nativeName] || createEventObj(this, nativeName);
@@ -9775,19 +9873,44 @@ return /******/ (function(modules) { // webpackBootstrap
 					return this;
 				}
 			}, {
+				key: 'onStatus',
+				value: function onStatus(statusCode, ctx, cbFn) {
+					if (typeof statusCode !== 'number') {
+						throw new TypeError(INVALID_STATUS_CODE_ERR);
+					}
+
+					// shift args: no ctx
+					if (!cbFn && typeof ctx === 'function') {
+						cbFn = ctx;
+						ctx = this.ctx;
+					}
+
+					if (typeof cbFn !== 'function') {
+						throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
+					}
+
+					this.on('load', ctx, function statusWrapper(responseObj, servant, ajaxEvent) {
+						if (responseObj.status.code === statusCode) {
+							cbFn.apply(ctx, [responseObj, servant, ajaxEvent]);
+						}
+					});
+
+					return this;
+				}
+			}, {
 				key: 'send',
 				value: function send() {
 					var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
 					var params = _ref.params;
-					var qryStr = _ref.qryStr;
+					var query = _ref.query;
 					var headers = _ref.headers;
 					var body = _ref.body;
 
 					var xhr = this.xhr = getXhr(this);
 
 					var verb = this.verb;
-					var url = (0, _resolveUrl2.default)(this, params, qryStr);
+					var url = (0, _resolveUrl2.default)(this, params, query);
 
 					headers = (0, _utils.copy)(this.baseHeaders, headers);
 					body = prepareBody(body, verb);
@@ -9820,11 +9943,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				value: function dismiss() {
 					this.abort();
 
-					var xhr = this.xhr;
-
-					xhr && (0, _utils.forIn)(this.events, function (eventName, eventObj) {
-						xhr.removeEventListener(eventName, eventObj.wrapper);
-					});
+					removeAllListeners(this);
 
 					this.xhr = null;
 					this.events = {};
@@ -9850,19 +9969,25 @@ return /******/ (function(modules) { // webpackBootstrap
 		Object.defineProperty(exports, "__esModule", {
 			value: true
 		});
-		var DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
-		var SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE'];
+		// method Signatures
 		var CONSTRUCTOR_SIGNATURE = 'new AjaxServant(verb, url, options)';
-		var DOT_ON_SIGNATURE = 'AjaxServant.on(eventName, optionalContext, eventHandler)';
-		var CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;
-		var UNKNOWN_EVENT_ERR = 'An unknown XMLHttpRequest eventName: ' + DOT_ON_SIGNATURE;
-		var CALLBACK_NOT_FUNCTION_ERR = 'eventHandler should be a function: ' + DOT_ON_SIGNATURE;
+		var ON_SIGNATURE = 'servant.on(eventName, optionalContext, eventHandler)';
+		var ON_STATUS_SIGNATURE = 'servant.onStatus(statusCode, optionalContext, eventHandler)';
 
+		// error messages
+		var CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings as first parmeters: an HTTP verb and a base-URL: ' + CONSTRUCTOR_SIGNATURE;
+		var UNKNOWN_EVENT_ERR = 'An unknown XMLHttpRequest event name: ' + ON_SIGNATURE;
+		var CALLBACK_NOT_FUNCTION_ERR = '"eventHandler" should be a function: ' + ON_SIGNATURE;
+		var INVALID_STATUS_CODE_ERR = '"statusCode" should be a number: ' + ON_STATUS_SIGNATURE;
+
+		//
+		var DEFAULT_CACHE_BREAKER_KEY = 'timestamp';
+		var SUPPORTED_VERBS = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'];
 		var DEFAULT_OPTIONS = {
 			timeout: 0,
 			async: true,
-			ctx: null,
-			qryStr: null,
+			context: null,
+			query: null,
 			headers: null,
 			cacheBreaker: false
 		};
@@ -9883,6 +10008,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			DEFAULT_CACHE_BREAKER_KEY: DEFAULT_CACHE_BREAKER_KEY,
 			SUPPORTED_VERBS: SUPPORTED_VERBS,
 			CONSTRUCTOR_INVALID_ARGS_ERR: CONSTRUCTOR_INVALID_ARGS_ERR,
+			INVALID_STATUS_CODE_ERR: INVALID_STATUS_CODE_ERR,
 			UNKNOWN_EVENT_ERR: UNKNOWN_EVENT_ERR,
 			CALLBACK_NOT_FUNCTION_ERR: CALLBACK_NOT_FUNCTION_ERR,
 			EVENT_NAME: EVENT_NAME
@@ -9960,7 +10086,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  \********************************/
 	/***/ function(module, exports) {
 
-		"use strict";
+		'use strict';
 
 		Object.defineProperty(exports, "__esModule", {
 			value: true
@@ -9975,7 +10101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					text: xhr.statusText
 				},
 				headers: headersObj,
-				body: xhr.responseText || xhr.responseXML
+				body: xhr.responseText || xhr.responseXML || ''
 			};
 		};
 

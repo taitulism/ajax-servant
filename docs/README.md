@@ -24,6 +24,7 @@ Bind Events
 -----------
 ```js
 servant.on(XHREventName, optionalContext, callback);
+servant.onStatus(statusCode, optionalContext, callback);
 ```
 [Read more about "Events"](./events.md)
 
@@ -37,7 +38,7 @@ Aborting a request is done with an `.abort()` call.
 ```js
 var dynamicDataObj = {
 	params  : ['param1', 'param2'], // -> <Base URL>/param1/param2
-	qryStr   : {query: 'string'},
+	query   : {query: 'string'},
 	headers : {key: 'value'},
 	body    : '*'
 }

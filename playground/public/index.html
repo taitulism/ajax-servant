@@ -83,14 +83,24 @@
 			}
 		}
 
-		var servant = new AjaxServant.default('GET','/test', opts);
+		var servant = new AjaxServant.default('GET','/test/request', opts);
 
 		servant
 			.on('timeout', function (servant, ajaxEvent) {
 				console.log('timeout:', ajaxEvent)
 			})
+			.onStatus(200, 'sss', function (response, servant, ajaxEvent) {
+				console.log(this)
+			})
 			.on('load', function (response, servant, ajaxEvent) {
-				console.log('load:', (response.body.length < 200) ? response.body : '<long response...>')
+				const resp = (response.body.length < 200) 
+					? (response.body || '<empty response>')
+					: '<long response...>';
+					
+				console.log('load:', resp)
+			})
+			.onStatus(500, function (response, servant, ajaxEvent) {
+				console.log(response.status)
 			})
 			.on('error', (response, servant, ajaxEvent) => {
 				console.log('error')

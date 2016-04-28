@@ -1,3 +1,3 @@
 module.exports = function (io) {
-	io.res.end('BTS');
+	io.res.end('default');
 };

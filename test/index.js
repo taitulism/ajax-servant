@@ -3,8 +3,9 @@ var AjaxServant = require('../dist/ajax-servant.bundle').default;
 
 const DELAY = 250;
 const CONSTRUCTOR_INVALID_ARGS_ERR = 'AjaxServant requires two strings';
-const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest eventName:';
-const CALLBACK_NOT_FUNCTION_ERR    = 'eventHandler should be a function:';
+const UNKNOWN_EVENT_ERR            = 'An unknown XMLHttpRequest event name:';
+const INVALID_STATUS_CODE_ERR      = '"statusCode" should be a number:';
+const CALLBACK_NOT_FUNCTION_ERR    = '"eventHandler" should be a function:';
 const LOCAL_TEST_SERVER_URL        = 'http://localhost:8081/test';
 
 const noopFn = function emptyHandler () {};
@@ -197,6 +198,67 @@ describe('AjaxServant', function() {
 			});
 		});
 
+		describe('.onStatus()', function () {
+			it('should throw an error when called with invalid status code', function () {
+				const servant =	createServant();
+
+				try {
+					servant.onStatus('not a status code', noopFn);
+				}
+				catch (err) {
+					expect(err.name).to.equal('TypeError');
+					expect(err.message).to.contain(INVALID_STATUS_CODE_ERR);
+				}
+			});
+
+			it('should throw an error when called with invalid callback function', function () {
+				const servant =	createServant();
+
+				try {
+					servant.onStatus(200, 'not a function');
+				}
+				catch (err) {
+					expect(err.name).to.equal('TypeError');
+					expect(err.message).to.contain(CALLBACK_NOT_FUNCTION_ERR);
+				}
+			});
+
+			it('should bind a "load" event handler', function () {
+				const servant = createServant();
+				
+				servant.onStatus(200, noopFn);
+
+				expect(servant.events).to.have.property('load');
+				expect(servant.events.load).to.have.property('queue');
+				expect(servant.events.load).to.have.property('wrapper');
+				expect(servant.events.load.queue.length).to.equal(1);
+				expect(servant.events.load.queue[0]).to.have.property('ctx');
+				expect(servant.events.load.queue[0].ctx).to.be.a('null');
+				expect(servant.events.load.queue[0].fn.name).to.equal('statusWrapper');
+				expect(servant.events.load.wrapper).to.be.a('function');
+
+				servant.dismiss();
+			});
+
+			it('should bind a "load" event handler with a context', function () {
+				const servant = createServant();
+				const contextObj = {id: 'context'};
+				
+				servant.onStatus(200, contextObj, noopFn);
+
+				expect(servant.events).to.have.property('load');
+				expect(servant.events.load).to.have.property('queue');
+				expect(servant.events.load).to.have.property('wrapper');
+				expect(servant.events.load.queue.length).to.equal(1);
+				expect(servant.events.load.queue[0]).to.have.property('ctx');
+				expect(servant.events.load.queue[0].ctx).to.equal(contextObj);
+				expect(servant.events.load.queue[0].fn.name).to.equal('statusWrapper');
+				expect(servant.events.load.wrapper).to.be.a('function');
+
+				servant.dismiss();
+			});
+		});
+
 		describe('.send()', function () {
 			it('should send a blank request when invoked with no arguments', function (done) {
 				const servant = createServant('/blank');
@@ -301,8 +363,8 @@ describe('AjaxServant', function() {
 
 			describe('qryStr', function () {
 				it('should send a base queryString to the server', function (done) {
-					const qryStr = {'qry':'str'};
-					const servant = createServant('/request', {qryStr});
+					const qryStr = {'query':'str'};
+					const servant = createServant('/request', {query: qryStr});
 
 					servant.on('response', function (responseObj) {
 						const requestObj = getRequestObj(responseObj);
@@ -329,14 +391,14 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr});
+					servant.send({query:qryStr});
 				});
 
 				it('should send both base and dynamic queryString', function (done) {
 					const qry1 = {'qry1':'str1'};
 					const qry2 = {'qry2':'str2'};
 
-					const servant = createServant('/request', {qryStr: qry1});
+					const servant = createServant('/request', {query: qry1});
 
 					servant.on('response', function (responseObj) {
 						const requestObj = getRequestObj(responseObj);
@@ -347,7 +409,7 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr: qry2});
+					servant.send({query: qry2});
 				});
 			});
 
@@ -409,7 +471,7 @@ describe('AjaxServant', function() {
 				it('should send a cacheBreaker with base queryString', function (done) {
 					const servant = createServant('/request', {
 						cacheBreaker: true,
-						qryStr: {qry:'str'}
+						query: {qry:'str'}
 					});
 
 					servant.on('response', function (responseObj) {
@@ -448,13 +510,13 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr: {qry:'str'}});
+					servant.send({query: {qry:'str'}});
 				});
 
 				it('should send a cacheBreaker with both base and dynamic queryString', function (done) {
 					const servant = createServant('/blank', {
 						cacheBreaker: true,
-						qryStr: {qry1:'str1'}
+						query: {qry1:'str1'}
 					});
 
 					servant.on('response', function (responseObj) {
@@ -464,13 +526,13 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr: {qry2:'str2'}});
+					servant.send({query: {qry2:'str2'}});
 				});
 
 				it('should send a cacheBreaker with both base and dynamic queryString and URL params', function (done) {
 					const servant = createServant('/request', {
 						cacheBreaker: true,
-						qryStr: {qry2: 'str2'}
+						query: {qry2: 'str2'}
 					});
 
 					servant.on('response', function (responseObj) {
@@ -489,7 +551,7 @@ describe('AjaxServant', function() {
 						servant.dismiss();
 					});
 
-					servant.send({qryStr: {qry1:'str1'}});
+					servant.send({query: {qry1:'str1'}});
 				});
 			});
 
@@ -596,12 +658,12 @@ describe('AjaxServant', function() {
 						})
 						.send();
 
-						setTimeout(function () {
-							expect(timeoutWorks).to.be.ok;
-							done();
+					setTimeout(function () {
+						expect(timeoutWorks).to.be.ok;
+						done();
 
-							servant.dismiss();
-						}, 1500);
+						servant.dismiss();
+					}, 1500);
 				});
 
 				it('should trigger "loadstart", "load", "loadend" events on a standard request', function (done) {
@@ -695,7 +757,7 @@ describe('AjaxServant', function() {
 						eventsLog += 'b';
 					});
 
-					servant.on('load', function (r) {
+					servant.on('load', function () {
 						eventsLog += 'X';
 					});
 
@@ -717,6 +779,33 @@ describe('AjaxServant', function() {
 					}, DELAY);
 				});
 
+				it('should trigger an "onStatus" event when response is 200 ok', function (done) {
+					const servant = createServant('/blank');
+
+					servant.onStatus(200, function (responseObj) {
+						expect(responseObj.status.code).to.equal(200);
+						done();
+
+						servant.dismiss();
+					});
+					
+					servant.send();
+				});
+
+				it('should trigger an "onStatus" event when response is 404 not found', function (done) {
+					const servant = createServant('/status/404/NotFound');
+
+					servant.onStatus(404, function (responseObj) {
+						expect(responseObj.status.code).to.equal(404);
+						expect(responseObj.status.text).to.equal('NotFound');
+						done();
+
+						servant.dismiss();
+					});
+					
+					servant.send();
+				});
+
 				it('should run handlers with a default (global) context', function (done) {
 					const servant = createServant('/blank');
 
@@ -736,7 +825,7 @@ describe('AjaxServant', function() {
 
 				it('should run handlers with a base context', function (done) {
 					const contextObj = {id: 'context'};
-					const servant = createServant('/blank', {ctx:contextObj});
+					const servant = createServant('/blank', {context:contextObj});
 
 					servant.on('load', function () {
 						expect(this.id).to.equal('context');

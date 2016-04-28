@@ -1,7 +1,9 @@
+const $path       = require('path');
 const send        = require('send');
 const serveStatic = require('serve-static');
 
-const serve = serveStatic(`../${__dirname}/public`, {'index': false});
+const publicPath = $path.resolve(`${__dirname}`, '../public');
+const serve      = serveStatic(publicPath, {'index': false});
 
 module.exports = function (io) {
 	const req = io.req;
@@ -9,6 +11,7 @@ module.exports = function (io) {
 
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, hdr-A, hdr-B');
+
 
 	if (req.url === '/favicon.ico') {
 		res.end();

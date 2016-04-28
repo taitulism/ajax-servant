@@ -10,6 +10,7 @@ const {
 	DEFAULT_CACHE_BREAKER_KEY,
 	SUPPORTED_VERBS,
 	CONSTRUCTOR_INVALID_ARGS_ERR,
+	INVALID_STATUS_CODE_ERR,
 	UNKNOWN_EVENT_ERR,
 	CALLBACK_NOT_FUNCTION_ERR,
 	EVENT_NAME
@@ -186,6 +187,14 @@ function resolveCacheBreakerKey (breaker) {
 	return (typeof breaker === 'string') ? breaker : DEFAULT_CACHE_BREAKER_KEY;
 }
 
+function removeAllListeners (servant) {
+	const xhr = servant.xhr;
+
+	xhr && forIn(servant.events, (eventName, eventObj) => {
+		xhr.removeEventListener(eventName, eventObj.wrapper);
+	});
+}
+
 
 
 
@@ -203,31 +212,31 @@ class AjaxServant {
 		this.events       = {};
 		this.baseUrl      = baseUrl;
 		this.verb         = verb.toUpperCase();
-		this.ctx          = options.ctx;
+		this.ctx          = options.context;
 		this.timeout      = options.timeout;
 		this.baseHeaders  = options.headers;
-		this.baseQryStr   = options.qryStr;
+		this.baseQryStr   = options.query;
 		this.async        = isNotUndefined(options.async) ? options.async : true;
 		this.cacheBreaker = resolveCacheBreakerKey(options.cacheBreaker);
 	}
 
 	on (eventName, ctx, cbFn) {
-		this.xhr = getXhr(this);
+		const nativeName = eventsDictionary.resolve(eventName);
+		if (!nativeName) {
+			throw new TypeError(UNKNOWN_EVENT_ERR);
+		}
 
 		// shift args: no ctx
 		if (!cbFn && typeof ctx === 'function') {
 			cbFn = ctx;
-			ctx = this.ctx;
+			ctx  = this.ctx;
 		}
 
-		// validate eventName
-		const nativeName = eventsDictionary.resolve(eventName);
-		if (!nativeName || typeof cbFn !== 'function') {
-			if (!nativeName) {
-				throw new TypeError(UNKNOWN_EVENT_ERR);
-			}
+		if (typeof cbFn !== 'function') {
 			throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
 		}
+
+		this.xhr = getXhr(this);
 
 		// get or create eventObj
 		const eventObj = this.events[nativeName] || createEventObj(this, nativeName);
@@ -241,11 +250,35 @@ class AjaxServant {
 		return this;
 	}
 
-	send ({params, qryStr, headers, body} = {}) {
+	onStatus (statusCode, ctx, cbFn) {
+		if (typeof statusCode !== 'number') {
+			throw new TypeError(INVALID_STATUS_CODE_ERR);
+		}
+
+		// shift args: no ctx
+		if (!cbFn && typeof ctx === 'function') {
+			cbFn = ctx;
+			ctx  = this.ctx;
+		}
+
+		if (typeof cbFn !== 'function') {
+			throw new TypeError(CALLBACK_NOT_FUNCTION_ERR);
+		}
+
+		this.on('load', ctx, function statusWrapper (responseObj, servant, ajaxEvent) {
+			if (responseObj.status.code === statusCode) {
+				cbFn.apply(ctx, [responseObj, servant, ajaxEvent]);
+			}
+		});
+		
+		return this;
+	}
+
+	send ({params, query, headers, body} = {}) {
 		const xhr = this.xhr = getXhr(this);
 
 		const verb = this.verb;
-		const url  = resolveUrl(this, params, qryStr);
+		const url  = resolveUrl(this, params, query);
 		
 		headers = copy(this.baseHeaders, headers);
 		body    = prepareBody(body, verb);
@@ -276,11 +309,7 @@ class AjaxServant {
 	dismiss () {
 		this.abort();
 
-		const xhr = this.xhr;
-
-		xhr && forIn(this.events, (eventName, eventObj) => {
-			xhr.removeEventListener(eventName, eventObj.wrapper);
-		});
+		removeAllListeners(this);
 
 		this.xhr    = null;
 		this.events = {};
