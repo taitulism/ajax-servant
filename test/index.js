@@ -757,7 +757,7 @@ describe('AjaxServant', function() {
 						eventsLog += 'b';
 					});
 
-					servant.on('load', function (r) {
+					servant.on('load', function () {
 						eventsLog += 'X';
 					});
 
